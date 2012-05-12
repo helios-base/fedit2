@@ -1,32 +1,37 @@
+2012-05-12  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* configure.ac:
+	- autoconfマクロの宣言順の不備を修正
+
 2012-02-13  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/main_window.cpp:
-	- �����������Υ��������򤫤�KNN��CDT����
+	- 新規作成時のタイプ選択からKNNとCDTを削除
 
 2011-06-21  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* tool/Makefile.am:
-	- average_formation�򥤥󥹥ȡ��륿�����åȤ��ѹ�
+	- average_formationをインストールターゲットに変更
 
 	* src/edit_canvas.cpp:
-	- ����ɽ���Υե����᡼�����ǡ����Υ���ǥå����ֹ椬0����Ϥޤ�
-	�褦���ѹ�
+	- 背面表示のフォーメーションデータのインデックス番号が0から始まる
+	ように変更
 
 2011-06-07  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_canvas.cpp:
 	* src/sample_view.cpp:
-	- ɽ�������ǡ����Υ���ǥå�����0����Ϥޤ�褦���ѹ�
+	- 表示されるデータのインデックスが0から始まるように変更
 
 2011-06-04  Tomoharu NAKASHIMA  <nakashi@cs.osakafu-u.ac.jp>
 
 	* tool/Makefile.am:
-	- typo �ν���
+	- typo の修正
 
 2011-05-31  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* configure.ac:
-	- clang�饤�֥��Υ����å����ɲ�
+	- clangライブラリのチェックを追加
 
 2010-09-01  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
@@ -43,8 +48,8 @@
 	* src/fedit2.ico:
 	* src/main_window.cpp:
 	* rcsc/rcsc.pro:
-	- Qt+MinGW�Ķ��Ѥ�.pro�ե����������ʪ���ɲá�
-	- ����������ѹ���
+	- Qt+MinGW環境用の.proファイルを配布物へ追加．
+	- アイコンを変更．
 
 2010-08-31  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
@@ -56,12 +61,12 @@
 	* src/src.pro:
 	* Makefile.am:
 	* src/Makefile.am:
-	- MinGW�Ķ��ǤΥӥ��������ɲá�
+	- MinGW環境でのビルド設定を追加．
 
 2010-08-30  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* configure.ac:
-	- cppunit�Υ����å�����
+	- cppunitのチェックを削除
 
 2010-08-27  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
@@ -71,10 +76,10 @@
 	- initial release candidate.
 
 	* m4/ax_boost_base.m4:
-	- �ǿ��Υޥ����˹���
+	- 最新のマクロに更新
 
 	* src/main_window.cpp:
-	- ��������Ƥ��ʤ���˥塼��õ�
+	- 実装されていないメニューを消去
 
 	* tool/average_formation.cpp:
 	- fixed typo
@@ -82,8 +87,8 @@
 2010-06-19  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_canvas.cpp:
-	- �Хå����饦��ɥǡ����λ��ѷ�ʬ��򻲾Ȥ��٤��Ȥ������̾�ǡ�
-	���λ��ѷ�ʬ��򻲾Ȥ��Ƥ����Х���������
+	- バックグラウンドデータの三角形分割を参照しべきところを，通常デー
+	タの三角形分割を参照していたバグを修正した
 
 2010-06-02  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
@@ -92,13 +97,13 @@
 	* Makefile.am:
 	* configure.ac:
 	* src/Makefile.am:
-	- 2�ĤΥե����᡼���������ե����뤫�顤ʿ���ͤ���ե����᡼����
-	���������������ե�����ǡ�������Ϥ��륳�ޥ�ɥ饤��ġ�����ɲ�
-	����
+	- 2つのフォーメーション設定ファイルから，平均値を取るフォーメーショ
+	ンを生成し，設定ファイルデータを出力するコマンドラインツールを追加
+	した
 
 	* src/edit_data.cpp:
-	- �Хå����åץե������̿̾��ˡ���ѹ����������ॹ����פ������ˤ�
-	����褦�ˤ���
+	- バックアップファイルの命名方法を変更し，タイムスタンプを末尾につ
+	けるようにした
 
 2010-01-29  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
@@ -106,8 +111,8 @@
 	* configure.ac:
 	* m4/qt.m4:
 	* reconfig.sh:
-	- qt.m4�򹹿�
-	- ibrcsc�Υ������ѥ����ɲ�
+	- qt.m4を更新
+	- ibrcscのサーチパスを追加
 
 2009-09-14  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
@@ -119,20 +124,20 @@
 2009-08-07  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/main.cpp:
-	- ���ԡ��饤�Ƚ��Ϥ��ɲ�
+	- コピーライト出力を追加
 
 2009-06-17  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_canvas.cpp:
 	* src/edit_data.cpp:
-	- �Ť�cdt�饤�֥��Υإå����󥯥롼�ɤ���
+	- 古いcdtライブラリのヘッダインクルードを削除
 
 2009-05-19  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_canvas.cpp:
 	* src/edit_data.cpp:
 	* src/edit_data.h:
-	- ���ѷ�ʬ��򿷤���Triangulation�饤�֥���Ȥäƺ��ľ������
+	- 三角形分割を新しいTriangulationライブラリを使って作り直した．
 
 2009-05-04  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
