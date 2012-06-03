@@ -1,3 +1,10 @@
+2012-06-03  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/edit_data.cpp:
+	* src/edit_data.h:
+	* src/main_window.cpp:
+	- ファイルセーブ時に日時をコメントとしてファイル先頭に書き込む機能を追加
+
 2012-05-12  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* configure.ac:

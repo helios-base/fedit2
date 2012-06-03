@@ -64,6 +64,7 @@ private:
 
     QString M_filepath;
     bool M_conf_changed;
+    QString M_saved_datetime;
 
     rcsc::formation::SampleData M_state; //!< current state on the edit canvas.
 

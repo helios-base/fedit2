@@ -165,7 +165,15 @@ EditData::backup( const QString & filepath )
     }
 
     QString backup_filepath = filepath;
-    backup_filepath += QDateTime::currentDateTime().toString( QString( ".yyyyMMdd-hhmmss" ) );
+    if ( M_saved_datetime.isEmpty() )
+    {
+        backup_filepath += QDateTime::currentDateTime().toString( QString( ".yyyyMMdd-hhmmss" ) );
+    }
+    else
+    {
+        backup_filepath += QString( "." );
+        backup_filepath += M_saved_datetime;
+    }
 
     if ( ! QFile::copy( filepath, backup_filepath ) )
     {
@@ -337,6 +345,8 @@ EditData::saveConfAs( const QString & filepath )
         return false;
     }
 
+    M_saved_datetime = QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
+
     if ( Options::instance().autoBackup() )
     {
         backup( M_filepath );
@@ -348,6 +358,8 @@ EditData::saveConfAs( const QString & filepath )
         fout.close();
         return false;
     }
+
+    M_formation->printComment( fout, M_saved_datetime.toStdString() );
 
     if ( ! M_formation->print( fout ) )
     {
