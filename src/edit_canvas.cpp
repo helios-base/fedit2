@@ -305,7 +305,6 @@ EditCanvas::drawField( QPainter & painter )
                               ServerParam::DEFAULT_GOAL_WIDTH ),
                       Qt::black );
 
-
     if ( Options::instance().antialiasing() )
     {
         setAntialiasFlag( painter, true );
@@ -734,11 +733,9 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
     const double max_accel = ServerParam::i().maxDashPower() * ServerParam::i().defaultDashPowerRate() * ServerParam::i().defaultEffortMax();
     const double decay = ServerParam::i().defaultPlayerDecay();
 
-    // const QColor base_color( M_field_color.red(), M_field_color.green(), M_field_color.blue(),
-    //                          192 ); // transparency
+    const QTransform transform = painter.worldTransform();
     const QColor base_color = M_field_color;
-
-    painter.setPen( Qt::black );
+    // base_color.setAlphaF( 0.2 );
 
     double radius[10];
 
@@ -753,6 +750,7 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
         radius[i] = dist + catch_area;
     }
 
+    painter.setPen( Qt::black );
     for ( int i = 9; i >= 0; --i )
     {
         painter.setBrush( base_color.darker( 300 - 20*i ) );
@@ -761,6 +759,18 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
                                      radius[i]*2.0,
                                      radius[i]*2.0 ) );
     }
+
+    painter.setPen( Qt::white );
+    painter.setWorldMatrixEnabled( false );
+    for ( int i = 0; i < 10; ++i )
+    {
+        QString str = QString::number( i + 1 );
+        painter.drawText( transform.map( QPointF( goalie_pos.x - radius[i], goalie_pos.y ) ), str );
+        painter.drawText( transform.map( QPointF( goalie_pos.x + radius[i], goalie_pos.y ) ), str );
+        painter.drawText( transform.map( QPointF( goalie_pos.x, goalie_pos.y - radius[i] ) ), str );
+        painter.drawText( transform.map( QPointF( goalie_pos.x, goalie_pos.y + radius[i] ) ), str );
+    }
+    painter.setWorldMatrixEnabled( true );
 }
 
 /*-------------------------------------------------------------------*/
@@ -1032,11 +1042,6 @@ EditCanvas::setFocusPoint( const QPoint & pos )
                     ServerParam::DEFAULT_PITCH_WIDTH ) );
 
     double s = M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length();
-
-    std::cerr << "setFocusPoint pos=(" << p.x() << ", " << p.y() << ")" << std::endl;
-    std::cerr << "setFocusPoint new_translate=("
-              << this->width()*0.5 - p.x()*s << ", "
-              << this->height()*0.5 - p.y()*s << ")" <<  std::endl;
 
     M_transform.reset();
     M_transform.translate( this->width()*0.5 - p.x()*s,

@@ -1113,7 +1113,7 @@ MainWindow::saveChanges()
     {
         if ( M_edit_data->isConfChanged() )
         {
-            std::cerr << "saveChanges() saveConf" << std::endl;
+            std::cerr << "(MainWindow::saveChanges)" << std::endl;
             saveConf();
         }
     }
@@ -1128,7 +1128,7 @@ MainWindow::saveChanges()
 bool
 MainWindow::openConfFile( const QString & filepath )
 {
-    std::cerr << "MainWindow::openConfFile() " << filepath.toStdString()
+    std::cerr << "(MainWindow::openConfFile) " << filepath.toStdString()
               << std::endl;
 
     if ( filepath.isEmpty() )
@@ -1204,7 +1204,7 @@ MainWindow::openConfFile( const QString & filepath )
 bool
 MainWindow::openBackgroundConfFile( const QString & filepath )
 {
-    std::cerr << "MainWindow::openBackgroundConfFile() " << filepath.toStdString()
+    std::cerr << "(MainWindow::openBackgroundConfFile) " << filepath.toStdString()
               << std::endl;
 
     if ( ! M_edit_data )
@@ -1271,7 +1271,7 @@ MainWindow::openBackgroundConfFile( const QString & filepath )
 bool
 MainWindow::openDataFile( const QString & filepath )
 {
-    std::cerr << "MainWindow::openDataFile() " << filepath.toStdString()
+    std::cerr << "(MainWindow::openDataFile) " << filepath.toStdString()
               << std::endl;
 
     if ( filepath.isEmpty() )
@@ -1690,7 +1690,7 @@ MainWindow::setConstraintEditMode( bool on )
 void
 MainWindow::addData()
 {
-    std::cerr << "addData" << std::endl;
+    std::cerr << "(MainWindow::addData)" << std::endl;
     if ( ! M_edit_data
          || ! M_edit_data->samples() )
     {
@@ -1721,7 +1721,7 @@ MainWindow::addData()
 void
 MainWindow::insertData()
 {
-    std::cerr << "insertData" << std::endl;
+    std::cerr << "(MainWindow::insertData)" << std::endl;
     if ( ! M_edit_data
          || ! M_edit_data->samples() )
     {
@@ -1754,7 +1754,7 @@ MainWindow::insertData()
 void
 MainWindow::replaceData()
 {
-    std::cerr << "replaceData" << std::endl;
+    std::cerr << "(MainWindow::replaceData)" << std::endl;
     if ( ! M_edit_data
          || ! M_edit_data->samples() )
     {
@@ -1831,7 +1831,7 @@ void
 MainWindow::changeSampleIndex( int old_visual_index,
                                int new_visual_index )
 {
-    std::cerr << "changeSampleIndex "
+    std::cerr << "(MainWindow::changeSampleIndex)"
               << " old_vis_idx=" << old_visual_index
               << " new_vis_idx=" << new_visual_index << std::endl;
     if ( ! M_edit_data
@@ -1864,7 +1864,7 @@ MainWindow::changeSampleIndex( int old_visual_index,
 void
 MainWindow::reverseY()
 {
-    std::cerr << "reverseY" << std::endl;
+    std::cerr << "(MainWindow::reverseY)" << std::endl;
     if ( M_edit_data )
     {
         M_edit_data->reverseY();
@@ -1879,7 +1879,7 @@ MainWindow::reverseY()
 void
 MainWindow::train()
 {
-    std::cerr << "train" << std::endl;
+    std::cerr << "(MainWindow::train)" << std::endl;
     if ( ! M_edit_data
          || ! M_edit_data->samples() )
     {
@@ -2117,7 +2117,7 @@ MainWindow::selectSampleVisualIndex( int value )
 void
 MainWindow::deleteSample( int index )
 {
-    std::cerr << "deleteSample index=" << index << std::endl;
+    std::cerr << "(MainWindow::deleteSample) index=" << index << std::endl;
 
     SampleDataSet::ErrorType err = M_edit_data->deleteData( index );
     if ( err != SampleDataSet::NO_ERROR )
@@ -2146,7 +2146,7 @@ MainWindow::replaceBall( int index,
                          double x,
                          double y )
 {
-    std::cerr << "replaceBall index=" << index
+    std::cerr << "(MainWindow::replaceBall) index=" << index
               << " (" << x << " , " << y << ")" << std::endl;
 
     if ( ! M_edit_data )
@@ -2181,7 +2181,7 @@ MainWindow::replacePlayer( int index,
                            double x,
                            double y )
 {
-    std::cerr << "replacePlayer index=" << index
+    std::cerr << "(MainWindow::replacePlayer) index=" << index
               << " unum=" << unum
               << " (" << x << " , " << y << ")" << std::endl;
 
@@ -2215,7 +2215,7 @@ void
 MainWindow::deleteConstraint( int origin_idx,
                               int terminal_idx )
 {
-    std::cerr << "deleteConstraint"
+    std::cerr << "(MainWindow::deleteConstraint)"
               << " origin=" << origin_idx
               << " terminal=" << terminal_idx << std::endl;
 
@@ -2240,7 +2240,7 @@ MainWindow::replaceConstraint( int idx,
                                int origin_idx,
                                int terminal_idx )
 {
-    std::cerr << "ReplaceConstraint idx=" << idx
+    std::cerr << "(MainWindow::ReplaceConstraint) idx=" << idx
               << " origin=" << origin_idx
               << " terminal=" << terminal_idx << std::endl;
 
@@ -2306,7 +2306,7 @@ void
 MainWindow::showConstraintEditDialog( int first_index,
                                       int second_index )
 {
-    std::cerr << "showConstraintEditDialog"
+    std::cerr << "(MainWindow::showConstraintEditDialog)"
               << " first=" << first_index << " second=" << second_index
               << std::endl;
 

@@ -2,6 +2,7 @@
 
 	* src/edit_canvas.cpp:
 	- 拡大縮小操作時にフォーカス位置がずれていたバグを修正
+	- キーパーの移動範囲円周上にインデックス番号描画を追加
 
 	* src/edit_canvas.cpp:
 	* src/edit_canvas.h:
@@ -11,6 +12,13 @@
 	* src/options.h:
 	- ゴール隅へシュートを撃たれた場合のボールの移動予測位置表示機能を追加
 	- キーパーの移動範囲円表示機能を追加．初速と体の向きは考慮していない
+
+2012-06-03  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/edit_data.cpp:
+	* src/edit_data.h:
+	* src/main_window.cpp:
+	- ファイルセーブ時に日時をコメントとしてファイル先頭に書き込む機能を追加
 
 2012-05-12  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
