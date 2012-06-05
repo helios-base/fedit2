@@ -656,7 +656,7 @@ EditCanvas::drawShootLines( QPainter & painter )
     painter.setBrush( Qt::NoBrush );
 
     const Vector2D ball = ptr->state().ball_;
-    const double goal_line_x = -ServerParam::i().pitchHalfLength();
+    const double goal_line_x = -ServerParam::i().pitchHalfLength() - 0.1;
     const double goal_half_width = ServerParam::i().goalHalfWidth();
     const double bdecay = ServerParam::i().ballDecay();
 
@@ -669,6 +669,8 @@ EditCanvas::drawShootLines( QPainter & painter )
     Vector2D ball_vel = Vector2D( goal_line_x, -goal_half_width ) - ball_pos;
     ball_vel.setLength( ServerParam::i().ballSpeedMax() );
 
+    const int left_angle = qRound( ball_vel.th().degree() * -16 );
+    int max_count = 0;
     int count = 1;
     while ( ball_pos.x > goal_line_x )
     {
@@ -686,11 +688,13 @@ EditCanvas::drawShootLines( QPainter & painter )
             break;
         }
     }
+    max_count = std::max( max_count, count - 1 );
 
     ball_pos = ball;
     ball_vel = Vector2D( goal_line_x, +goal_half_width ) - ball_pos;
     ball_vel.setLength( ServerParam::i().ballSpeedMax() );
 
+    const int right_angle = qRound( ball_vel.th().degree() * -16 );
     count = 1;
     while ( ball_pos.x > goal_line_x )
     {
@@ -707,6 +711,20 @@ EditCanvas::drawShootLines( QPainter & painter )
         {
             break;
         }
+    }
+    max_count = std::max( max_count, count - 1 );
+
+    int span_angle = 360*16 + ( right_angle - left_angle );
+    if ( span_angle > 360*16 ) span_angle -= 360*16;
+
+    double ball_move = 0.0;
+    double ball_speed = ServerParam::i().ballSpeedMax();
+    for ( int i = 0; i < max_count; ++i )
+    {
+        ball_move += ball_speed;
+        painter.drawArc( QRectF( ball.x - ball_move, ball.y - ball_move, ball_move*2, ball_move*2 ),
+                         left_angle, span_angle );
+        ball_speed *= bdecay;
     }
 }
 
