@@ -57,35 +57,37 @@ using namespace rcsc::formation;
 EditCanvas::EditCanvas( QWidget * parent )
     :
 #ifdef USE_GLWIDGET
-    QGLWidget( QGLFormat( QGL::SampleBuffers ), parent )
+    QGLWidget( QGLFormat( QGL::SampleBuffers ), parent ),
 #else
-    QWidget( parent )
+    QWidget( parent ),
 #endif
     // foreground graphic context
-    , M_field_color( 31, 160, 31 )
-    //, M_field_brush( QColor( 31, 160, 31 ), Qt::SolidPattern )
-    , M_field_dark_brush( QColor( 15, 143, 15 ), Qt::SolidPattern )
-    , M_line_pen( QColor( 255, 255, 255 ), 0, Qt::SolidLine )
-    //, M_triangle_pen( QColor( 255, 127, 0 ), 1, Qt::SolidLine )
-    , M_triangle_pen( QColor( 255, 0, 0 ), 0, Qt::SolidLine )
-    , M_constraint_pen( QColor( 255, 0, 255 ), 0, Qt::SolidLine )
-    , M_triangle_font( "Sans Serif", 10 )
-    , M_area_pen( QColor( 127, 127, 127 ), 0, Qt::SolidLine )
-    , M_ball_pen( QColor( 255, 255, 255 ), 0, Qt::SolidLine )
-    , M_ball_brush( QColor( 255, 255, 255 ), Qt::SolidPattern )
-    , M_player_pen( QColor( 0, 0, 0 ), 0, Qt::SolidLine )
-    , M_select_pen( Qt::white, 0, Qt::SolidLine )
-    , M_player_brush( QColor( 255, 215, 0 ), Qt::SolidPattern )
-    , M_symmetry_brush( QColor( 0, 255, 95 ), Qt::SolidPattern )
-    , M_player_font( "Sans Serif", 10 )
+    M_field_color( 31, 160, 31 ),
+    // M_field_brush( QColor( 31, 160, 31 ), Qt::SolidPattern ),
+    M_field_dark_brush( QColor( 15, 143, 15 ), Qt::SolidPattern ),
+    M_line_pen( QColor( 255, 255, 255 ), 0, Qt::SolidLine ),
+    // M_triangle_pen( QColor( 255, 127, 0 ), 1, Qt::SolidLine ),
+    M_triangle_pen( QColor( 255, 0, 0 ), 0, Qt::SolidLine ),
+    M_constraint_pen( QColor( 255, 0, 255 ), 0, Qt::SolidLine ),
+    M_triangle_font( "Sans Serif", 10 ),
+    M_area_pen( QColor( 127, 127, 127 ), 0, Qt::SolidLine ),
+    M_ball_pen( QColor( 255, 255, 255 ), 0, Qt::SolidLine ),
+    M_ball_brush( QColor( 255, 255, 255 ), Qt::SolidPattern ),
+    M_player_pen( QColor( 0, 0, 0 ), 0, Qt::SolidLine ),
+    M_select_pen( Qt::white, 0, Qt::SolidLine ),
+    M_player_brush( QColor( 255, 215, 0 ), Qt::SolidPattern ),
+    M_symmetry_brush( QColor( 0, 255, 95 ), Qt::SolidPattern ),
+    M_player_font( "Sans Serif", 10 ),
     // background graphic context
-    , M_background_contained_area_brush( QColor( 31, 143, 31 ), Qt::SolidPattern )
-    , M_background_triangle_pen( QColor( 0, 127, 255 ), 0, Qt::SolidLine )
-    , M_background_player_pen( QColor( 127, 127, 127 ), 0, Qt::SolidLine )
-    , M_background_left_team_brush( QColor( 192, 251, 0 ), Qt::SolidPattern )
-    , M_background_right_team_brush( QColor( 127, 20, 20 ), Qt::SolidPattern )
-    , M_background_symmetry_brush( QColor( 0, 192, 31 ), Qt::SolidPattern )
-    , M_background_font_pen( QColor( 0, 63, 127 ), 0, Qt::SolidLine )
+    M_background_contained_area_brush( QColor( 31, 143, 31 ), Qt::SolidPattern ),
+    M_background_triangle_pen( QColor( 0, 127, 255 ), 0, Qt::SolidLine ),
+    M_background_player_pen( QColor( 127, 127, 127 ), 0, Qt::SolidLine ),
+    M_background_left_team_brush( QColor( 192, 251, 0 ), Qt::SolidPattern ),
+    M_background_right_team_brush( QColor( 127, 20, 20 ), Qt::SolidPattern ),
+    M_background_symmetry_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
+    M_background_font_pen( QColor( 0, 63, 127 ), 0, Qt::SolidLine ),
+    // additional info
+    M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine )
 {
     //this->setPalette( QPalette( M_field_brush.color() ) );
     this->setPalette( QPalette( M_field_color ) );
@@ -143,7 +145,6 @@ EditCanvas::paintEvent( QPaintEvent * )
     {
         setAntialiasFlag( painter, true );
     }
-
     drawField( painter );
     if ( Options::instance().showBackgroundData() )
     {
@@ -156,6 +157,10 @@ EditCanvas::paintEvent( QPaintEvent * )
         drawBackgroundPlayers( painter );
     }
     drawBall( painter );
+    if ( Options::instance().showShootLines() )
+    {
+        drawShootLines( painter );
+    }
     drawConstraintSelection( painter );
 }
 
@@ -200,6 +205,11 @@ EditCanvas::drawField( QPainter & painter )
     if ( Options::instance().showTriangulation() )
     {
         drawContainedArea( painter );
+    }
+
+    if ( Options::instance().showGoalieMovableArea() )
+    {
+        drawGoalieMovableArea( painter );
     }
 
     // set screen coordinates of field
@@ -531,25 +541,25 @@ EditCanvas::drawPlayers( QPainter & painter )
                        ? 1.085
                        : 0.3 ); // body radius
     const double d = r * 2.0;   // body diameter
-    const int kr = 1.085;       // kickable radius
-    const int kd = kr * 2.0;    // kickable diameter
-    const int cr = 1.3; // 2.0  // catchable radius
-    const int cd = cr * 2.0;    // catchable diameter
+    const double kr = ServerParam::i().defaultKickableArea(); // kickable radius
+    const double kd = kr * 2.0;    // kickable diameter
+    const double cr = ServerParam::i().catchableArea();  // catchable radius
+    const double cd = cr * 2.0;    // catchable diameter
 
     const QTransform transform = painter.worldTransform();
 
-    const std::vector< Vector2D >::const_iterator s
+    const std::vector< Vector2D >::const_iterator selected
         = ( ptr->selectType() == EditData::SELECT_PLAYER
             ? ( ptr->state().players_.begin() + ptr->selectIndex() )
             : ptr->state().players_.end() );
 
     int unum = 1;
-    const std::vector< Vector2D >::const_iterator p_end = ptr->state().players_.end();
-    for ( std::vector< Vector2D >::const_iterator p = ptr->state().players_.begin();
-          p != p_end;
+    for ( std::vector< Vector2D >::const_iterator p = ptr->state().players_.begin(),
+              end = ptr->state().players_.end();
+          p != end;
           ++p, ++unum )
     {
-        if ( p == s )
+        if ( p == selected )
         {
             painter.setPen( M_select_pen );
             painter.setBrush( f->isSymmetryType( unum )
@@ -567,17 +577,19 @@ EditCanvas::drawPlayers( QPainter & painter )
             painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
         }
 
-        if ( ! enlarge
-             && unum != 1 )
+        painter.setBrush( Qt::NoBrush );
+
+        if ( unum == 1 )
         {
-            painter.setBrush( Qt::NoBrush );
-            painter.drawEllipse( QRectF( p->x - kr, p->y - kr, kd, kd ) );
-        }
-        else if ( unum == 1 )
-        {
-            painter.setBrush( Qt::NoBrush );
+            // catchable area circle
             painter.drawEllipse( QRectF( p->x - cr, p->y - cr, cd, cd ) );
         }
+        else if ( ! enlarge )
+        {
+            // kickable area circle
+            painter.drawEllipse( QRectF( p->x - kr, p->y - kr, kd, kd ) );
+        }
+
 
         painter.setPen( Qt::white );
         painter.setWorldMatrixEnabled( false );
@@ -628,6 +640,128 @@ EditCanvas::drawBall( QPainter & painter )
     }
 }
 
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+EditCanvas::drawShootLines( QPainter & painter )
+{
+    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    if ( ! ptr )
+    {
+        return;
+    }
+
+    painter.setPen( M_shoot_line_pen );
+    painter.setBrush( Qt::NoBrush );
+
+    const Vector2D ball = ptr->state().ball_;
+    const double goal_line_x = -ServerParam::i().pitchHalfLength();
+    const double goal_half_width = ServerParam::i().goalHalfWidth();
+    const double bdecay = ServerParam::i().ballDecay();
+
+    const QTransform transform = painter.worldTransform();
+
+    painter.drawLine( QLineF( ball.x, ball.y, goal_line_x, -goal_half_width ) );
+    painter.drawLine( QLineF( ball.x, ball.y, goal_line_x, +goal_half_width ) );
+
+    Vector2D ball_pos = ball;
+    Vector2D ball_vel = Vector2D( goal_line_x, -goal_half_width ) - ball_pos;
+    ball_vel.setLength( ServerParam::i().ballSpeedMax() );
+
+    int count = 1;
+    while ( ball_pos.x > goal_line_x )
+    {
+        ball_pos += ball_vel;
+        ball_vel *= bdecay;
+
+        painter.drawRect( QRectF( ball_pos.x - 0.05, ball_pos.y - 0.05, 0.1, 0.1 ) );
+        painter.setWorldMatrixEnabled( false );
+        painter.drawText( transform.map( QPointF( ball_pos.x + 0.1, ball_pos.y ) ),
+                          QString::number( count ) );
+        painter.setWorldMatrixEnabled( true );
+
+        if ( ++count > 15 )
+        {
+            break;
+        }
+    }
+
+    ball_pos = ball;
+    ball_vel = Vector2D( goal_line_x, +goal_half_width ) - ball_pos;
+    ball_vel.setLength( ServerParam::i().ballSpeedMax() );
+
+    count = 1;
+    while ( ball_pos.x > goal_line_x )
+    {
+        ball_pos += ball_vel;
+        ball_vel *= bdecay;
+
+        painter.drawRect( QRectF( ball_pos.x - 0.05, ball_pos.y - 0.05, 0.1, 0.1 ) );
+        painter.setWorldMatrixEnabled( false );
+        painter.drawText( transform.map( QPointF( ball_pos.x + 0.1, ball_pos.y ) ),
+                          QString::number( count ) );
+        painter.setWorldMatrixEnabled( true );
+
+        if ( ++count > 15 )
+        {
+            break;
+        }
+    }
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+EditCanvas::drawGoalieMovableArea( QPainter & painter )
+{
+    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    if ( ! ptr )
+    {
+        return;
+    }
+
+    if ( ptr->state().players_.empty() )
+    {
+        return;
+    }
+
+    const Vector2D goalie_pos = ptr->state().players_.front();
+    const double catch_area = ServerParam::i().catchableArea();
+    const double max_accel = ServerParam::i().maxDashPower() * ServerParam::i().defaultDashPowerRate() * ServerParam::i().defaultEffortMax();
+    const double decay = ServerParam::i().defaultPlayerDecay();
+
+    // const QColor base_color( M_field_color.red(), M_field_color.green(), M_field_color.blue(),
+    //                          192 ); // transparency
+    const QColor base_color = M_field_color;
+
+    painter.setPen( Qt::black );
+
+    double radius[10];
+
+    double dist = 0.0;
+    double speed = 0.0;
+    for ( int i = 0; i < 10; ++i )
+    {
+        speed += max_accel;
+        dist += speed;
+        speed *= decay;
+
+        radius[i] = dist + catch_area;
+    }
+
+    for ( int i = 9; i >= 0; --i )
+    {
+        painter.setBrush( base_color.darker( 300 - 20*i ) );
+        painter.drawEllipse( QRectF( goalie_pos.x - radius[i],
+                                     goalie_pos.y - radius[i],
+                                     radius[i]*2.0,
+                                     radius[i]*2.0 ) );
+    }
+}
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -1066,13 +1200,25 @@ EditCanvas::mouseMoveEvent( QMouseEvent * event )
 void
 EditCanvas::zoomIn()
 {
-    if ( M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length() * 1.5 > 100.0 )
+    double current_scale = M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length();
+    double new_scale = current_scale * 1.5;
+    if ( new_scale > 100.0 )
     {
         return;
     }
 
-    Options::instance().setAutoFitMode( false );
+    // qreal tx, ty;
+    // M_transform.map( this->width()/0.5, this->height()/0.5, &tx, &ty );
+
+    // std::cerr << "zoomIn window=" << this->width() << ", " << this->height() << std::endl;
+    // std::cerr << "zoomIn current_scale=" << current_scale << std::endl;
+    // std::cerr << "zoomIn center=(" << tx << ", " << ty << ")" << std::endl;
+
+    // M_transform.reset();
+    // M_transform.translate( tx, ty );
     M_transform.scale( 1.5, 1.5 );
+
+    Options::instance().setAutoFitMode( false );
 
     this->update();
 }
@@ -1084,13 +1230,24 @@ EditCanvas::zoomIn()
 void
 EditCanvas::zoomOut()
 {
-    if ( M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length() / 1.5 < 2.0 )
+    double current_scale = M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length();
+    double new_scale = current_scale / 1.5;
+    if ( new_scale < 2.0 )
     {
         return;
     }
 
-    Options::instance().setAutoFitMode( false );
+    // qreal tx, ty;
+    // M_transform.map( 0.0, 0.0, &tx, &ty );
+
+    // std::cerr << "zoomOut current_scale=" << current_scale << std::endl;
+    // std::cerr << "zoomOut translate=(" << tx << ", " << ty << ")" << std::endl;
+
+    // M_transform.reset();
+    // M_transform.translate( tx, ty );
     M_transform.scale( 1.0/1.5, 1.0/1.5 );
+
+    Options::instance().setAutoFitMode( false );
 
     this->update();
 }

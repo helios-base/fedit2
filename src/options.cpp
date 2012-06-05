@@ -61,29 +61,30 @@ Options::instance()
 
 */
 Options::Options()
-    : M_maximize( false )
-    , M_full_screen( false )
-    , M_window_width( 0 )
-    , M_window_height( 0 )
-    , M_window_pos_x( -1 )
-    , M_window_pos_y( -1 )
-    , M_conf_file()
-    , M_data_file()
-    , M_background_conf_file()
-    , M_auto_backup( true )
+    : M_maximize( false ),
+      M_full_screen( false ),
+      M_window_width( 0 ),
+      M_window_height( 0 ),
+      M_window_pos_x( -1 ),
+      M_window_pos_y( -1 ),
+      M_conf_file(),
+      M_data_file(),
+      M_background_conf_file(),
+      M_auto_backup( true ),
       //
-    , M_player_auto_move( true )
-    , M_data_auto_select( true )
-    , M_symmetry_mode( true )
-    , M_constraint_edit_mode( false )
+      M_player_auto_move( true ),
+      M_data_auto_select( true ),
+      M_symmetry_mode( true ),
+      M_constraint_edit_mode( false ),
       //
-    , M_show_background_data( true )
-    , M_enlarge( true )
-    , M_show_index( true )
-    , M_show_triangulation( true )
-    , M_show_circumcircle( false )
-    , M_antialiasing( false )
-    , M_auto_fit_mode( true )
+      M_show_background_data( true ),
+      M_enlarge( true ),
+      M_show_index( true ),
+      M_show_triangulation( true ),
+      M_show_circumcircle( false ),
+      M_show_shoot_lines( false ),
+      M_antialiasing( false ),
+      M_auto_fit_mode( true )
 {
     readSettings();
 }

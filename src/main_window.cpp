@@ -821,6 +821,24 @@ MainWindow::createActionsView()
     this->addAction( M_toggle_show_circumcircle_act );
 
     //
+    M_toggle_show_shoot_lines_act = new QAction( tr( "Show Shoot Lines" ), this );
+    M_toggle_show_shoot_lines_act->setStatusTip( tr( "Toggle shoot lines painting." ) );
+    connect( M_toggle_show_shoot_lines_act, SIGNAL( toggled( bool ) ),
+             this, SLOT( setShowShootLines( bool ) ) );
+    M_toggle_show_shoot_lines_act->setCheckable( true );
+    M_toggle_show_shoot_lines_act->setChecked( false );
+    this->addAction( M_toggle_show_shoot_lines_act );
+
+    //
+    M_toggle_show_goalie_movable_area_act = new QAction( tr( "Show Goalie Movalble Area" ), this );
+    M_toggle_show_goalie_movable_area_act->setStatusTip( tr( "Toggle goalie reachable area painting." ) );
+    connect( M_toggle_show_goalie_movable_area_act, SIGNAL( toggled( bool ) ),
+             this, SLOT( setShowGoalieMovableArea( bool ) ) );
+    M_toggle_show_goalie_movable_area_act->setCheckable( true );
+    M_toggle_show_goalie_movable_area_act->setChecked( false );
+    this->addAction( M_toggle_show_goalie_movable_area_act );
+
+    //
     M_toggle_antialiasing_act = new QAction( tr( "Antialiasing" ),
                                              this );
     M_toggle_antialiasing_act->setStatusTip( tr( "Toggle antialiasing" ) );
@@ -982,6 +1000,8 @@ MainWindow::createMenuView()
 
     menu->addAction( M_toggle_enlarge_act );
     menu->addAction( M_toggle_show_index_act );
+    menu->addAction( M_toggle_show_shoot_lines_act );
+    menu->addAction( M_toggle_show_goalie_movable_area_act );
     menu->addAction( M_toggle_show_triangulation_act );
     menu->addAction( M_toggle_show_circumcircle_act );
     menu->addAction( M_toggle_antialiasing_act );
@@ -1957,6 +1977,28 @@ void
 MainWindow::setShowCircumcircle( bool on )
 {
     Options::instance().setShowCircumcircle( on );
+    M_edit_canvas->update(); // emit viewUpdated();
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+MainWindow::setShowShootLines( bool on )
+{
+    Options::instance().setShowShootLines( on );
+    M_edit_canvas->update(); // emit viewUpdated();
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+MainWindow::setShowGoalieMovableArea( bool on )
+{
+    Options::instance().setShowGoalieMovableArea( on );
     M_edit_canvas->update(); // emit viewUpdated();
 }
 

@@ -1,3 +1,14 @@
+2012-06-05  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/edit_canvas.cpp:
+	* src/edit_canvas.h:
+	* src/main_window.cpp:
+	* src/main_window.h:
+	* src/options.cpp:
+	* src/options.h:
+	- ゴール隅へシュートを撃たれた場合のボールの移動予測位置表示機能を追加
+	- キーパーの移動範囲円表示機能を追加．初速と体の向きは考慮していない
+
 2012-05-12  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* configure.ac:

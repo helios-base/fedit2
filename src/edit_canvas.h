@@ -99,6 +99,8 @@ private:
     QBrush M_background_symmetry_brush;
     QPen M_background_font_pen;
 
+    QPen M_shoot_line_pen;
+
     //! 0: left, 1: middle, 2: right
     MouseState M_mouse_state[3];
 
@@ -128,6 +130,8 @@ private:
     void drawData( QPainter & painter );
     void drawPlayers( QPainter & painter );
     void drawBall( QPainter & painter );
+    void drawShootLines( QPainter & painter );
+    void drawGoalieMovableArea( QPainter & painter );
     void drawConstraintSelection( QPainter & painter );
 
     void drawBackgroundContainedArea( QPainter & painter );

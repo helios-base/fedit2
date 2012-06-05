@@ -90,12 +90,15 @@ private:
 
     bool M_show_background_data;
     bool M_enlarge;
+
     bool M_show_index;
     bool M_show_triangulation;
     bool M_show_circumcircle;
+    bool M_show_shoot_lines;
+    bool M_show_goalie_movable_area;
+
     bool M_antialiasing;
     bool M_auto_fit_mode;
-
 
     // private access for singleton
     Options();
@@ -274,6 +277,12 @@ public:
       {
           return M_show_circumcircle;
       }
+
+    void setShowShootLines( const bool on ) { M_show_shoot_lines = on; }
+    bool showShootLines() const { return M_show_shoot_lines; }
+
+    void setShowGoalieMovableArea( const bool on ) { M_show_goalie_movable_area = on; }
+    bool showGoalieMovableArea() const { return M_show_goalie_movable_area; }
 
     //
 

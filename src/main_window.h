@@ -111,6 +111,9 @@ private:
     QAction * M_toggle_show_index_act;
     QAction * M_toggle_show_triangulation_act;
     QAction * M_toggle_show_circumcircle_act;
+    QAction * M_toggle_show_shoot_lines_act;
+    QAction * M_toggle_show_goalie_movable_area_act;
+
     QAction * M_toggle_antialiasing_act;
     QAction * M_toggle_show_background_data_act;
     QAction * M_show_edit_dialog_act;
@@ -217,6 +220,8 @@ private slots:
     void setShowIndex( bool on );
     void setShowTriangulation( bool on );
     void setShowCircumcircle( bool on );
+    void setShowShootLines( bool on );
+    void setShowGoalieMovableArea( bool on );
     void setAntialiasing( bool on );
     void toggleShowBackgroundData( bool on );
 
