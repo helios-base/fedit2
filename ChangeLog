@@ -1,5 +1,8 @@
 2012-06-05  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
+	* src/edit_canvas.cpp:
+	- シュートコース表示用のゴール幅を-0.1
+
 	* src/main_window.cpp:
 	- シュートコース表とキーパー移動範囲の表示切り替えショートカットキー
 	を追加．シュートは's'，キーパーは'g'

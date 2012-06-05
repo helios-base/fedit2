@@ -657,7 +657,7 @@ EditCanvas::drawShootLines( QPainter & painter )
 
     const Vector2D ball = ptr->state().ball_;
     const double goal_line_x = -ServerParam::i().pitchHalfLength() - 0.001;
-    const double goal_half_width = ServerParam::i().goalHalfWidth();
+    const double goal_half_width = ServerParam::i().goalHalfWidth() - 0.1;
     const double bdecay = ServerParam::i().ballDecay();
 
     const QTransform transform = painter.worldTransform();
