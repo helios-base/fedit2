@@ -1033,9 +1033,14 @@ EditCanvas::setFocusPoint( const QPoint & pos )
 
     double s = M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length();
 
+    std::cerr << "setFocusPoint pos=(" << p.x() << ", " << p.y() << ")" << std::endl;
+    std::cerr << "setFocusPoint new_translate=("
+              << this->width()*0.5 - p.x()*s << ", "
+              << this->height()*0.5 - p.y()*s << ")" <<  std::endl;
+
     M_transform.reset();
-    M_transform.translate( this->width() * 0.5 - p.x() * s,
-                           this->height() * 0.5 - p.y() * s );
+    M_transform.translate( this->width()*0.5 - p.x()*s,
+                           this->height()*0.5 - p.y()*s );
     M_transform.scale( s, s );
 
     Options::instance().setAutoFitMode( false );
@@ -1202,21 +1207,23 @@ EditCanvas::zoomIn()
 {
     double current_scale = M_transform.map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length();
     double new_scale = current_scale * 1.5;
-    if ( new_scale > 100.0 )
+    if ( new_scale > 200.0 )
     {
         return;
     }
 
-    // qreal tx, ty;
-    // M_transform.map( this->width()/0.5, this->height()/0.5, &tx, &ty );
+    QPointF pos = M_transform.inverted().map( QPointF( this->width()*0.5, this->height()*0.5 ) );
+    pos.setX( qBound( -ServerParam::DEFAULT_PITCH_LENGTH,
+                      pos.x(),
+                      ServerParam::DEFAULT_PITCH_LENGTH ) );
+    pos.setY( qBound( -ServerParam::DEFAULT_PITCH_WIDTH,
+                      pos.y(),
+                      ServerParam::DEFAULT_PITCH_WIDTH ) );
 
-    // std::cerr << "zoomIn window=" << this->width() << ", " << this->height() << std::endl;
-    // std::cerr << "zoomIn current_scale=" << current_scale << std::endl;
-    // std::cerr << "zoomIn center=(" << tx << ", " << ty << ")" << std::endl;
-
-    // M_transform.reset();
-    // M_transform.translate( tx, ty );
-    M_transform.scale( 1.5, 1.5 );
+    M_transform.reset();
+    M_transform.translate( this->width()*0.5 - pos.x()*new_scale,
+                           this->height()*0.5 - pos.y()*new_scale );
+    M_transform.scale( new_scale, new_scale );
 
     Options::instance().setAutoFitMode( false );
 
@@ -1237,15 +1244,18 @@ EditCanvas::zoomOut()
         return;
     }
 
-    // qreal tx, ty;
-    // M_transform.map( 0.0, 0.0, &tx, &ty );
+    QPointF pos = M_transform.inverted().map( QPointF( this->width()*0.5, this->height()*0.5 ) );
+    pos.setX( qBound( -ServerParam::DEFAULT_PITCH_LENGTH,
+                      pos.x(),
+                      ServerParam::DEFAULT_PITCH_LENGTH ) );
+    pos.setY( qBound( -ServerParam::DEFAULT_PITCH_WIDTH,
+                      pos.y(),
+                      ServerParam::DEFAULT_PITCH_WIDTH ) );
 
-    // std::cerr << "zoomOut current_scale=" << current_scale << std::endl;
-    // std::cerr << "zoomOut translate=(" << tx << ", " << ty << ")" << std::endl;
-
-    // M_transform.reset();
-    // M_transform.translate( tx, ty );
-    M_transform.scale( 1.0/1.5, 1.0/1.5 );
+    M_transform.reset();
+    M_transform.translate( this->width()*0.5 - pos.x()*new_scale,
+                           this->height()*0.5 - pos.y()*new_scale );
+    M_transform.scale( new_scale, new_scale );
 
     Options::instance().setAutoFitMode( false );
 

@@ -1,6 +1,9 @@
 2012-06-05  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_canvas.cpp:
+	- 拡大縮小操作時にフォーカス位置がずれていたバグを修正
+
+	* src/edit_canvas.cpp:
 	* src/edit_canvas.h:
 	* src/main_window.cpp:
 	* src/main_window.h:
