@@ -588,7 +588,7 @@ MainWindow::createActionsEdit()
     M_toggle_symmetry_mode_act = new QAction( QIcon( QPixmap( symmetry_xpm ) ),
                                               tr( "Symmetry" ),
                                               this );
-    M_toggle_symmetry_mode_act->setShortcut( Qt::Key_S );
+    M_toggle_symmetry_mode_act->setShortcut( Qt::Key_M );
     M_toggle_symmetry_mode_act->setToolTip( tr( "Toggle symmetry mode" ) );
     M_toggle_symmetry_mode_act->setStatusTip( tr( "Toggle symmetry mode." )
                                               + M_toggle_symmetry_mode_act->shortcut().toString()
@@ -602,7 +602,7 @@ MainWindow::createActionsEdit()
     //
     M_toggle_constraint_edit_mode_act = new QAction( tr( "Edit Constraint" ),
                                                      this );
-    M_toggle_constraint_edit_mode_act->setShortcut( Qt::Key_C );
+    //M_toggle_constraint_edit_mode_act->setShortcut( Qt::Key_C );
     M_toggle_constraint_edit_mode_act->setToolTip( tr( "Toggle constraint edge edit mode" ) );
     M_toggle_constraint_edit_mode_act->setStatusTip( tr( "Toggle constraint edge edit mode." )
                                                      + M_toggle_constraint_edit_mode_act->shortcut().toString()
@@ -823,6 +823,7 @@ MainWindow::createActionsView()
     //
     M_toggle_show_shoot_lines_act = new QAction( tr( "Show Shoot Lines" ), this );
     M_toggle_show_shoot_lines_act->setStatusTip( tr( "Toggle shoot lines painting." ) );
+    M_toggle_show_shoot_lines_act->setShortcut( Qt::Key_S );
     connect( M_toggle_show_shoot_lines_act, SIGNAL( toggled( bool ) ),
              this, SLOT( setShowShootLines( bool ) ) );
     M_toggle_show_shoot_lines_act->setCheckable( true );
@@ -832,6 +833,7 @@ MainWindow::createActionsView()
     //
     M_toggle_show_goalie_movable_area_act = new QAction( tr( "Show Goalie Movalble Area" ), this );
     M_toggle_show_goalie_movable_area_act->setStatusTip( tr( "Toggle goalie reachable area painting." ) );
+    M_toggle_show_goalie_movable_area_act->setShortcut( Qt::Key_G );
     connect( M_toggle_show_goalie_movable_area_act, SIGNAL( toggled( bool ) ),
              this, SLOT( setShowGoalieMovableArea( bool ) ) );
     M_toggle_show_goalie_movable_area_act->setCheckable( true );
