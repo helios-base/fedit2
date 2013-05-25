@@ -291,6 +291,28 @@ EditCanvas::drawField( QPainter & painter )
     //
 
     painter.setPen( Qt::NoPen );
+    painter.setBrush( Qt::black );
+
+    // left goal post
+    painter.drawEllipse( QRectF( -ServerParam::DEFAULT_PITCH_LENGTH * 0.5,
+                                 -ServerParam::DEFAULT_GOAL_WIDTH * 0.5 - ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0 ) );
+    painter.drawEllipse( QRectF( -ServerParam::DEFAULT_PITCH_LENGTH * 0.5,
+                                 ServerParam::DEFAULT_GOAL_WIDTH * 0.5,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0 ) );
+    // right goal post
+    painter.drawEllipse( QRectF( ServerParam::DEFAULT_PITCH_LENGTH * 0.5 - ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 -ServerParam::DEFAULT_GOAL_WIDTH * 0.5 - ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0 ) );
+    painter.drawEllipse( QRectF( ServerParam::DEFAULT_PITCH_LENGTH * 0.5 - ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_WIDTH * 0.5,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0,
+                                 ServerParam::DEFAULT_GOAL_POST_RADIUS * 2.0 ) );
+
+
 
     // left goal
     painter.fillRect( QRectF( left_x - ServerParam::DEFAULT_GOAL_DEPTH,
