@@ -1,3 +1,8 @@
+2013-05-25  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/edit_data.cpp:
+	- 自動バックアップのファイル名フォーマットを変更
+
 2012-06-05  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_canvas.cpp:

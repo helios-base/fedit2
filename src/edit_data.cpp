@@ -167,12 +167,15 @@ EditData::backup( const QString & filepath )
     QString backup_filepath = filepath;
     if ( M_saved_datetime.isEmpty() )
     {
-        backup_filepath += QDateTime::currentDateTime().toString( QString( ".yyyyMMdd-hhmmss" ) );
+        backup_filepath += QString( "_" );
+        backup_filepath += QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
+        backup_filepath += QString( ".conf" );
     }
     else
     {
-        backup_filepath += QString( "." );
+        backup_filepath += QString( "_" );
         backup_filepath += M_saved_datetime;
+        backup_filepath += QString( ".conf" );
     }
 
     if ( ! QFile::copy( filepath, backup_filepath ) )
