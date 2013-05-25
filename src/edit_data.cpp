@@ -477,19 +477,22 @@ EditData::moveBallTo( const double & x,
     Vector2D pos = round_coordinates( x, y );
 
     M_state.ball_ = pos;
-    if ( pos.absY() < 1.0 )
-    {
-        M_state.ball_.y = 0.0;
-    }
 
-    if ( Options::instance().dataAutoSelect()
-         && M_samples )
+    if ( Options::instance().dataAutoSelect() )
     {
-        SampleDataSet::IndexData d = M_samples->nearestData( pos, 1.0 );
-        if ( d.second )
+        if ( pos.absY() < 1.0 )
         {
-            M_current_index = d.first;
-            M_state.ball_ = d.second->ball_;
+            M_state.ball_.y = 0.0;
+        }
+
+        if ( M_samples )
+        {
+            SampleDataSet::IndexData d = M_samples->nearestData( pos, 1.0 );
+            if ( d.second )
+            {
+                M_current_index = d.first;
+                M_state.ball_ = d.second->ball_;
+            }
         }
     }
 
