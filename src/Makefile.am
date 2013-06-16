@@ -4,6 +4,7 @@ bin_PROGRAMS = fedit2
 
 fedit2_SOURCES = \
 	command.cpp \
+	config_dialog.cpp \
 	constraint_delegate.cpp \
 	constraint_edit_dialog.cpp \
 	constraint_view.cpp \
@@ -19,6 +20,7 @@ fedit2_SOURCES = \
 noinst_HEADERS = \
 	mouse_state.h \
 	command.h \
+	config_dialog.h \
 	constraint_delegate.h \
 	constraint_edit_dialog.h \
 	constraint_view.h \
@@ -31,6 +33,7 @@ noinst_HEADERS = \
 	options.h
 
 nodist_fedit2_SOURCES = \
+	moc_config_dialog.cpp \
 	moc_constraint_delegate.cpp \
 	moc_constraint_edit_dialog.cpp \
 	moc_constraint_view.cpp \

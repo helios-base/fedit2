@@ -66,6 +66,9 @@ private:
     int M_window_pos_x;
     int M_window_pos_y;
 
+    int M_view_width;
+    int M_view_height;
+
     //
     // editor options
     //
@@ -161,24 +164,39 @@ public:
           return M_window_height;
       }
 
+    int viewWidth() const
+      {
+          return M_view_width;
+      }
+
+    int viewHeight() const
+      {
+          return M_view_height;
+      }
+
+
+    void setViewSize( const int width,
+                      const int height )
+      {
+          M_view_width = width;
+          M_view_height = height;
+      }
+
     //
     // editor options
     //
 
-    const
-    QString & confFile() const
+    const QString & confFile() const
       {
           return M_conf_file;
       }
 
-    const
-    QString & backgroundConfFile() const
+    const QString & backgroundConfFile() const
       {
           return M_background_conf_file;
       }
 
-    const
-    QString & dataFile() const
+    const QString & dataFile() const
       {
           return M_data_file;
       }

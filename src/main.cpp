@@ -45,8 +45,7 @@ main( int argc, char ** argv )
 {
     std::cout << "******************************************************************\n"
               << " "PACKAGE" "VERSION"\n"
-              << " Copyright: (C) 2009. Hidehisa Akiyama\n"
-              << " National Institute of Advanced Industrial Science and Technology\n"
+              << " Copyright: (C) 2013. Hidehisa Akiyama\n"
               << " All rights reserved.\n"
               << "******************************************************************\n"
               << std::endl;

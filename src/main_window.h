@@ -38,12 +38,14 @@
 
 class QCloseEvent;
 class QLabel;
-class QSpinBox;
 class QModelIndex;
-class QUndoStack;
+class QSpinBox;
+class QSplitter;
 class QToolBar;
 class QToolBox;
+class QUndoStack;
 
+class ConfigDialog;
 class EditCanvas;
 class EditData;
 class EditDialog;
@@ -65,10 +67,12 @@ private:
     QToolBar * M_tool_bar;
     QSpinBox * M_index_spin_box;
 
+    QSplitter * M_splitter;
     SampleView * M_sample_view;
     ConstraintView * M_constraint_view;
     EditCanvas * M_edit_canvas;
     EditDialog * M_edit_dialog;
+    ConfigDialog * M_config_dialog;
 
     QLabel * M_position_label;
 
@@ -117,6 +121,8 @@ private:
     QAction * M_toggle_antialiasing_act;
     QAction * M_toggle_show_background_data_act;
     QAction * M_show_edit_dialog_act;
+
+    QAction * M_show_config_dialog_act;
 
     // help actions
     QAction * M_about_act;
@@ -213,6 +219,7 @@ private slots:
     void train();
 
     // view
+    void resizeView( const QSize & size );
     void toggleFullScreen();
     void toggleToolBar();
     void toggleStatusBar();

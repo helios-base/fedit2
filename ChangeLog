@@ -1,3 +1,17 @@
+2013-06-16  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/config_dialog.cpp:
+	* src/config_dialog.h:
+	* src/Makefile.am:
+	* src/edit_canvas.cpp:
+	* src/main.cpp:
+	* src/main_window.cpp:
+	* src/main_window.h:
+	* src/options.cpp:
+	* src/options.h:
+	- ConfigDialogを追加
+	- フィールドの表示サイズを指定できるように機能追加
+
 2013-05-25  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_data.cpp:

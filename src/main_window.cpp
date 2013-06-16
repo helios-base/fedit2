@@ -42,6 +42,7 @@
 #include "main_window.h"
 
 #include "command.h"
+#include "config_dialog.h"
 #include "constraint_edit_dialog.h"
 #include "edit_canvas.h"
 #include "edit_data.h"
@@ -98,16 +99,19 @@ MainWindow::MainWindow()
     createSampleView();
     createConstraintView();
 
+    M_config_dialog = new ConfigDialog( this );
+    M_config_dialog->setVisible( false );
+
     QToolBox * tool_box = createToolBox();
     tool_box->addItem( M_sample_view, tr( "Samples" ) );
     tool_box->addItem( M_constraint_view, tr( "Constraints" ) );
 
-    QSplitter * splitter = new QSplitter( this );
-    splitter->addWidget( tool_box );
-    splitter->addWidget( M_edit_canvas );
-    splitter->setStretchFactor( 0, 0 );
-    splitter->setStretchFactor( 1, 1 );
-    this->setCentralWidget( splitter );
+    M_splitter = new QSplitter( this );
+    M_splitter->addWidget( tool_box );
+    M_splitter->addWidget( M_edit_canvas );
+    M_splitter->setStretchFactor( 0, 0 );
+    M_splitter->setStretchFactor( 1, 1 );
+    this->setCentralWidget( M_splitter );
     tool_box->resize( 50, tool_box->height() );
 
     //
@@ -124,6 +128,9 @@ MainWindow::MainWindow()
              M_edit_dialog, SLOT( updateData() ) );
     connect( M_edit_canvas, SIGNAL( objectMoved() ),
              this, SLOT( updateDataIndex() ) );
+
+    connect( M_config_dialog, SIGNAL( viewResizeApplied( const QSize & ) ),
+             this, SLOT( resizeView( const QSize & ) ) );
 
     connect( M_undo_stack, SIGNAL( canUndoChanged( bool ) ),
              M_undo_act, SLOT( setEnabled( bool ) ) );
@@ -881,6 +888,28 @@ MainWindow::createActionsView()
     M_show_edit_dialog_act->setCheckable( true );
     M_show_edit_dialog_act->setChecked( false );
     this->addAction( M_show_edit_dialog_act );
+
+    //
+    M_show_config_dialog_act = new QAction( tr( "Show Config Dialog" ),
+                                            this );
+    connect( M_show_config_dialog_act, SIGNAL( toggled( bool ) ),
+             M_config_dialog, SLOT( setVisible( bool ) ) );
+    connect( M_config_dialog, SIGNAL( shown( bool ) ),
+             M_show_config_dialog_act, SLOT( setChecked( bool ) ) );
+#ifdef Q_WS_MAC
+    M_show_config_dialog_act->setShortcut( Qt::META + Qt::Key_V );
+#else
+    M_show_config_dialog_act->setShortcut( Qt::CTRL + Qt::Key_V );
+#endif
+    M_show_config_dialog_act->setStatusTip( tr( "Show/Hide config dialog. (" )
+                                            + M_show_config_dialog_act->shortcut().toString()
+                                            + tr( ")" ) );
+    M_show_config_dialog_act->setToolTip( tr( "Show/Hide edit dialog.(" )
+                                          + M_show_config_dialog_act->shortcut().toString()
+                                          + tr( ")" ) );
+    M_show_config_dialog_act->setCheckable( true );
+    M_show_config_dialog_act->setChecked( false );
+    this->addAction( M_show_config_dialog_act );
 }
 
 /*-------------------------------------------------------------------*/
@@ -991,6 +1020,7 @@ MainWindow::createMenuView()
     menu->addAction( M_full_screen_act );
     menu->addAction( M_toggle_tool_bar_act );
     menu->addAction( M_toggle_status_bar_act );
+    menu->addAction( M_show_config_dialog_act );
 
     menu->addSeparator();
 
@@ -1896,6 +1926,39 @@ MainWindow::train()
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
     M_constraint_view->updateData();
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+MainWindow::resizeView( const QSize & size )
+{
+    if ( this->isMaximized()
+         || this->isFullScreen() )
+    {
+        this->showNormal();
+    }
+
+    QRect rect = this->geometry();
+    QList< int > sizes =  M_splitter->sizes();
+
+    if ( sizes.size() != 2 )
+    {
+        std::cerr << "MainWindow::resizeView unexpected splitter size "
+                  << sizes.size() << std::endl;
+        return;
+    }
+
+    int width_diff = rect.width() - M_splitter->width();
+    int height_diff = rect.height() - M_splitter->height();
+    int first_width = sizes.at( 0 );
+
+    rect.setWidth( width_diff + first_width + size.width() );
+    rect.setHeight( height_diff + size.height() );
+
+    this->setGeometry( rect );
 }
 
 /*-------------------------------------------------------------------*/

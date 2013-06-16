@@ -139,6 +139,8 @@ EditCanvas::paintEvent( QPaintEvent * )
         M_transform.scale( scale_factor, scale_factor );
     }
 
+    Options::instance().setViewSize( this->width(), this->height() );
+
     painter.setWorldTransform( M_transform );
 
     if ( Options::instance().antialiasing() )
