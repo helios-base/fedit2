@@ -69,6 +69,8 @@ Options::Options()
       M_window_pos_y( -1 ),
       M_view_width( 0 ),
       M_view_height( 0 ),
+      M_focus_point( 0.0, 0.0 ),
+      M_view_scale( 1.0 ),
       M_conf_file(),
       M_data_file(),
       M_background_conf_file(),

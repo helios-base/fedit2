@@ -131,6 +131,8 @@ MainWindow::MainWindow()
 
     connect( M_config_dialog, SIGNAL( viewResizeApplied( const QSize & ) ),
              this, SLOT( resizeView( const QSize & ) ) );
+    connect( M_config_dialog, SIGNAL( configured() ),
+             M_edit_canvas, SLOT( update() ) );
 
     connect( M_undo_stack, SIGNAL( canUndoChanged( bool ) ),
              M_undo_act, SLOT( setEnabled( bool ) ) );

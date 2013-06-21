@@ -134,9 +134,22 @@ EditCanvas::paintEvent( QPaintEvent * )
         double scale_h =  this->height() / ( ServerParam::DEFAULT_PITCH_WIDTH + 10.0 );
         double scale_factor = qMin( scale_w, scale_h );
 
+        Options::instance().setFocusPoint( QPointF( 0.0, 0.0 ) );
+        Options::instance().setViewScale( scale_factor );
+
         M_transform.reset();
         M_transform.translate( this->width() * 0.5, this->height() * 0.5 );
         M_transform.scale( scale_factor, scale_factor );
+    }
+    else
+    {
+        QPointF p = Options::instance().focusPoint();
+        double s =  Options::instance().viewScale();
+
+        M_transform.reset();
+        M_transform.translate( this->width()*0.5 - p.x()*s,
+                               this->height()*0.5 - p.y()*s );
+        M_transform.scale( s, s );
     }
 
     Options::instance().setViewSize( this->width(), this->height() );
@@ -1091,6 +1104,8 @@ EditCanvas::setFocusPoint( const QPoint & pos )
     M_transform.scale( s, s );
 
     Options::instance().setAutoFitMode( false );
+    Options::instance().setFocusPoint( p );
+    Options::instance().setViewScale( s );
 
     this->update();
 }
@@ -1273,6 +1288,7 @@ EditCanvas::zoomIn()
     M_transform.scale( new_scale, new_scale );
 
     Options::instance().setAutoFitMode( false );
+    Options::instance().setViewScale( new_scale );
 
     this->update();
 }
@@ -1305,6 +1321,7 @@ EditCanvas::zoomOut()
     M_transform.scale( new_scale, new_scale );
 
     Options::instance().setAutoFitMode( false );
+    Options::instance().setViewScale( new_scale );
 
     this->update();
 }
@@ -1325,6 +1342,8 @@ EditCanvas::fitToScreen()
     M_transform.reset();
     M_transform.translate( this->width() * 0.5, this->height() * 0.5 );
     M_transform.scale( scale_factor, scale_factor );
+
+    Options::instance().setViewScale( scale_factor );
 
     this->update();
 }

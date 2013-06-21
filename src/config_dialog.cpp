@@ -40,6 +40,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <cmath>
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -74,6 +75,8 @@ ConfigDialog::createWidgets()
     layout->setSpacing( 4 );
 
     layout->addWidget( createViewSizeControls(),
+                       0, Qt::AlignLeft );
+    layout->addWidget( createViewScaleControls(),
                        0, Qt::AlignLeft );
 
     this->setLayout( layout );
@@ -113,6 +116,33 @@ ConfigDialog::createViewSizeControls()
     connect( apply_view_size_btn, SIGNAL( clicked() ),
              this, SLOT( applyViewSize() ) );
     layout->addWidget( apply_view_size_btn );
+
+    group_box->setLayout( layout );
+    return group_box;
+}
+
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+QWidget *
+ConfigDialog::createViewScaleControls()
+{
+    QGroupBox * group_box = new QGroupBox( tr( "View Scale" ) );
+
+    QHBoxLayout * layout = new QHBoxLayout();
+    layout->setContentsMargins( 1, 1, 1, 1 );
+    layout->setSpacing( 0 );
+
+    layout->addWidget( new QLabel( tr( " Scale:" ) ) );
+
+    M_scale_text = new QLineEdit( tr( "0.0" ) );
+    M_scale_text->setValidator( new QDoubleValidator( 0.0, 400.0, 3, M_scale_text ) );
+    M_scale_text->setMaximumSize( 48, 24 );
+    connect( M_scale_text, SIGNAL( textChanged( const QString & ) ),
+             this, SLOT( editViewScale( const QString & ) ) );
+    layout->addWidget( M_scale_text );
 
     group_box->setLayout( layout );
     return group_box;
@@ -172,5 +202,25 @@ ConfigDialog::applyViewSize()
          && height > 0 )
     {
         emit viewResizeApplied( QSize( width, height ) );
+    }
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+ConfigDialog::editViewScale( const QString & text )
+{
+    bool ok = true;
+    double value = text.toDouble( &ok );
+
+    if ( ok
+         && std::fabs( value - Options::instance().viewScale() ) >= 0.01 )
+    {
+        Options::instance().setAutoFitMode( false );
+        Options::instance().setViewScale( value );
+
+        emit configured();
     }
 }

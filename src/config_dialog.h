@@ -46,6 +46,7 @@ private:
     // canvas size control
     QLineEdit * M_view_width_text;
     QLineEdit * M_view_height_text;
+    QLineEdit * M_scale_text;
 
 public:
 
@@ -57,6 +58,7 @@ private:
 
     void createWidgets();
     QWidget * createViewSizeControls();
+    QWidget * createViewScaleControls();
 
 protected:
 
@@ -68,10 +70,12 @@ private slots:
     void updateAll();
 
     void applyViewSize();
+    void editViewScale( const QString & text );
 
 signals:
 
     void viewResizeApplied( const QSize & size );
+    void configured();
     void shown( bool on );
 
 };

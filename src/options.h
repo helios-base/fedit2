@@ -32,6 +32,7 @@
 #ifndef FEDIT_OPTIONS_H
 #define FEDIT_OPTIONS_H
 
+#include <QPointF>
 #include <QString>
 
 /*!
@@ -68,6 +69,9 @@ private:
 
     int M_view_width;
     int M_view_height;
+
+    QPointF M_focus_point;
+    double M_view_scale;
 
     //
     // editor options
@@ -174,12 +178,31 @@ public:
           return M_view_height;
       }
 
+    const QPointF & focusPoint() const
+      {
+          return M_focus_point;
+      }
+
+    double viewScale() const
+      {
+          return M_view_scale;
+      }
 
     void setViewSize( const int width,
                       const int height )
       {
           M_view_width = width;
           M_view_height = height;
+      }
+
+    void setFocusPoint( const QPointF & p )
+      {
+          M_focus_point = p;
+      }
+
+    void setViewScale( const double scale )
+      {
+          M_view_scale = scale;
       }
 
     //
