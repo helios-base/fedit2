@@ -471,6 +471,26 @@ EditData::updateRoleData( const int unum,
 
  */
 void
+EditData::updateMarkerData( const int unum,
+                            const bool marker,
+                            const bool setplay_marker )
+{
+    if ( ! M_formation )
+    {
+        return;
+    }
+
+    if ( M_formation->updateMarker( unum, marker, setplay_marker ) )
+    {
+        M_conf_changed = true;
+    }
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
 EditData::moveBallTo( const double & x,
                       const double & y )
 {

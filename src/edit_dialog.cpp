@@ -81,7 +81,7 @@ EditDialog::createWidgets()
         QHBoxLayout * layout = new QHBoxLayout();
         top_vbox->addLayout( layout );
 
-        layout->addStretch( 1 );
+        //layout->addStretch( 1 );
         {
             QLabel * label = new QLabel( tr( "Type Name " ) );
             label->setAlignment( Qt::AlignCenter );
@@ -89,7 +89,7 @@ EditDialog::createWidgets()
                                1,
                                Qt::AlignLeft | Qt::AlignVCenter );
         }
-        layout->addSpacing( 4 );
+        //layout->addSpacing( 4 );
         {
             M_type_name = new QLineEdit( tr( "---" ) );
             M_type_name->setMinimumWidth( this->fontMetrics().width( "DelaunayTriangulationXXXX" ) + 4 );
@@ -108,13 +108,13 @@ EditDialog::createWidgets()
         QHBoxLayout * layout = new QHBoxLayout();
         top_vbox->addLayout( layout );
 
-        layout->addStretch( 1 );
+        //layout->addStretch( 1 );
         {
             QLabel * label = new QLabel( tr( "Ball" ) );
             label->setMaximumSize( 40, this->fontMetrics().height() + 12 );
             layout->addWidget( label, 0, Qt::AlignCenter );
         }
-        layout->addStretch( 1 );
+        //layout->addStretch( 1 );
         {
             QLabel * label = new QLabel( tr( " X:" ) );
             label->setMaximumSize( 24, this->fontMetrics().height() + 12 );
@@ -129,7 +129,7 @@ EditDialog::createWidgets()
                      this, SLOT( validateBallCoordinate() ) );
             layout->addWidget( M_ball_pos_x, 0, Qt::AlignLeft | Qt::AlignVCenter );
         }
-        layout->addStretch( 1 );
+        //layout->addStretch( 1 );
         {
             QLabel * label = new QLabel( tr( " Y:" ) );
             label->setMaximumSize( 24, this->fontMetrics().height() + 12 );
@@ -149,9 +149,11 @@ EditDialog::createWidgets()
 
     {
         const int unum_width = this->fontMetrics().width( tr( "Unum" ) ) + 4;
-        const int symmetry_width = this->fontMetrics().width( tr( "Symmetry" ) ) + 4;
+        const int symmetry_width = this->fontMetrics().width( tr( "0000" ) ) + 4;
         const int role_width = this->fontMetrics().width( tr( "CenterForwardXXXX" ) ) + 4;
         const int coord_width = this->fontMetrics().width( tr( "-00.0000" ) ) + 4;
+        const int marker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
+        const int smarker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
 
         QGridLayout * layout = new QGridLayout();
         top_vbox->addLayout( layout );
@@ -160,15 +162,31 @@ EditDialog::createWidgets()
         layout->setSpacing( 0 );
         layout->setColumnMinimumWidth( 0, unum_width );
         layout->setColumnMinimumWidth( 1, symmetry_width );
+        layout->setColumnMinimumWidth( 5, marker_width );
+        layout->setColumnMinimumWidth( 6, smarker_width );
 
         // header
         int row = 0;
         int col = 0;
         layout->addWidget( new QLabel( tr( "Unum" ) ), 0, col, Qt::AlignCenter ); ++col;
-        layout->addWidget( new QLabel( tr( "Symmetry" ) ), 0, col, Qt::AlignCenter ); ++col;
+        {
+            QLabel * l = new QLabel( tr( "R" ) );
+            l->setToolTip( tr( "Symmetry Reference Number" ) );
+            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        }
         layout->addWidget( new QLabel( tr( "Role" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "X" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Y" ) ), 0, col, Qt::AlignCenter ); ++col;
+        {
+            QLabel * l = new QLabel( tr( "M" ) );
+            l->setToolTip( tr( "Marker Type" ) );
+            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        }
+        {
+            QLabel * l = new QLabel( tr( "SPM" ) );
+            l->setToolTip( tr( "SetPlay Marker Type" ) );
+            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        }
 
         row = 1;
         for ( int i = 0; i < 11; ++i, ++row )
@@ -203,6 +221,14 @@ EditDialog::createWidgets()
             M_pos_y[i]->setMaximumSize( coord_width, 24 );
             M_pos_y[i]->setValidator( new QDoubleValidator( -39.0, 39.0, 2, M_pos_y[i] ) );
             layout->addWidget( M_pos_y[i], row, col, Qt::AlignCenter );
+            ++col;
+
+            M_marker[i] = new QCheckBox();
+            layout->addWidget( M_marker[i], row, col, Qt::AlignCenter );
+            ++col;
+
+            M_setplay_marker[i] = new QCheckBox();
+            layout->addWidget( M_setplay_marker[i], row, col, Qt::AlignCenter );
             ++col;
         }
     }
@@ -315,6 +341,12 @@ EditDialog::updateData()
         //M_role_name[i]->setReadOnly( symmetry );
         //M_role_name[i]->setEnabled( ! symmetry );
 
+        M_marker[i]->setCheckState( f->isMarker( unum )
+                                    ? Qt::Checked
+                                    : Qt::Unchecked );
+        M_setplay_marker[i]->setCheckState( f->isSetPlayMarker( unum )
+                                            ? Qt::Checked
+                                            : Qt::Unchecked );
     }
 }
 
@@ -415,6 +447,10 @@ EditDialog::applyToField()
         {
             ptr->movePlayerTo( unum, x, y );
         }
+
+        ptr->updateMarkerData( unum,
+                               ( M_marker[unum-1]->checkState() == Qt::Checked ),
+                               ( M_setplay_marker[unum-1]->checkState() == Qt::Checked ) );
     }
 
     updateData();

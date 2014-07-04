@@ -36,6 +36,7 @@
 
 #include <boost/weak_ptr.hpp>
 
+class QCheckBox;
 class QCloseEvent;
 class QShowEvent;
 class QLineEdit;
@@ -62,6 +63,8 @@ private:
 
     QLineEdit * M_symmetry_unum[11];
     QLineEdit * M_role_name[11];
+    QCheckBox * M_marker[11];
+    QCheckBox * M_setplay_marker[11];
 
     QLineEdit * M_pos_x[11];
     QLineEdit * M_pos_y[11];

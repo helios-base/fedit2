@@ -1,3 +1,11 @@
+2014-07-04  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/edit_data.cpp:
+	* src/edit_data.h:
+	* src/edit_dialog.cpp:
+	* src/edit_dialog.h:
+	- 編集ダイアログにマーク行動の割当を選択できるチェックボックスを追加
+
 2013-06-22  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/config_dialog.cpp:
