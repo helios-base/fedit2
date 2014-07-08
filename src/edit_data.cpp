@@ -471,6 +471,25 @@ EditData::updateRoleData( const int unum,
 
  */
 void
+EditData::updateRoleType( const int unum,
+                          const int type_index )
+{
+    if ( ! M_formation )
+    {
+        return;
+    }
+
+    if ( M_formation->updateRoleType( unum, static_cast< Formation::RoleType >( type_index ) ) )
+    {
+        M_conf_changed = true;
+    }
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
 EditData::updateMarkerData( const int unum,
                             const bool marker,
                             const bool setplay_marker )

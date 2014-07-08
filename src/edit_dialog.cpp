@@ -174,7 +174,8 @@ EditDialog::createWidgets()
             l->setToolTip( tr( "Symmetry Reference Number" ) );
             layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
         }
-        layout->addWidget( new QLabel( tr( "Role" ) ), 0, col, Qt::AlignCenter ); ++col;
+        layout->addWidget( new QLabel( tr( "Type" ) ), 0, col, Qt::AlignCenter ); ++col;
+        layout->addWidget( new QLabel( tr( "Role Name" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "X" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Y" ) ), 0, col, Qt::AlignCenter ); ++col;
         {
@@ -204,6 +205,14 @@ EditDialog::createWidgets()
             M_symmetry_unum[i]->setMaximumSize( symmetry_width, 24 );
             M_symmetry_unum[i]->setValidator( new QIntValidator( -1, 11, M_symmetry_unum[i] ) );
             layout->addWidget( M_symmetry_unum[i], row, col, Qt::AlignCenter );
+            ++col;
+
+            M_role_type[i] = new QComboBox();
+            M_role_type[i]->addItem( tr( "G" ) );
+            M_role_type[i]->addItem( tr( "DF" ) );
+            M_role_type[i]->addItem( tr( "MF" ) );
+            M_role_type[i]->addItem( tr( "FW" ) );
+            layout->addWidget( M_role_type[i], row, col, Qt::AlignCenter );
             ++col;
 
             M_role_name[i] = new QLineEdit( tr( "Role" ) );
@@ -333,6 +342,8 @@ EditDialog::updateData()
         int unum = i + 1;
         //const bool symmetry = ( p->symmetryUnum() > 0 );
         M_symmetry_unum[i]->setText( QString::number( f->getSymmetryNumber( unum ) ) );
+
+        M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ) ) );
         M_role_name[i]->setText( QString::fromStdString( f->getRoleName( unum ) ) );
 
         M_pos_x[i]->setText( QString::number( s.players_[i].x, 'f', 2 ) );
@@ -447,6 +458,8 @@ EditDialog::applyToField()
         {
             ptr->movePlayerTo( unum, x, y );
         }
+
+        ptr->updateRoleType( unum, M_role_type[unum-1]->currentIndex() );
 
         ptr->updateMarkerData( unum,
                                ( M_marker[unum-1]->checkState() == Qt::Checked ),

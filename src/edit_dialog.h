@@ -38,6 +38,7 @@
 
 class QCheckBox;
 class QCloseEvent;
+class QComboBox;
 class QShowEvent;
 class QLineEdit;
 
@@ -56,12 +57,13 @@ private:
 
     boost::weak_ptr< EditData > M_edit_data;
 
-    QLineEdit * M_type_name;
+    QLineEdit * M_type_name; //! formation method type
 
     QLineEdit * M_ball_pos_x;
     QLineEdit * M_ball_pos_y;
 
     QLineEdit * M_symmetry_unum[11];
+    QComboBox * M_role_type[11];
     QLineEdit * M_role_name[11];
     QCheckBox * M_marker[11];
     QCheckBox * M_setplay_marker[11];

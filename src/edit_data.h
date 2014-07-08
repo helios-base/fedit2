@@ -188,6 +188,8 @@ public:
     void updateRoleData( const int unum,
                          const int symmetry_unum,
                          const std::string & role_name );
+    void updateRoleType( const int unum,
+                         const int type_index );
     void updateMarkerData( const int unum,
                            const bool marker,
                            const bool setplay_marker );
