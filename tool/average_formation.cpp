@@ -145,6 +145,11 @@ AverageConfGenerator::generate( const char * base_filepath,
         average_formation->updateRole( unum,
                                        symmetry_unum,
                                        M_base_formation->getRoleName( unum ) );
+        average_formation->updateRoleType( unum,
+                                           M_base_formation->roleType( unum ) );
+        average_formation->updateMarker( unum,
+                                         M_base_formation->isMarker( unum ),
+                                         M_base_formation->isSetPlayMarker( unum ) );
     }
 
     //
