@@ -175,7 +175,7 @@ EditData::backup( const QString & filepath )
     {
         backup_filepath += QString( "_" );
         backup_filepath += M_saved_datetime;
-        backup_filepath += QString( ".conf" );
+        //backup_filepath += QString( ".conf" );
     }
 
     if ( ! QFile::copy( filepath, backup_filepath ) )
