@@ -1,3 +1,18 @@
+2016-05-20  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* tool/dttrainer/Makefile.am:
+	* tool/dttrainer/main.cpp:
+	* tool/dttrainer/memo:
+	* tool/dttrainer/trainer.cpp:
+	* tool/dttrainer/trainer.h:
+	* configure.ac:
+	* tool/Makefile.am:
+	- 三角形分割フォーメーションモデルを用いた学習プログラムを追加。実
+	装途中。
+
+	* m4/qt.m4:
+	- OSX環境での不具合に対応
+
 2015-07-18  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* src/edit_data.cpp:

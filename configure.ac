@@ -123,6 +123,7 @@ AC_CHECK_FUNCS([sqrt rint])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 tool/Makefile])
+                 tool/Makefile
+                 tool/dttrainer/Makefile])
 
 AC_OUTPUT
