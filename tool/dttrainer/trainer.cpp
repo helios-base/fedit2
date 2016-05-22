@@ -35,6 +35,9 @@
 
 #include "trainer.h"
 
+#include <rcsc/geom/line_2d.h>
+#include <rcsc/geom/segment_2d.h>
+
 #include <iostream>
 #include <fstream>
 #include <cstdio>
@@ -65,18 +68,13 @@ Trainer::readFormation( const std::string & filepath )
         return false;
     }
 
-    Formation::Ptr ptr = Formation::create( fin );
-
-    if ( ! ptr )
+    if ( ! M_formation.read( fin ) )
     {
+        std::cerr << "Failed to read formation data" << std::endl;
         return false;
     }
 
-    fin.seekg( 0 );
-    if ( ! ptr->read( fin ) )
-    {
-        return false;
-    }
+    M_target_data = M_formation.sampleVector();
 
     fin.close();
 
@@ -126,10 +124,22 @@ Trainer::readTrainingData( const std::string & filepath )
             return false;
         }
 
-        M_data.push_back( Data( bx, by, unum, px, py ) );
+        M_training_data.push_back( Data( bx, by, unum, px, py ) );
     }
 
     return true;
+}
+
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+bool
+Trainer::printFormation( std::ostream & os ) const
+{
+    M_formation.print( os );
+    return os;
 }
 
 /*-------------------------------------------------------------------*/
@@ -139,6 +149,64 @@ Trainer::readTrainingData( const std::string & filepath )
 bool
 Trainer::train()
 {
+    for ( std::vector< Data >::const_iterator it = M_training_data.begin(), end = M_training_data.end();
+          it != end;
+          ++it )
+    {
+        train( *it );
+    }
 
-    return false;
+    M_formation.train();
+
+    return true;
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+Trainer::train( const Data & data )
+{
+    const DelaunayTriangulation::Triangle * t = M_formation.triangulation().findTriangleContains( data.ball_ );
+
+    if ( ! t )
+    {
+        std::cerr << "Could not find the triangle that contains " << data.ball_ << std::endl;
+        return;
+    }
+
+    const Vector2D old_pos = M_formation.getPosition( data.unum_, data.ball_ );
+
+    if ( ! old_pos.isValid() )
+    {
+        std::cerr << "Could not calculate the position."
+                  << " ball=" << data.ball_ << " unum=" << data.unum_ << std::endl;
+        return;
+    }
+
+    size_t idx0 = size_t( t->vertex( 0 )->id() );
+    size_t idx1 = size_t( t->vertex( 1 )->id() );
+    size_t idx2 = size_t( t->vertex( 2 )->id() );
+
+    if ( idx0 >= M_target_data.size()
+         || idx1 >= M_target_data.size()
+         || idx2 >= M_target_data.size() )
+    {
+        std::cerr << "Could not find the target vertex ball=" << data.ball_ << std::endl;
+        return;
+    }
+
+    const Vector2D diff = ( data.pos_ - old_pos ) * M_alpha;
+
+    M_target_data[idx0].players_[data.unum_] += diff;
+    M_target_data[idx1].players_[data.unum_] += diff;
+    M_target_data[idx2].players_[data.unum_] += diff;
+
+    std::cerr << "vertices " << idx0 << ' ' << idx1 << ' ' << idx2 << std::endl;
+
+    formation::SampleDataSet::Ptr ptr = M_formation.samples();
+    ptr->replaceData( M_formation, idx0, M_target_data[idx0], true );
+    ptr->replaceData( M_formation, idx1, M_target_data[idx1], true );
+    ptr->replaceData( M_formation, idx2, M_target_data[idx2], true );
 }

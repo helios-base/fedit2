@@ -32,7 +32,6 @@
 #ifndef FEDIT2_TRAINER_H
 #define FEDIT2_TRAINER_H
 
-#include <rcsc/formation/formation.h>
 #include <rcsc/formation/formation_dt.h>
 
 #include <rcsc/geom/vector_2d.h>
@@ -61,9 +60,11 @@ public:
 
 private:
 
-    rcsc::Formation::Ptr M_formation; //!< target formation
+    rcsc::FormationDT M_formation; //!< target formation
+    std::vector< rcsc::formation::SampleData > M_target_data;
+
     double M_alpha; //!< learning rate
-    std::vector< Data > M_data;
+    std::vector< Data > M_training_data;
 
 public:
 
@@ -71,9 +72,12 @@ public:
 
     bool readFormation( const std::string & filepath );
     bool readTrainingData( const std::string & filepath );
+    bool printFormation( std::ostream & os ) const;
 
     bool train();
 
+private:
+    void train( const Data & data );
 
 };
 

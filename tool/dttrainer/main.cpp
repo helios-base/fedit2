@@ -32,10 +32,36 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 int
-main()
+main( int argc,
+      char ** argv )
 {
+    Trainer trainer;
+
+    std::string formation_conf;
+    std::string training_data;
+
+    if ( argc < 3 )
+    {
+        std::cerr << "Usage: "
+                  << argv[0] << " <FORMATION.CONF> <TRAINING.DAT>"
+                  << std::endl;
+        return 1;
+    }
+
+    if ( ! trainer.readFormation( formation_conf ) )
+    {
+        return 1;
+    }
+
+    if ( ! trainer.readTrainingData( training_data ) )
+    {
+        return 1;
+    }
+
+    trainer.train();
 
     return 0;
 }

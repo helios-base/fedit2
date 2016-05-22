@@ -1,3 +1,10 @@
+2016-05-22  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* tool/dttrainer/main.cpp:
+	* tool/dttrainer/trainer.cpp:
+	* tool/dttrainer/trainer.h:
+	- 三角形分割フォーメーションの学習機能と入出力をほぼ実装．
+
 2016-05-20  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* tool/dttrainer/Makefile.am:
