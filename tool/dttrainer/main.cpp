@@ -51,17 +51,28 @@ main( int argc,
         return 1;
     }
 
+    formation_conf = argv[1];
+    training_data = argv[2];
+
     if ( ! trainer.readFormation( formation_conf ) )
     {
+        std::cerr << "ERROR: readFormation" << std::endl;
         return 1;
     }
 
     if ( ! trainer.readTrainingData( training_data ) )
     {
+        std::cerr << "ERROR: readTrainingData" << std::endl;
         return 1;
     }
 
     trainer.train();
 
+    {
+        std::string result_conf = "result.conf";
+        std::ofstream fout( result_conf.c_str() );
+        trainer.printFormation( fout );
+    }
+    std::cerr << "finished all" << std::endl;
     return 0;
 }
