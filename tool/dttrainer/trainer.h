@@ -63,8 +63,11 @@ private:
     rcsc::FormationDT M_formation; //!< target formation
     std::vector< rcsc::formation::SampleData > M_target_data;
 
-    double M_alpha; //!< learning rate
     std::vector< Data > M_training_data;
+
+    double M_alpha; //!< learning rate
+    double M_error_thr;
+    int M_max_loop;
 
 public:
 
@@ -74,10 +77,13 @@ public:
     bool readTrainingData( const std::string & filepath );
     bool printFormation( std::ostream & os ) const;
 
-    bool train();
+    void train();
 
 private:
-    void train( const Data & data );
+    /*!
+      \return error value. negative value is returned if update process failed
+     */
+    double train( const Data & data );
 
 };
 

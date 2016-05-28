@@ -49,7 +49,9 @@ using namespace rcsc;
 
  */
 Trainer::Trainer()
-    : M_alpha( 0.1 )
+    : M_alpha( 0.1 ),
+      M_error_thr( 0.1 ),
+      M_max_loop( 500 )
 {
 
 }
@@ -146,26 +148,39 @@ Trainer::printFormation( std::ostream & os ) const
 /*!
 
  */
-bool
+void
 Trainer::train()
 {
-    for ( std::vector< Data >::const_iterator it = M_training_data.begin(), end = M_training_data.end();
-          it != end;
-          ++it )
+    for ( int i = 0; i < M_max_loop; ++i )
     {
-        train( *it );
+        double max_error = 0.0;
+
+        for ( std::vector< Data >::const_iterator it = M_training_data.begin(), end = M_training_data.end();
+              it != end;
+              ++it )
+        {
+            double error_value = train( *it );
+            if ( error_value >= 0.0
+                 && error_value > max_error )
+            {
+                max_error = error_value;
+            }
+        }
+
+        M_formation.train();
+
+        if ( max_error < M_error_thr )
+        {
+            break;
+        }
     }
-
-    M_formation.train();
-
-    return true;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-void
+double
 Trainer::train( const Data & data )
 {
     const DelaunayTriangulation::Triangle * t = M_formation.triangulation().findTriangleContains( data.ball_ );
@@ -173,7 +188,7 @@ Trainer::train( const Data & data )
     if ( ! t )
     {
         std::cerr << "Could not find the triangle that contains " << data.ball_ << std::endl;
-        return;
+        return -1.0;
     }
 
     const Vector2D old_pos = M_formation.getPosition( data.unum_, data.ball_ );
@@ -182,7 +197,7 @@ Trainer::train( const Data & data )
     {
         std::cerr << "Could not calculate the position."
                   << " ball=" << data.ball_ << " unum=" << data.unum_ << std::endl;
-        return;
+        return -1.0;
     }
 
     size_t idx0 = size_t( t->vertex( 0 )->id() );
@@ -194,19 +209,29 @@ Trainer::train( const Data & data )
          || idx2 >= M_target_data.size() )
     {
         std::cerr << "Could not find the target vertex ball=" << data.ball_ << std::endl;
-        return;
+        return -1.0;
     }
 
-    const Vector2D diff = ( data.pos_ - old_pos ) * M_alpha;
+    Vector2D diff = data.pos_ - old_pos;
+    double error_value = diff.r();
 
+#if 1
+    std::cerr << "train:\n"
+              << " ball=" << data.ball_  << " unum=" << data.unum_ << data.pos_ << '\n';
+    std::cerr << " target vertices: " << idx0 << ' ' << idx1 << ' ' << idx2 << '\n';
+    std::cerr << " diff=" << diff << " error=" << error_value << std::endl;
+#endif
+
+    diff *= M_alpha;
     M_target_data[idx0].players_[data.unum_] += diff;
     M_target_data[idx1].players_[data.unum_] += diff;
     M_target_data[idx2].players_[data.unum_] += diff;
 
-    std::cerr << "vertices " << idx0 << ' ' << idx1 << ' ' << idx2 << std::endl;
 
     formation::SampleDataSet::Ptr ptr = M_formation.samples();
     ptr->replaceData( M_formation, idx0, M_target_data[idx0], true );
     ptr->replaceData( M_formation, idx1, M_target_data[idx1], true );
     ptr->replaceData( M_formation, idx2, M_target_data[idx2], true );
+
+    return error_value;
 }

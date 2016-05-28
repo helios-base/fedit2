@@ -1,3 +1,9 @@
+2016-05-28  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* tool/dttrainer/trainer.cpp:
+	* tool/dttrainer/trainer.h:
+	- 学習のループと誤差値の判定を追加．未テスト
+
 2016-05-22  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* tool/dttrainer/main.cpp:
