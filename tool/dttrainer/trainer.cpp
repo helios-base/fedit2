@@ -155,6 +155,8 @@ Trainer::train()
     {
         double max_error = 0.0;
 
+        std::cerr << "loop " << i + 1 << std::endl;
+
         for ( std::vector< Data >::const_iterator it = M_training_data.begin(), end = M_training_data.end();
               it != end;
               ++it )
@@ -167,7 +169,7 @@ Trainer::train()
             }
         }
 
-        M_formation.train();
+         M_formation.train();
 
         if ( max_error < M_error_thr )
         {
@@ -211,7 +213,6 @@ Trainer::train( const Data & data )
         std::cerr << "Could not find the target vertex ball=" << data.ball_ << std::endl;
         return -1.0;
     }
-
     Vector2D diff = data.pos_ - old_pos;
     double error_value = diff.r();
 
@@ -223,10 +224,9 @@ Trainer::train( const Data & data )
 #endif
 
     diff *= M_alpha;
-    M_target_data[idx0].players_[data.unum_] += diff;
-    M_target_data[idx1].players_[data.unum_] += diff;
-    M_target_data[idx2].players_[data.unum_] += diff;
-
+    M_target_data[idx0].players_[data.unum_ - 1] += diff;
+    M_target_data[idx1].players_[data.unum_ - 1] += diff;
+    M_target_data[idx2].players_[data.unum_ - 1] += diff;
 
     formation::SampleDataSet::Ptr ptr = M_formation.samples();
     ptr->replaceData( M_formation, idx0, M_target_data[idx0], true );

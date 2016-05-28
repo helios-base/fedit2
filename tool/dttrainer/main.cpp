@@ -66,6 +66,7 @@ main( int argc,
         return 1;
     }
 
+    std::cerr << "start" << std::endl;
     trainer.train();
 
     {

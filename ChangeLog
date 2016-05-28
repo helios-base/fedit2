@@ -1,6 +1,10 @@
 2016-05-28  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* tool/dttrainer/main.cpp:
+	* tool/dttrainer/trainer.cpp:
+	- 配列のインデックス誤りのバグを修正
+
+	* tool/dttrainer/main.cpp:
 	- ファイル入出力処理を追加
 
 	* tool/dttrainer/trainer.cpp:
