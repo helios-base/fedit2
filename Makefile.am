@@ -9,7 +9,6 @@ libtool: $(LIBTOOL_DEPS)
 EXTRA_DIST = \
 	bootstrap \
 	fedit2.pro \
-	rcsc/rcsc.pro \
 	xpm/chase.xpm \
 	xpm/delete.xpm \
 	xpm/hand.xpm \

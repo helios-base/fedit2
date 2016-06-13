@@ -1,3 +1,10 @@
+2016-06-13  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* Makefile.am:
+	* configure.ac:
+	- 存在しないファイルをターゲットから削除
+	- 暫定バージョン番号として日付を設定
+
 2016-05-28  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* tool/dttrainer/main.cpp:

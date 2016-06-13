@@ -2,11 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(fedit2, 0.0.0, akky@users.sourceforge.jp)
+AC_INIT(fedit2, [20160613], akky@users.sourceforge.jp)
 
 AC_CONFIG_AUX_DIR([config])
 #AM_INIT_AUTOMAKE([gnu check-news])
 AM_INIT_AUTOMAKE([gnu])
+
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
