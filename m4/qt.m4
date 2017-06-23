@@ -68,7 +68,7 @@ AC_DEFUN([AX_QT3],
   QT3_CXXFLAGS="$QT3_CFLAGS"
   QT3_CPPFLAGS=""
   QT3_LDFLAGS=$($PKG_CONFIG --libs-only-L qt-mt)
-  QT3_LDADD="$($PKG_CONFIG --libs-only-other qt-mt)$($PKG_CONFIG --libs-only-l qt-mt)"
+  QT3_LDADD="$($PKG_CONFIG --libs-only-other qt-mt) $($PKG_CONFIG --libs-only-l qt-mt)"
   AC_MSG_NOTICE([set QT3_CXXFLAGS... $QT3_CXXFLAGS])
   AC_MSG_NOTICE([set QT3_LDFLAGS... $QT3_LDFLAGS])
   AC_MSG_NOTICE([set QT3_LDADD... $QT3_LDADD])

@@ -1,3 +1,8 @@
+2017-06-23  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* m4/qt4.m4:
+	- Ubuntu16.04でのエラーに対応
+
 2016-06-13  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* Makefile.am:
