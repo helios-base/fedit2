@@ -33,7 +33,13 @@
 #include <config.h>
 #endif
 
+#include <QtGlobal>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
 
 #include "constraint_view.h"
 
@@ -67,9 +73,13 @@ ConstraintView::ConstraintView( QWidget * parent )
     //header_labels << tr( "Origin" ) << tr( "Terminal" );
     this->setHorizontalHeaderLabels( header_labels );
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    this->horizontalHeader()->setSectionResizeMode( QHeaderView::Stretch );
+#else
     //this->horizontalHeader()->setResizeMode( QHeaderView::ResizeToContents );
     this->horizontalHeader()->setResizeMode( QHeaderView::Stretch );
     //this->horizontalHeader()->setStretchLastSection( true );
+#endif
 
     this->verticalHeader()->hide();
 

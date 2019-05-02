@@ -1,3 +1,29 @@
+2019-05-02  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* m4/ax_boost_system.m4:
+	* m4/ax_cxx_compile_stdcxx.m4:
+	* m4/ax_cxx_compile_stdcxx_14.m4:
+	* configure.ac:
+	* m4/ax_boost_base.m4:
+	* m4/qt.m4:
+	* src/Makefile.am:
+	* src/command.cpp:
+	* src/config_dialog.cpp:
+	* src/constraint_delegate.cpp:
+	* src/constraint_edit_dialog.cpp:
+	* src/constraint_view.cpp:
+	* src/coordinate_delegate.cpp:
+	* src/edit_canvas.cpp:
+	* src/edit_dialog.cpp:
+	* src/main.cpp:
+	* src/main_window.cpp:
+	* src/sample_view.cpp:
+	* tool/average_formation.cpp:
+	* tool/dttrainer/trainer.cpp:
+	* tool/dttrainer/trainer.h:
+	- Qt5に対応
+	- C++14に対応
+
 2017-06-23  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* m4/qt4.m4:

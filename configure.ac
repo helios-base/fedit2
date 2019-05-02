@@ -4,55 +4,90 @@
 AC_PREREQ(2.61)
 AC_INIT(fedit2, [20160613], akky@users.sourceforge.jp)
 
+AC_CONFIG_SRCDIR([config.h.in])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([config])
+AC_CONFIG_MACRO_DIR([m4])
+
 #AM_INIT_AUTOMAKE([gnu check-news])
 AM_INIT_AUTOMAKE([gnu])
 
-AC_CONFIG_SRCDIR([config.h.in])
-AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
 
 AC_LANG([C++])
 
 # Checks for programs.
-AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
-AC_SUBST(LIBTOOL_DEPS)
+#AC_DISABLE_STATIC
+#AC_PROG_LIBTOOL
+#AC_SUBST(LIBTOOL_DEPS)
 
 # Checks for libraries.
 
-# boost
-AX_BOOST_BASE([1.38.0])
-#AX_BOOST_UNIT_TEST_FRAMEWORK
-CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
-
-# Qt4
-AC_MSG_NOTICE(enabled Qt4)
-QT4MODULES="QtCore QtGui QtNetwork"
-
+# ----------------------------------------------------------
+# check Qt
+AC_ARG_ENABLE(qt5,
+              AC_HELP_STRING([--enable-qt5],
+                             [use Qt5 tool kit (default no)]))
 AC_ARG_ENABLE(gl,
               AC_HELP_STRING([--enable-gl],
-                             [enable GLWidget for Qt4 (default no)]))
-if test "x$enable_gl" == "xyes"; then
-  AC_MSG_NOTICE(enabled GLWidget)
-  CFLAGS="-DUSE_GLWIDGET $CFLAGS"
-  CXXFLAGS="-DUSE_GLWIDGET $CXXFLAGS"
-  QT4MODULES="$QT4MODULES QtOpenGL"
+                             [enable GLWidget for Qt (default yes)]))
+
+if test "x$enable_qt5" == "xyes"; then
+  AC_MSG_NOTICE(enabled Qt5)
+
+  QTMODULES="Qt5Core Qt5Gui Qt5Widgets Qt5Network"
+
+  if test "x$enable_gl" == "xyes"; then
+    AC_MSG_NOTICE(enabled GL5Widget)
+    CFLAGS="-DUSE_GLWIDGET $CFLAGS"
+    CXXFLAGS="-DUSE_GLWIDGET $CXXFLAGS"
+    QTMODULES="$QTMODULES Qt5OpenGL"
+  fi
+
+  AX_QT([5.0.0],[$QTMODULES])
+
+else
+  AC_MSG_NOTICE(enabled Qt4)
+
+  QTMODULES="QtCore QtGui QtNetwork"
+
+  if test "x$enable_gl" == "xyes"; then
+    AC_MSG_NOTICE(enabled GLWidget)
+    CFLAGS="-DUSE_GLWIDGET $CFLAGS"
+    CXXFLAGS="-DUSE_GLWIDGET $CXXFLAGS"
+    QTMODULES="$QTMODULES QtOpenGL"
+  fi
+
+  AX_QT([4.3.0],[$QTMODULES])
 fi
 
-AX_QT4([4.3.0],[$QT4MODULES])
-if test x$have_qt4 != xyes ; then
-  AC_MSG_ERROR([The Qt4 library could not be found.])
+if test x$have_qt != xyes ; then
+  AC_MSG_ERROR([$QTMODULES could not be found.])
+  AM_CONDITIONAL(BUILD_QT, [test "1" = "0"])
+else
+  CFLAGS="-fPIC $CFLAGS"
+  CXXFLAGS="-fPIC $CXXFLAGS"
+  AM_CONDITIONAL(BUILD_QT, [test "1" = "1"])
 fi
 
+# ----------------------------------------------------------
+# check C++
+
+AX_CXX_COMPILE_STDCXX_14(noext)
+
+# ----------------------------------------------------------
+# check boost
+AX_BOOST_BASE([1.38.0])
+AX_BOOST_SYSTEM
+CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
+LIBS="$LIBS $BOOST_SYSTEM_LIB"
 
 # check librcsc path
 AC_SUBST(LIBRCSCLIB)

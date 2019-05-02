@@ -75,7 +75,7 @@ public:
 
     bool readFormation( const std::string & filepath );
     bool readTrainingData( const std::string & filepath );
-    bool printFormation( std::ostream & os ) const;
+    std::ostream & printFormation( std::ostream & os ) const;
 
     void train();
 

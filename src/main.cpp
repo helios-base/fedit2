@@ -44,7 +44,7 @@ int
 main( int argc, char ** argv )
 {
     std::cout << "******************************************************************\n"
-              << " "PACKAGE" "VERSION"\n"
+              << " " PACKAGE " " VERSION "\n"
               << " Copyright: (C) 2013. Hidehisa Akiyama\n"
               << " All rights reserved.\n"
               << "******************************************************************\n"
@@ -52,8 +52,7 @@ main( int argc, char ** argv )
 
     QApplication app( argc, argv );
 
-    if ( ! Options::instance().parseCmdLine( app.argc(),
-                                             app.argv() ) )
+    if ( ! Options::instance().parseCmdLine( argc, argv ) )
     {
         return 1;
     }

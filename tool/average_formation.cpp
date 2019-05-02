@@ -95,7 +95,7 @@ AverageConfGenerator::openTargetFormation( const char * filepath )
         return false;
     }
 
-    return M_target_formation;
+    return true;
 }
 
 /*-------------------------------------------------------------------*/

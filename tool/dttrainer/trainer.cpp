@@ -137,7 +137,7 @@ Trainer::readTrainingData( const std::string & filepath )
 /*!
 
  */
-bool
+std::ostream &
 Trainer::printFormation( std::ostream & os ) const
 {
     M_formation.print( os );
