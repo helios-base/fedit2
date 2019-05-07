@@ -1,3 +1,8 @@
+2019-05-07  Hidehisa Akiyama  <akky@users.sourceforge.jp>
+
+	* src/main_window.cpp:
+	- FormationDT以外を無効化
+
 2019-05-02  Hidehisa Akiyama  <akky@users.sourceforge.jp>
 
 	* m4/ax_boost_system.m4:

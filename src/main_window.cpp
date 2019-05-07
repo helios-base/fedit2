@@ -60,9 +60,9 @@
 #include <rcsc/formation/sample_data.h>
 
 //#include <rcsc/formation/formation_bpn.h>
-#include <rcsc/formation/formation_cdt.h>
+//#include <rcsc/formation/formation_cdt.h>
 #include <rcsc/formation/formation_dt.h>
-#include <rcsc/formation/formation_knn.h>
+//#include <rcsc/formation/formation_knn.h>
 //#include <rcsc/formation/formation_ngnet.h>
 //#include <rcsc/formation/formation_sbsp.h>
 //#include <rcsc/formation/formation_rbf.h>
