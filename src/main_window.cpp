@@ -1089,12 +1089,36 @@ MainWindow::closeEvent( QCloseEvent * event )
 void
 MainWindow::wheelEvent( QWheelEvent * event )
 {
+    //
+    // set window opacity
+    //
+    if ( event->modifiers() == Qt::ControlModifier )
+    {
+        if ( event->delta() < 0 )
+        {
+            this->setWindowOpacity( std::max( 0.1, this->windowOpacity() - 0.05 ) );
+        }
+        else
+        {
+            this->setWindowOpacity( std::min( 1.0, this->windowOpacity() + 0.05 ) );
+        }
+
+        event->accept();
+        return;
+    }
+
+    //
+    // no data
+    //
     if ( M_index_spin_box->maximum() <= 0 )
     {
         event->accept();
         return;
     }
 
+    //
+    // change the selection data
+    //
     int idx = M_index_spin_box->value();
 
     if ( event->delta() > 0 )
