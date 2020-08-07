@@ -102,7 +102,7 @@ if test x$librcsc_prefix != x; then
   LDFLAGS="$LDFLAGS -L$librcsc_prefix/lib"
   LIBRCSCLIB="$librcsc_prefix/lib"
 else
-  for librcsc_path_tmp in $HOME $HOME/local $HOME/rcss /opt/robocup /opt /opt/local ; do
+  for librcsc_path_tmp in $HOME/.local $HOME/local $HOME/rcss /opt/robocup /opt /opt/local ; do
     if test -d "$librcsc_path_tmp/include/rcsc" && test -r "$librcsc_path_tmp/include/rcsc/types.h" ; then
       CPPFLAGS="$CPPFLAGS -I$librcsc_path_tmp/include"
       LDFLAGS="$LDFLAGS -L$librcsc_path_tmp/lib"
