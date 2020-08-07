@@ -116,32 +116,9 @@ fi
 AC_CHECK_LIB([m], [cos],
              [LIBS="-lm $LIBS"],
              [AC_MSG_ERROR([*** -lm not found! ***])])
-AC_CHECK_LIB([rcsc_geom], [main],
-             [LIBS="-lrcsc_geom $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_geom not found! ***])])
-AC_CHECK_LIB([rcsc_rcg], [main],
-             [LIBS="-lrcsc_rcg $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_rcg not found! ***])])
-AC_CHECK_LIB([rcsc_gz], [main])
-AC_CHECK_LIB([rcsc_param], [main],
-             [LIBS="-lrcsc_param $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_param not found! ***])])
-AC_CHECK_LIB([rcsc_net], [main],
-             [LIBS="-lrcsc_net $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_net not found! ***])])
-AC_CHECK_LIB([rcsc_time], [main],
-             [LIBS="-lrcsc_time $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_time not found! ***])])
-AC_CHECK_LIB([rcsc_ann], [main],
-             [LIBS="-lrcsc_ann $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_ann not found! ***])])
-AC_CHECK_LIB([rcsc_clang], [main],
-             [LIBS="-lrcsc_clang $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_ann not found! ***])])
-AC_CHECK_LIB([rcsc_agent], [main],
-             [LIBS="-lrcsc_agent $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_agent not found! ***])])
-
+AC_CHECK_LIB([rcsc], [main],
+             [LIBS="-lrcsc $LIBS"],
+             [AC_MSG_ERROR([*** -lrcsc not found! ***])])
 
 # Checks for header files.
 
