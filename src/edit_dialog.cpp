@@ -349,7 +349,7 @@ EditDialog::updateData()
         //const bool symmetry = ( p->symmetryUnum() > 0 );
         M_symmetry_unum[i]->setText( QString::number( f->getSymmetryNumber( unum ) ) );
 
-        M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ) ) );
+        M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ).type() ) );
         M_role_name[i]->setText( QString::fromStdString( f->getRoleName( unum ) ) );
 
         M_pos_x[i]->setText( QString::number( s.players_[i].x, 'f', 2 ) );
