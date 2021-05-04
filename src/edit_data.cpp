@@ -479,7 +479,7 @@ EditData::updateRoleType( const int unum,
         return;
     }
 
-    if ( M_formation->updateRoleType( unum, static_cast< Formation::RoleType >( type_index ) ) )
+    if ( M_formation->updateRoleType( unum, static_cast< RoleType >( type_index ) ) )
     {
         M_conf_changed = true;
     }
