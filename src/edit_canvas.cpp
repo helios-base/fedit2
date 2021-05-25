@@ -1053,7 +1053,7 @@ EditCanvas::drawBackgroundPlayers( QPainter & painter )
     const double r = ( enlarge
                        ? 1.085 * 0.5
                        : 0.3 * 0.5 );
-    const int d = r * 2.0;
+    const double d = r * 2.0;
 
     const QTransform transform = painter.worldTransform();
 
