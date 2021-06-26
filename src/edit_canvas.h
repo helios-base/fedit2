@@ -100,6 +100,7 @@ private:
     QPen M_background_font_pen;
 
     QPen M_shoot_line_pen;
+    QPen M_free_kick_circle_pen;
 
     //! 0: left, 1: middle, 2: right
     MouseState M_mouse_state[3];
@@ -131,6 +132,7 @@ private:
     void drawPlayers( QPainter & painter );
     void drawBall( QPainter & painter );
     void drawShootLines( QPainter & painter );
+    void drawFreeKickCircle( QPainter & painter );
     void drawGoalieMovableArea( QPainter & painter );
     void drawConstraintSelection( QPainter & painter );
 
