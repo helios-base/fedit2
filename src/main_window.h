@@ -113,6 +113,7 @@ private:
 
     QAction * M_toggle_enlarge_act;
     QAction * M_toggle_show_index_act;
+    QAction * M_toggle_show_free_kick_circle_act;
     QAction * M_toggle_show_triangulation_act;
     QAction * M_toggle_show_circumcircle_act;
     QAction * M_toggle_show_shoot_lines_act;
@@ -225,6 +226,7 @@ private slots:
     void toggleStatusBar();
     void setEnlargeMode( bool on );
     void setShowIndex( bool on );
+    void setShowFreeKickCircle( bool on );
     void setShowTriangulation( bool on );
     void setShowCircumcircle( bool on );
     void setShowShootLines( bool on );

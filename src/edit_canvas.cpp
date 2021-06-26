@@ -93,7 +93,8 @@ EditCanvas::EditCanvas( QWidget * parent )
     M_background_symmetry_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
     M_background_font_pen( QColor( 0, 63, 127 ), 0, Qt::SolidLine ),
     // additional info
-    M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine )
+    M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine ),
+    M_free_kick_circle_pen( QColor( 127, 0, 127 ), 0, Qt::SolidLine )
 {
     //this->setPalette( QPalette( M_field_brush.color() ) );
     this->setPalette( QPalette( M_field_color ) );
@@ -182,6 +183,12 @@ EditCanvas::paintEvent( QPaintEvent * )
     {
         drawShootLines( painter );
     }
+
+    if ( Options::instance().showFreeKickCircle() )
+    {
+        drawFreeKickCircle( painter );
+    }
+
     drawConstraintSelection( painter );
 }
 
@@ -769,6 +776,28 @@ EditCanvas::drawShootLines( QPainter & painter )
                          left_angle, span_angle );
         ball_speed *= bdecay;
     }
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+EditCanvas::drawFreeKickCircle( QPainter & painter )
+{
+    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    if ( ! ptr )
+    {
+        return;
+    }
+
+    painter.setPen( M_free_kick_circle_pen );
+    painter.setBrush( Qt::NoBrush );
+
+    const Vector2D ball = ptr->state().ball_;
+    const double r = ServerParam::DEFAULT_CENTER_CIRCLE_R;
+
+    painter.drawEllipse( QRectF( ball.x - r, ball.y - r, r*2, r*2 ) );
 }
 
 /*-------------------------------------------------------------------*/

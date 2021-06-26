@@ -102,6 +102,7 @@ private:
     bool M_show_triangulation;
     bool M_show_circumcircle;
     bool M_show_shoot_lines;
+    bool M_show_free_kick_circle;
     bool M_show_goalie_movable_area;
 
     bool M_antialiasing;
@@ -321,6 +322,9 @@ public:
 
     void setShowShootLines( const bool on ) { M_show_shoot_lines = on; }
     bool showShootLines() const { return M_show_shoot_lines; }
+
+    void setShowFreeKickCircle( const bool on ) { M_show_free_kick_circle = on; }
+    bool showFreeKickCircle() const { return M_show_free_kick_circle; }
 
     void setShowGoalieMovableArea( const bool on ) { M_show_goalie_movable_area = on; }
     bool showGoalieMovableArea() const { return M_show_goalie_movable_area; }
