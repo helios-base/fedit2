@@ -87,6 +87,7 @@ Options::Options()
       M_show_triangulation( true ),
       M_show_circumcircle( false ),
       M_show_shoot_lines( false ),
+      M_show_free_kick_circle( false ),
       M_antialiasing( false ),
       M_auto_fit_mode( true )
 {

@@ -816,6 +816,17 @@ MainWindow::createActionsView()
     this->addAction( M_toggle_show_index_act );
 
     //
+    M_toggle_show_free_kick_circle_act = new QAction( tr( "Show Free Kick Circle" ),
+                                                      this );
+    M_toggle_show_free_kick_circle_act->setStatusTip( tr( "Toggle free kick circle painting." ) );
+    M_toggle_show_free_kick_circle_act->setShortcut( Qt::Key_F );
+    connect( M_toggle_show_free_kick_circle_act, SIGNAL( toggled( bool ) ),
+             this, SLOT( setShowFreeKickCircle( bool ) ) );
+    M_toggle_show_free_kick_circle_act->setCheckable( true );
+    M_toggle_show_free_kick_circle_act->setChecked( false );
+    this->addAction( M_toggle_show_free_kick_circle_act );
+
+    //
     M_toggle_show_triangulation_act = new QAction( tr( "Show Triangulation" ),
                                                    this );
     M_toggle_show_triangulation_act->setStatusTip( tr( "Toggle triangulation painting." ) );
@@ -1040,6 +1051,7 @@ MainWindow::createMenuView()
 
     menu->addAction( M_toggle_enlarge_act );
     menu->addAction( M_toggle_show_index_act );
+    menu->addAction( M_toggle_show_free_kick_circle_act );
     menu->addAction( M_toggle_show_shoot_lines_act );
     menu->addAction( M_toggle_show_goalie_movable_area_act );
     menu->addAction( M_toggle_show_triangulation_act );
@@ -2052,6 +2064,17 @@ void
 MainWindow::setShowIndex( bool on )
 {
     Options::instance().setShowIndex( on );
+    M_edit_canvas->update(); // emit viewUpdated();
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
+MainWindow::setShowFreeKickCircle( bool on )
+{
+    Options::instance().setShowFreeKickCircle( on );
     M_edit_canvas->update(); // emit viewUpdated();
 }
 

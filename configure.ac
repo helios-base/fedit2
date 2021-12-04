@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(fedit2, [20160613], akky@users.sourceforge.jp)
+AC_INIT(fedit2, [2020.08], akky@users.sourceforge.jp)
 
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
@@ -31,28 +31,15 @@ AC_PROG_MAKE_SET
 
 # ----------------------------------------------------------
 # check Qt
-AC_ARG_ENABLE(qt5,
-              AC_HELP_STRING([--enable-qt5],
-                             [use Qt5 tool kit (default no)]))
+AC_ARG_ENABLE(qt4,
+              AC_HELP_STRING([--enable-qt4],
+                             [use Qt4 tool kit instead of Qt5 (default no)]))
 AC_ARG_ENABLE(gl,
               AC_HELP_STRING([--enable-gl],
                              [enable GLWidget for Qt (default yes)]))
 
-if test "x$enable_qt5" == "xyes"; then
-  AC_MSG_NOTICE(enabled Qt5)
+if test "x$enable_qt4" == "xyes"; then
 
-  QTMODULES="Qt5Core Qt5Gui Qt5Widgets Qt5Network"
-
-  if test "x$enable_gl" == "xyes"; then
-    AC_MSG_NOTICE(enabled GL5Widget)
-    CFLAGS="-DUSE_GLWIDGET $CFLAGS"
-    CXXFLAGS="-DUSE_GLWIDGET $CXXFLAGS"
-    QTMODULES="$QTMODULES Qt5OpenGL"
-  fi
-
-  AX_QT([5.0.0],[$QTMODULES])
-
-else
   AC_MSG_NOTICE(enabled Qt4)
 
   QTMODULES="QtCore QtGui QtNetwork"
@@ -65,6 +52,19 @@ else
   fi
 
   AX_QT([4.3.0],[$QTMODULES])
+else
+  AC_MSG_NOTICE(enabled Qt5)
+
+  QTMODULES="Qt5Core Qt5Gui Qt5Widgets Qt5Network"
+
+  if test "x$enable_gl" == "xyes"; then
+    AC_MSG_NOTICE(enabled GL5Widget)
+    CFLAGS="-DUSE_GLWIDGET $CFLAGS"
+    CXXFLAGS="-DUSE_GLWIDGET $CXXFLAGS"
+    QTMODULES="$QTMODULES Qt5OpenGL"
+  fi
+
+  AX_QT([5.0.0],[$QTMODULES])
 fi
 
 if test x$have_qt != xyes ; then
@@ -102,7 +102,7 @@ if test x$librcsc_prefix != x; then
   LDFLAGS="$LDFLAGS -L$librcsc_prefix/lib"
   LIBRCSCLIB="$librcsc_prefix/lib"
 else
-  for librcsc_path_tmp in $HOME $HOME/local $HOME/rcss /opt/robocup /opt /opt/local ; do
+  for librcsc_path_tmp in $HOME/.local $HOME/local $HOME/rcss /opt/robocup /opt /opt/local ; do
     if test -d "$librcsc_path_tmp/include/rcsc" && test -r "$librcsc_path_tmp/include/rcsc/types.h" ; then
       CPPFLAGS="$CPPFLAGS -I$librcsc_path_tmp/include"
       LDFLAGS="$LDFLAGS -L$librcsc_path_tmp/lib"
@@ -116,32 +116,9 @@ fi
 AC_CHECK_LIB([m], [cos],
              [LIBS="-lm $LIBS"],
              [AC_MSG_ERROR([*** -lm not found! ***])])
-AC_CHECK_LIB([rcsc_geom], [main],
-             [LIBS="-lrcsc_geom $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_geom not found! ***])])
-AC_CHECK_LIB([rcsc_rcg], [main],
-             [LIBS="-lrcsc_rcg $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_rcg not found! ***])])
-AC_CHECK_LIB([rcsc_gz], [main])
-AC_CHECK_LIB([rcsc_param], [main],
-             [LIBS="-lrcsc_param $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_param not found! ***])])
-AC_CHECK_LIB([rcsc_net], [main],
-             [LIBS="-lrcsc_net $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_net not found! ***])])
-AC_CHECK_LIB([rcsc_time], [main],
-             [LIBS="-lrcsc_time $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_time not found! ***])])
-AC_CHECK_LIB([rcsc_ann], [main],
-             [LIBS="-lrcsc_ann $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_ann not found! ***])])
-AC_CHECK_LIB([rcsc_clang], [main],
-             [LIBS="-lrcsc_clang $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_ann not found! ***])])
-AC_CHECK_LIB([rcsc_agent], [main],
-             [LIBS="-lrcsc_agent $LIBS"],
-             [AC_MSG_ERROR([*** -lrcsc_agent not found! ***])])
-
+AC_CHECK_LIB([rcsc], [main],
+             [LIBS="-lrcsc $LIBS"],
+             [AC_MSG_ERROR([*** -lrcsc not found! ***])])
 
 # Checks for header files.
 

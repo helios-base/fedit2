@@ -93,7 +93,8 @@ EditCanvas::EditCanvas( QWidget * parent )
     M_background_symmetry_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
     M_background_font_pen( QColor( 0, 63, 127 ), 0, Qt::SolidLine ),
     // additional info
-    M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine )
+    M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine ),
+    M_free_kick_circle_pen( QColor( 127, 0, 127 ), 0, Qt::SolidLine )
 {
     //this->setPalette( QPalette( M_field_brush.color() ) );
     this->setPalette( QPalette( M_field_color ) );
@@ -182,6 +183,12 @@ EditCanvas::paintEvent( QPaintEvent * )
     {
         drawShootLines( painter );
     }
+
+    if ( Options::instance().showFreeKickCircle() )
+    {
+        drawFreeKickCircle( painter );
+    }
+
     drawConstraintSelection( painter );
 }
 
@@ -408,8 +415,8 @@ EditCanvas::drawContainedArea( QPainter & painter )
     Vector2D center = Triangle2D::centroid( vertex_0, vertex_1, vertex_2 );
     const double pix = M_transform.inverted().map( QLineF( 0.0, 0.0, 1.0, 0.0 ) ).length();
 
-    painter.setPen( Qt::red );
-    painter.setBrush( Qt::red );
+    painter.setPen( QPen( Qt::red, 0, Qt::SolidLine ) );
+    painter.setBrush( QBrush( Qt::red, Qt::SolidPattern ) );
     painter.drawRect( QRectF( center.x - pix, center.y - pix,
                               pix*2.0, pix*2.0 ) );
     //painter.drawPoint( QPointF( center.x, center.y ) );
@@ -422,8 +429,8 @@ EditCanvas::drawContainedArea( QPainter & painter )
         double y = circumcenter.y;
         double r = circumcenter.dist( vertex_0 );
 
-        painter.setPen( Qt::cyan );
-        painter.setBrush( Qt::cyan );
+        painter.setPen( QPen( Qt::cyan, 0, Qt::SolidLine ) );
+        painter.setBrush( QBrush( Qt::cyan, Qt::SolidPattern ) );
         painter.drawRect( QRectF( x - pix, y - pix, pix * 2.0, pix * 2.0 ) );
         //painter.drawPoint( QPointF( x, y ) );
 
@@ -544,7 +551,7 @@ EditCanvas::drawData( QPainter & painter )
         SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
         std::advance( it, ptr->currentIndex() );
 
-        painter.setPen( Qt::yellow );
+        painter.setPen( QPen( Qt::yellow, 0, Qt::SolidLine) );
         painter.setBrush( Qt::NoBrush );
 
         //painter.drawEllipse( QRectF( it->ball_.x - 1.0, it->ball_.y - 1.0, 2.0, 2.0 ) );
@@ -776,6 +783,28 @@ EditCanvas::drawShootLines( QPainter & painter )
 
  */
 void
+EditCanvas::drawFreeKickCircle( QPainter & painter )
+{
+    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    if ( ! ptr )
+    {
+        return;
+    }
+
+    painter.setPen( M_free_kick_circle_pen );
+    painter.setBrush( Qt::NoBrush );
+
+    const Vector2D ball = ptr->state().ball_;
+    const double r = ServerParam::DEFAULT_CENTER_CIRCLE_R;
+
+    painter.drawEllipse( QRectF( ball.x - r, ball.y - r, r*2, r*2 ) );
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
 EditCanvas::drawGoalieMovableArea( QPainter & painter )
 {
     boost::shared_ptr< EditData > ptr = M_edit_data.lock();
@@ -795,8 +824,8 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
     const double decay = ServerParam::i().defaultPlayerDecay();
 
     const QTransform transform = painter.worldTransform();
-    const QColor base_color = M_field_color;
-    // base_color.setAlphaF( 0.2 );
+    QColor base_color = M_field_color;
+    base_color.setAlphaF( 0.4 );
 
     double radius[10];
 
@@ -811,10 +840,10 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
         radius[i] = dist + catch_area;
     }
 
-    painter.setPen( Qt::black );
+    painter.setPen( QPen( Qt::black, 0, Qt::SolidLine ) );
     for ( int i = 9; i >= 0; --i )
     {
-        painter.setBrush( base_color.darker( 300 - 20*i ) );
+        painter.setBrush( QBrush( base_color.darker( 300 - 20*i ), Qt::SolidPattern ) );
         painter.drawEllipse( QRectF( goalie_pos.x - radius[i],
                                      goalie_pos.y - radius[i],
                                      radius[i]*2.0,
@@ -860,8 +889,8 @@ EditCanvas::drawConstraintSelection( QPainter & painter )
     SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
     std::advance( it, ptr->constraintOriginIndex() );
 
-    painter.setPen( Qt::blue );
-    painter.setBrush( Qt::blue );
+    painter.setPen( QPen( Qt::blue, 0, Qt::SolidLine ) );
+    painter.setBrush( QBrush( Qt::blue, Qt::SolidPattern ) );
 
     painter.drawEllipse( QRectF( it->ball_.x - 0.5, it->ball_.y - 0.5, 1.0, 1.0 ) );
 
@@ -1053,7 +1082,7 @@ EditCanvas::drawBackgroundPlayers( QPainter & painter )
     const double r = ( enlarge
                        ? 1.085 * 0.5
                        : 0.3 * 0.5 );
-    const int d = r * 2.0;
+    const double d = r * 2.0;
 
     const QTransform transform = painter.worldTransform();
 
