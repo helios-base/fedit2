@@ -368,13 +368,13 @@ EditCanvas::drawField( QPainter & painter )
 void
 EditCanvas::drawContainedArea( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return ;
     }
 
-    boost::shared_ptr< const Formation > f = ptr->formation();
+    std::shared_ptr< const Formation > f = ptr->formation();
     if ( ! f )
     {
         return;
@@ -447,7 +447,7 @@ EditCanvas::drawContainedArea( QPainter & painter )
 void
 EditCanvas::drawData( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -571,7 +571,7 @@ EditCanvas::drawData( QPainter & painter )
 void
 EditCanvas::drawPlayers( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -655,7 +655,7 @@ EditCanvas::drawPlayers( QPainter & painter )
 void
 EditCanvas::drawBall( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -696,7 +696,7 @@ EditCanvas::drawBall( QPainter & painter )
 void
 EditCanvas::drawShootLines( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -785,7 +785,7 @@ EditCanvas::drawShootLines( QPainter & painter )
 void
 EditCanvas::drawFreeKickCircle( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -807,7 +807,7 @@ EditCanvas::drawFreeKickCircle( QPainter & painter )
 void
 EditCanvas::drawGoalieMovableArea( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -870,7 +870,7 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
 void
 EditCanvas::drawConstraintSelection( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -918,7 +918,7 @@ EditCanvas::drawConstraintSelection( QPainter & painter )
 void
 EditCanvas::drawBackgroundContainedArea( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return ;
@@ -969,7 +969,7 @@ EditCanvas::drawBackgroundContainedArea( QPainter & painter )
 void
 EditCanvas::drawBackgroundData( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -1064,7 +1064,7 @@ EditCanvas::drawBackgroundData( QPainter & painter )
 void
 EditCanvas::drawBackgroundPlayers( QPainter & painter )
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -1175,7 +1175,7 @@ EditCanvas::mousePressEvent( QMouseEvent * event )
 
         if ( event->modifiers() == 0 )
         {
-            if ( boost::shared_ptr< EditData > ptr = M_edit_data.lock() )
+            if ( std::shared_ptr< EditData > ptr = M_edit_data.lock() )
             {
                 QPointF field_pos = M_transform.inverted().map( QPointF( event->pos() ) );
                 if ( ptr->selectObject( field_pos.x(), field_pos.y() ) )
@@ -1195,7 +1195,7 @@ EditCanvas::mousePressEvent( QMouseEvent * event )
 
         if ( event->modifiers() == 0 )
         {
-            if ( boost::shared_ptr< EditData > ptr = M_edit_data.lock() )
+            if ( std::shared_ptr< EditData > ptr = M_edit_data.lock() )
             {
                 QPointF field_pos = M_transform.inverted().map( QPointF( event->pos() ) );
                 ptr->moveBallTo( field_pos.x(), field_pos.y() );
@@ -1221,7 +1221,7 @@ EditCanvas::mouseReleaseEvent( QMouseEvent * event )
             M_mouse_state[0].setMenuFailed( false );
         }
 
-        if ( boost::shared_ptr< EditData > ptr = M_edit_data.lock() )
+        if ( std::shared_ptr< EditData > ptr = M_edit_data.lock() )
         {
             if ( ptr->selectType() == EditData::SELECT_SAMPLE
                  && ptr->constraintTerminalIndex() != size_t( -1 ) )
@@ -1265,7 +1265,7 @@ EditCanvas::mouseMoveEvent( QMouseEvent * event )
     {
         if ( event->modifiers() == 0 )
         {
-            boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+            std::shared_ptr< EditData > ptr = M_edit_data.lock();
             if ( ptr
                  && ptr->moveSelectObjectTo( field_pos.x(), field_pos.y() ) )
             {

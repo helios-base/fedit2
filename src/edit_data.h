@@ -40,12 +40,6 @@
 #include <rcsc/geom/triangulation.h>
 #include <rcsc/geom/vector_2d.h>
 
-#include <boost/shared_ptr.hpp>
-
-#include <vector>
-#include <utility>
-#include <iostream>
-
 
 class EditData {
 public:

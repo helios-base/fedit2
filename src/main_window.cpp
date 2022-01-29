@@ -1230,7 +1230,7 @@ MainWindow::openConfFile( const QString & filepath )
         return false;
     }
 
-    M_edit_data = boost::shared_ptr< EditData >( new EditData );
+    M_edit_data = std::shared_ptr< EditData >( new EditData );
     if ( ! M_edit_data->openConf( filepath ) )
     {
         M_edit_data.reset();
@@ -1507,7 +1507,7 @@ MainWindow::newFile()
 
     // create new data
 
-    M_edit_data = boost::shared_ptr< EditData >( new EditData() );
+    M_edit_data = std::shared_ptr< EditData >( new EditData() );
     M_edit_data->createFormation( name );
 
     if ( ! M_edit_data->formation()

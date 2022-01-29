@@ -54,7 +54,7 @@
 */
 ConstraintEditDialog::ConstraintEditDialog( QWidget * parent,
                                             EditCanvas * canvas,
-                                            boost::shared_ptr< EditData > data,
+                                            std::shared_ptr< EditData > data,
                                             const int origin_index,
                                             const int terminal_index )
     : QDialog( parent )

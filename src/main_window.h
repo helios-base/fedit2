@@ -34,7 +34,7 @@
 
 #include <QMainWindow>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class QCloseEvent;
 class QLabel;
@@ -62,7 +62,7 @@ class MainWindow
 
 private:
 
-    boost::shared_ptr< EditData > M_edit_data;
+    std::shared_ptr< EditData > M_edit_data;
 
     QToolBar * M_tool_bar;
     QSpinBox * M_index_spin_box;

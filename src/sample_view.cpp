@@ -124,7 +124,7 @@ SampleView::~SampleView()
 void
 SampleView::updateData()
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
          || ! ptr->samples() )
     {
@@ -405,7 +405,7 @@ SampleView::setCurrentData( QTreeWidgetItem * current )
 void
 SampleView::menuChangeSampleIndex()
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
          || ! ptr->samples() )
     {

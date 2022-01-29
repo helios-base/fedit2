@@ -46,7 +46,7 @@
 
 #include "mouse_state.h"
 
-#include <boost/weak_ptr.hpp>
+#include <memory>
 
 class QPainter;
 
@@ -68,7 +68,7 @@ class EditCanvas
 
 private:
 
-    boost::weak_ptr< EditData > M_edit_data;
+    std::weak_ptr< EditData > M_edit_data;
 
     QTransform M_transform;
 
@@ -116,7 +116,7 @@ public:
     ~EditCanvas();
 
 
-    void setData( boost::shared_ptr< EditData > ptr )
+    void setData( std::shared_ptr< EditData > ptr )
       {
           M_edit_data = ptr;
       }

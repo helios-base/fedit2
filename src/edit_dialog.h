@@ -34,7 +34,7 @@
 
 #include <QDialog>
 
-#include <boost/weak_ptr.hpp>
+#include <memory>
 
 class QCheckBox;
 class QCloseEvent;
@@ -55,7 +55,7 @@ class EditDialog
 
 private:
 
-    boost::weak_ptr< EditData > M_edit_data;
+    std::weak_ptr< EditData > M_edit_data;
 
     QLineEdit * M_type_name; //! formation method type
 
@@ -80,7 +80,7 @@ public:
     EditDialog( QWidget * paremt );
     ~EditDialog();
 
-    void setData( boost::shared_ptr< EditData > ptr )
+    void setData( std::shared_ptr< EditData > ptr )
       {
           M_edit_data = ptr;
       }

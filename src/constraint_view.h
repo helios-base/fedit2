@@ -34,7 +34,7 @@
 
 #include <QTableWidget>
 
-#include <boost/weak_ptr.hpp>
+#include <memory>
 
 class ConstraintDelegate;
 class EditData;
@@ -46,7 +46,7 @@ class ConstraintView
 
 private:
 
-    boost::weak_ptr< EditData > M_edit_data;
+    std::weak_ptr< EditData > M_edit_data;
 
     ConstraintDelegate * M_origin_delegate;
     ConstraintDelegate * M_terminal_delegate;
@@ -56,7 +56,7 @@ public:
     ConstraintView( QWidget * parent = 0 );
     ~ConstraintView();
 
-    void setData( boost::shared_ptr< EditData > ptr )
+    void setData( std::shared_ptr< EditData > ptr )
       {
           M_edit_data = ptr;
       }

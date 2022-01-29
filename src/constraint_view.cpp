@@ -114,7 +114,7 @@ ConstraintView::~ConstraintView()
 void
 ConstraintView::updateData()
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
          || ! ptr->samples() )
     {

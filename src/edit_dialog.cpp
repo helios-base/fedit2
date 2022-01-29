@@ -316,7 +316,7 @@ EditDialog::updateData()
         return;
     }
 
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         return;
@@ -405,7 +405,7 @@ EditDialog::resetChanges()
 void
 EditDialog::applyToField()
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
         std::cerr << "EditDialog::applyToField  no data" << std::endl;
