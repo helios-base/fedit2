@@ -54,7 +54,6 @@
 #include <iostream>
 
 using namespace rcsc;
-using namespace rcsc::formation;
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -508,12 +507,9 @@ EditCanvas::drawData( QPainter & painter )
         painter.setPen( M_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        const SampleDataSet::DataCont::const_iterator end = ptr->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
-              it != end;
-              ++it )
+        for ( const FormationData::Data & data : ptr->data()->dataCont() )
         {
-            painter.drawRect( QRectF( it->ball_.x - r, it->ball_.y - r, d, d ) );
+            painter.drawRect( QRectF( data.ball_.x - r, data.ball_.y - r, d, d ) );
         }
     }
 
@@ -530,13 +526,11 @@ EditCanvas::drawData( QPainter & painter )
         painter.setWorldMatrixEnabled( false );
 
         int count = 0;
-        const SampleDataSet::DataCont::const_iterator d_end = ptr->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
-              it != d_end;
-              ++it, ++count )
+        for ( const FormationData::Data & data : ptr->data()->dataCont() )
         {
-            painter.drawText( transform.map( QPointF( it->ball_.x + 0.7, it->ball_.y - 0.7 ) ),
+            painter.drawText( transform.map( QPointF( data.ball_.x + 0.7, data.ball_.y - 0.7 ) ),
                               QString::number( count ) );
+            ++count;
         }
 
         painter.setWorldMatrixEnabled( true );
@@ -548,7 +542,7 @@ EditCanvas::drawData( QPainter & painter )
 
     if ( 0 <= ptr->currentIndex() )
     {
-        SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
+        FormationData::DataCont::const_iterator it = ptr->data()->dataCont().begin();
         std::advance( it, ptr->currentIndex() );
 
         painter.setPen( QPen( Qt::yellow, 0, Qt::SolidLine) );
@@ -886,7 +880,7 @@ EditCanvas::drawConstraintSelection( QPainter & painter )
         setAntialiasFlag( painter, false );
     }
 
-    SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
+    FormationData::DataCont::const_iterator it = ptr->data()->dataCont().begin();
     std::advance( it, ptr->constraintOriginIndex() );
 
     painter.setPen( QPen( Qt::blue, 0, Qt::SolidLine ) );
@@ -1018,12 +1012,9 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setPen( M_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        const SampleDataSet::DataCont::const_iterator d_end = ptr->backgroundFormation()->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->backgroundFormation()->samples()->dataCont().begin();
-              it != d_end;
-              ++it )
+        for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
         {
-            painter.drawRect( QRectF( it->ball_.x - r, it->ball_.y - r, d, d ) );
+            painter.drawRect( QRectF( data.ball_.x - r, data.ball_.y - r, d, d ) );
         }
     }
 
@@ -1039,13 +1030,11 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setWorldMatrixEnabled( false );
 
         int count = 0;
-        const SampleDataSet::DataCont::const_iterator d_end = ptr->backgroundFormation()->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->backgroundFormation()->samples()->dataCont().begin();
-              it != d_end;
-              ++it, ++count )
+        for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
         {
-            painter.drawText( transform.map( QPointF( it->ball_.x + 0.7, it->ball_.y - 0.7 ) ),
+            painter.drawText( transform.map( QPointF( data.ball_.x + 0.7, data.ball_.y - 0.7 ) ),
                               QString::number( count ) );
+            ++count;
         }
 
         painter.setWorldMatrixEnabled( true );

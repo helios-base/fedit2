@@ -116,7 +116,7 @@ ConstraintView::updateData()
 {
     std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
-         || ! ptr->samples() )
+         || ! ptr->data() )
     {
         M_origin_delegate->setRange( 0, 0 );
         M_terminal_delegate->setRange( 0, 0 );
@@ -127,9 +127,9 @@ ConstraintView::updateData()
     // update range
     //
 
-    if ( ! ptr->samples()->constraints().empty() )
+    if ( ! ptr->data()->constraints().empty() )
     {
-        int maximum = ptr->samples()->dataCont().size();
+        int maximum = ptr->data()->dataCont().size();
         M_origin_delegate->setRange( 1,  maximum );
         M_terminal_delegate->setRange( 1, maximum );
     }
@@ -138,7 +138,7 @@ ConstraintView::updateData()
     // update constraints
     //
 
-    const int data_count = ptr->samples()->constraints().size();
+    const int data_count = ptr->data()->constraints().size();
 
     while ( this->rowCount() > data_count )
     {
@@ -146,10 +146,7 @@ ConstraintView::updateData()
     }
 
     int idx = 0;
-    const rcsc::formation::SampleDataSet::Constraints::const_iterator end = ptr->samples()->constraints().end();
-    for ( rcsc::formation::SampleDataSet::Constraints::const_iterator it = ptr->samples()->constraints().begin();
-          it != end;
-          ++it, ++idx )
+    for ( const rcsc::FormationData::Constraint & c : ptr->data()->constraints() )
     {
         QTableWidgetItem * item = this->item( idx, 0 );
         if ( ! item )
@@ -164,7 +161,7 @@ ConstraintView::updateData()
             this->setItem( idx, col, item );
             ++col;
 
-            item = new QTableWidgetItem( QString::number( it->first->index_ + 1 ) );
+            item = new QTableWidgetItem( QString::number( c.first->index_ + 1 ) );
             item->setFlags( Qt::ItemIsSelectable
                             | Qt::ItemIsEditable
                             | Qt::ItemIsDragEnabled
@@ -175,7 +172,7 @@ ConstraintView::updateData()
             this->setItem( idx, col, item );
             ++col;
 
-            item = new QTableWidgetItem( QString::number( it->second->index_ + 1 ) );
+            item = new QTableWidgetItem( QString::number( c.second->index_ + 1 ) );
             item->setFlags( Qt::ItemIsSelectable
                             | Qt::ItemIsEditable
                             | Qt::ItemIsDragEnabled
@@ -186,6 +183,7 @@ ConstraintView::updateData()
             this->setItem( idx, col, item );
             ++col;
         }
+        ++idx;
     }
 }
 

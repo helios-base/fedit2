@@ -123,14 +123,14 @@ ConstraintEditDialog::createWidgets()
 
         //
         M_origin = new QSpinBox();
-        M_origin->setRange( 1, M_edit_data->samples()->dataCont().size() );
+        M_origin->setRange( 1, M_edit_data->data()->dataCont().size() );
         M_origin->setWrapping( true );
         connect( M_origin, SIGNAL( valueChanged( int ) ),
                  this, SLOT( changeIndex() ) );
         layout->addWidget( M_origin, 1, 0 );
         //
         M_terminal = new QSpinBox();
-        M_terminal->setRange( 1, M_edit_data->samples()->dataCont().size() );
+        M_terminal->setRange( 1, M_edit_data->data()->dataCont().size() );
         M_terminal->setWrapping( true );
         connect( M_terminal, SIGNAL( valueChanged( int ) ),
                  this, SLOT( changeIndex() ) );

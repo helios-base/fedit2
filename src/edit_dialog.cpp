@@ -334,7 +334,7 @@ EditDialog::updateData()
     M_type_name->setText( QString::fromStdString( f->methodName() ) );
 
     // ball info
-    const rcsc::formation::SampleData & s = ptr->state();
+    const rcsc::FormationData::Data & s = ptr->state();
 
     M_ball_pos_x->setText( QString::number( s.ball_.x, 'f', 2 ) );
     M_ball_pos_y->setText( QString::number( s.ball_.y, 'f', 2 ) );

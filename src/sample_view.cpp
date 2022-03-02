@@ -126,7 +126,7 @@ SampleView::updateData()
 {
     std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
-         || ! ptr->samples() )
+         || ! ptr->data() )
     {
         return;
     }
@@ -135,7 +135,7 @@ SampleView::updateData()
     // update samples
     //
 
-    const int data_count = ptr->samples()->dataCont().size();
+    const int data_count = ptr->data()->dataCont().size();
 
     while ( this->topLevelItemCount() > data_count )
     {
@@ -143,8 +143,7 @@ SampleView::updateData()
     }
 
     int idx = 0;
-    const rcsc::formation::SampleDataSet::DataCont::const_iterator end = ptr->samples()->dataCont().end();
-    for ( rcsc::formation::SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
+    for ( rcsc::FormationData::DataCont::const_iterator it = ptr->data()->dataCont().begin(), end = ptr->data()->dataCont().end();
           it != end;
           ++it, ++idx )
     {
@@ -407,7 +406,7 @@ SampleView::menuChangeSampleIndex()
 {
     std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
-         || ! ptr->samples() )
+         || ! ptr->data() )
     {
         return;
     }
@@ -421,7 +420,7 @@ SampleView::menuChangeSampleIndex()
     int idx = this->indexOfTopLevelItem( item );
     if ( 0 <= idx )
     {
-        const int data_size = ptr->samples()->dataCont().size();
+        const int data_size = ptr->data()->dataCont().size();
         if ( data_size == 0 )
         {
             return;

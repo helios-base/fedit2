@@ -48,7 +48,6 @@
 #include <iostream>
 
 using namespace rcsc;
-using namespace rcsc::formation;
 
 const double EditData::MAX_X = ServerParam::DEFAULT_PITCH_LENGTH * 0.5 + 2.0;
 const double EditData::MAX_Y = ServerParam::DEFAULT_PITCH_WIDTH * 0.5 + 2.0;
@@ -60,12 +59,8 @@ Vector2D
 round_coordinates( const double & x,
                    const double & y )
 {
-    return Vector2D( rint( bound( - EditData::MAX_X, x, EditData::MAX_X )
-                           / SampleData::PRECISION )
-                     * SampleData::PRECISION,
-                     rint( bound( - EditData::MAX_Y, y, EditData::MAX_Y )
-                           / SampleData::PRECISION )
-                     * SampleData::PRECISION );
+    return Vector2D( rint( bound( - EditData::MAX_X, x, EditData::MAX_X ) / FormationData::PRECISION ) * FormationData::PRECISION,
+                     rint( bound( - EditData::MAX_Y, y, EditData::MAX_Y ) / FormationData::PRECISION ) * FormationData::PRECISION );
 }
 
 }
@@ -106,7 +101,7 @@ void
 EditData::init()
 {
     M_conf_changed = false;
-    M_samples.reset();
+    M_data.reset();
 
     M_state.ball_.assign( 0.0, 0.0 );
     for ( size_t i = 0; i < M_state.players_.size(); ++i )
@@ -146,7 +141,7 @@ EditData::createFormation( const QString & type_name )
     }
 
     M_conf_changed = true;
-    M_samples = M_formation->samples();
+    M_data = M_formation->data();
 
     M_formation->createDefaultData();
     train();
@@ -201,7 +196,7 @@ EditData::openConf( const QString & filepath )
         return false;
     }
 
-    M_samples.reset();
+    M_data.reset();
 
     M_formation = Formation::create( fin );
     if ( ! M_formation )
@@ -223,7 +218,7 @@ EditData::openConf( const QString & filepath )
 
     init();
     M_filepath = filepath;
-    M_samples = M_formation->samples();
+    M_data = M_formation->data();
     updateTriangulation();
     updatePlayerPosition();
     return true;
@@ -244,15 +239,15 @@ EditData::openData( const QString & filepath )
 
     M_triangulation.clear();
 
-    M_samples = SampleDataSet::Ptr( new SampleDataSet() );
-    if ( ! M_samples->open( filepath.toStdString() ) )
+    M_data = FormationData::Ptr( new FormationData() );
+    if ( ! M_data->open( filepath.toStdString() ) )
     {
         return false;
     }
 
     M_current_index = -1;
 
-    M_formation->setSamples( M_samples );
+    M_formation->setData( M_data );
     train();
 
     return true;
@@ -296,22 +291,15 @@ EditData::openBackgroundConf( const QString & filepath )
     {
         M_background_triangulation.clear();
 
-        const SampleDataSet::DataCont::const_iterator end = M_background_formation->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = M_background_formation->samples()->dataCont().begin();
-              it != end;
-              ++it )
+        for ( const FormationData::Data & d : M_background_formation->data()->dataCont() )
         {
-            M_background_triangulation.addPoint( it->ball_ );
+            M_background_triangulation.addPoint( d.ball_ );
         }
 
-        for ( SampleDataSet::Constraints::const_iterator it = M_background_formation->samples()->constraints().begin();
-              it != M_background_formation->samples()->constraints().end();
-              ++it )
+        for ( const FormationData::Constraint & c : M_background_formation->data()->constraints() )
         {
-            //M_background_triangulation.addConstraint( cdt::Triangulation::IndexPair( size_t( it->first->index_ ),
-            //                                                                         size_t( it->second->index_ ) ) );
-            M_background_triangulation.addConstraint( static_cast< size_t >( it->first->index_ ),
-                                                      static_cast< size_t >( it->second->index_ ) );
+            M_background_triangulation.addConstraint( static_cast< size_t >( c.first->index_ ),
+                                                      static_cast< size_t >( c.second->index_ ) );
         }
 
         M_background_triangulation.compute();
@@ -410,29 +398,22 @@ EditData::updatePlayerPosition()
 void
 EditData::updateTriangulation()
 {
-    if ( ! M_samples )
+    if ( ! M_data )
     {
         return;
     }
 
     M_triangulation.clear();
 
-    const SampleDataSet::DataCont::const_iterator end = M_samples->dataCont().end();
-    for ( SampleDataSet::DataCont::const_iterator it = M_samples->dataCont().begin();
-          it != end;
-          ++it )
+    for ( const FormationData::Data & d : M_data->dataCont() )
     {
-        M_triangulation.addPoint( it->ball_ );
+        M_triangulation.addPoint( d.ball_ );
     }
 
-    for ( SampleDataSet::Constraints::const_iterator it = M_samples->constraints().begin();
-          it != M_samples->constraints().end();
-          ++it )
+    for ( const FormationData::Constraint & c : M_data->constraints() )
     {
-        //M_triangulation.addConstraint( cdt::Triangulation::IndexPair( size_t( it->first->index_ ),
-        //                                                              size_t( it->second->index_ ) ) );
-        M_triangulation.addConstraint( static_cast< size_t >( it->first->index_ ),
-                                       static_cast< size_t >( it->second->index_ ) );
+        M_triangulation.addConstraint( static_cast< size_t >( c.first->index_ ),
+                                       static_cast< size_t >( c.second->index_ ) );
     }
 
     M_triangulation.compute();
@@ -524,10 +505,10 @@ EditData::moveBallTo( const double & x,
             M_state.ball_.y = 0.0;
         }
 
-        if ( M_samples )
+        if ( M_data )
         {
-            const int idx = M_samples->nearestDataIndex( pos, 1.0 );
-            const SampleData * data = M_samples->data( idx );
+            const int idx = M_data->nearestDataIndex( pos, 1.0 );
+            const FormationData::Data * data = M_data->data( idx );
             if ( data )
             {
                 M_current_index = idx;
@@ -608,10 +589,10 @@ EditData::setConstraintTerminal( const double & x,
     M_constraint_terminal = pos;
 
     // automatically select terminal vertex
-    if ( M_samples )
+    if ( M_data )
     {
-        const int idx = M_samples->nearestDataIndex( pos, 1.0 );
-        const SampleData * data = M_samples->data( idx );
+        const int idx = M_data->nearestDataIndex( pos, 1.0 );
+        const FormationData::Data * data = M_data->data( idx );
         if ( M_constraint_origin_index != idx
              && data )
         {
@@ -630,7 +611,7 @@ void
 EditData::setConstraintIndex( const int origin_idx,
                               const int terminal_idx )
 {
-    if ( ! M_samples )
+    if ( ! M_data )
     {
         return;
     }
@@ -645,7 +626,7 @@ EditData::setConstraintIndex( const int origin_idx,
         return;
     }
 
-    if ( static_cast< int >( M_samples->dataCont().size() ) < origin_idx + 1 )
+    if ( static_cast< int >( M_data->dataCont().size() ) < origin_idx + 1 )
     {
         std::cerr << "(EditData::setConstraintIndex) origin index over range."
                   << " origin=" << origin_idx
@@ -663,7 +644,7 @@ EditData::setConstraintIndex( const int origin_idx,
         return;
     }
 
-    if ( static_cast< int >( M_samples->dataCont().size() ) < terminal_idx + 1 )
+    if ( static_cast< int >( M_data->dataCont().size() ) < terminal_idx + 1 )
     {
         std::cerr << "(EditData::setConstraintIndex) terminal index over range."
                   << " origin=" << origin_idx
@@ -685,7 +666,7 @@ EditData::setConstraintIndex( const int origin_idx,
     M_constraint_origin_index = origin_idx;
     M_constraint_terminal_index = terminal_idx;
 
-    SampleDataSet::DataCont::const_iterator it = M_samples->dataCont().begin();
+    FormationData::DataCont::const_iterator it = M_data->dataCont().begin();
     std::advance( it, terminal_idx );
 
     M_constraint_terminal = it->ball_;
@@ -734,17 +715,14 @@ EditData::selectObject( const double & x,
     if ( Options::instance().constraintEditMode() )
     {
         //
-        // samples
+        // data
         //
-        if ( M_samples )
+        if ( M_data )
         {
             size_t index = 0;
-            const SampleDataSet::DataCont::const_iterator d_end = M_samples->dataCont().end();
-            for ( SampleDataSet::DataCont::const_iterator d = M_samples->dataCont().begin();
-                  d != d_end;
-                  ++d, ++index )
+            for ( const FormationData::Data & d : M_data->dataCont() )
             {
-                double d2 = d->ball_.dist2( pos );
+                double d2 = d.ball_.dist2( pos );
                 if ( d2 < dist2_thr
                      && d2 < mindist2 )
                 {
@@ -753,6 +731,7 @@ EditData::selectObject( const double & x,
                     M_constraint_origin_index = index;
                     mindist2 = d2;
                 }
+                ++index;
             }
         }
     }
@@ -830,18 +809,18 @@ EditData::releaseObject()
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::addData()
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
     // add data
-    SampleDataSet::ErrorType err = M_samples->addData( M_state );
-    if ( err != SampleDataSet::NO_ERROR )
+    FormationData::ErrorType err = M_data->addData( M_state );
+    if ( err != FormationData::NO_ERROR )
     {
 
     }
@@ -850,56 +829,56 @@ EditData::addData()
     if ( Options::instance().symmetryMode()
          && M_state.ball_.absY() >= 0.5 )
     {
-        SampleData reversed = M_state;
+        FormationData::Data reversed = M_state;
         reversed.ball_.y *= -1.0;
         reverseY( &reversed.players_ );
-        err = M_samples->addData( reversed );
-        if ( err != SampleDataSet::NO_ERROR )
+        err = M_data->addData( reversed );
+        if ( err != FormationData::NO_ERROR )
         {
 
         }
     }
 
-    M_state = M_samples->dataCont().back();
-    M_current_index = M_samples->dataCont().size() - 1;
+    M_state = M_data->dataCont().back();
+    M_current_index = M_data->dataCont().size() - 1;
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::insertData( const int idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
     if ( idx < 0 )
     {
-        return SampleDataSet::INVALID_INDEX;
+        return FormationData::INVALID_INDEX;
     }
 
-    SampleDataSet::ErrorType err = M_samples->insertData( static_cast< size_t >( idx ), M_state );
-    if ( err != SampleDataSet::NO_ERROR )
+    FormationData::ErrorType err = M_data->insertData( static_cast< size_t >( idx ), M_state );
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
 
     if ( Options::instance().symmetryMode() )
     {
-        SampleData reversed_data = M_state;
+        FormationData::Data reversed_data = M_state;
         reversed_data.ball_.y *= -1.0;
         reverseY( &reversed_data.players_ );
 
-        err = M_samples->insertData( static_cast< size_t >( idx + 1 ), reversed_data );
-        if ( err != SampleDataSet::NO_ERROR )
+        err = M_data->insertData( static_cast< size_t >( idx + 1 ), reversed_data );
+        if ( err != FormationData::NO_ERROR )
         {
             return err;
         }
@@ -910,14 +889,14 @@ EditData::insertData( const int idx )
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::replaceData( const int idx )
 {
     return replaceDataImpl( idx, M_state );
@@ -927,28 +906,28 @@ EditData::replaceData( const int idx )
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::replaceDataImpl( const int idx,
-                           const SampleData & data )
+                           const FormationData::Data & data )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
 
-    const SampleData * original_data = M_samples->data( static_cast< size_t >( idx ) );
+    const FormationData::Data * original_data = M_data->data( static_cast< size_t >( idx ) );
     if ( ! original_data )
     {
-        return SampleDataSet::INVALID_INDEX;
+        return FormationData::INVALID_INDEX;
     }
     const Vector2D original_ball = original_data->ball_;
 
     // replace data
-    SampleDataSet::ErrorType err = M_samples->replaceData( static_cast< size_t >( idx ), data );
+    FormationData::ErrorType err = M_data->replaceData( static_cast< size_t >( idx ), data );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
@@ -959,9 +938,9 @@ EditData::replaceDataImpl( const int idx,
     {
         size_t reversed_idx = size_t( -1 );
 
-        for ( size_t i = 0; i < M_samples->dataCont().size(); ++i )
+        for ( size_t i = 0; i < M_data->dataCont().size(); ++i )
         {
-            const SampleData * r = M_samples->data( i );
+            const FormationData::Data * r = M_data->data( i );
             if ( r
                  && std::fabs( r->ball_.x - original_ball.x ) < 1.0e-5
                  && std::fabs( r->ball_.y + original_ball.y ) < 1.0e-5 )
@@ -971,22 +950,22 @@ EditData::replaceDataImpl( const int idx,
             }
         }
 
-        SampleData reversed_data = data;
+        FormationData::Data reversed_data = data;
         reversed_data.ball_.y *= -1.0;
         reverseY( &reversed_data.players_ );
 
         if ( reversed_idx != size_t( -1 ) )
         {
-            err = M_samples->replaceData( reversed_idx, reversed_data );
-            if ( err != SampleDataSet::NO_ERROR )
+            err = M_data->replaceData( reversed_idx, reversed_data );
+            if ( err != FormationData::NO_ERROR )
             {
                 return err;
             }
         }
         else
         {
-            err = M_samples->addData( reversed_data );
-            if ( err != SampleDataSet::NO_ERROR )
+            err = M_data->addData( reversed_data );
+            if ( err != FormationData::NO_ERROR )
             {
                 std::cerr << __FILE__ << ':' << __LINE__ << " ERROR?" << std::endl;
             }
@@ -996,32 +975,32 @@ EditData::replaceDataImpl( const int idx,
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::replaceBall( const int idx,
                        const double x,
                        const double y )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
-    const SampleData * d = M_samples->data( static_cast< size_t >( idx ) );
+    const FormationData::Data * d = M_data->data( static_cast< size_t >( idx ) );
 
     if ( ! d )
     {
-        return SampleDataSet::INVALID_INDEX;
+        return FormationData::INVALID_INDEX;
     }
 
-    SampleData tmp = *d;
+    FormationData::Data tmp = *d;
     tmp.ball_.assign( x, y );
 
     return replaceDataImpl( idx, tmp );
@@ -1031,26 +1010,26 @@ EditData::replaceBall( const int idx,
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::replacePlayer( const int idx,
                          const int unum,
                          const double x,
                          const double y )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
-    const SampleData * d = M_samples->data( static_cast< size_t >( idx ) );
+    const FormationData::Data * d = M_data->data( static_cast< size_t >( idx ) );
 
     if ( ! d )
     {
-        return SampleDataSet::INVALID_INDEX;
+        return FormationData::INVALID_INDEX;
     }
 
-    SampleData tmp = *d;
+    FormationData::Data tmp = *d;
     try
     {
         tmp.players_.at( unum - 1 ).assign( x, y );
@@ -1060,7 +1039,7 @@ EditData::replacePlayer( const int idx,
         std::cerr << e.what()
                   << ": EditData::replacePlayer() illegal player number. "
                   << unum << std::endl;
-        return SampleDataSet::INVALID_INDEX;
+        return FormationData::INVALID_INDEX;
     }
 
     return replaceDataImpl( idx, tmp );
@@ -1070,18 +1049,18 @@ EditData::replacePlayer( const int idx,
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::deleteData( const int idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
-    SampleDataSet::ErrorType err = M_samples->removeData( static_cast< size_t >( idx ) );
+    FormationData::ErrorType err = M_data->removeData( static_cast< size_t >( idx ) );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
@@ -1090,21 +1069,21 @@ EditData::deleteData( const int idx )
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-SampleDataSet::ErrorType
+FormationData::ErrorType
 EditData::changeDataIndex( const int old_idx,
                            const int new_idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
     size_t old_index = static_cast< size_t >( old_idx );
@@ -1115,9 +1094,9 @@ EditData::changeDataIndex( const int old_idx,
         new_index += 1;
     }
 
-    SampleDataSet::ErrorType err = M_samples->changeDataIndex( old_index, new_index );
+    FormationData::ErrorType err = M_data->changeDataIndex( old_index, new_index );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
@@ -1129,29 +1108,29 @@ EditData::changeDataIndex( const int old_idx,
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-rcsc::formation::SampleDataSet::ErrorType
+rcsc::FormationData::ErrorType
 EditData::addConstraint( const int origin_idx,
                          const int terminal_idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
     size_t origin = static_cast< size_t >( std::min( origin_idx, terminal_idx ) );
     size_t terminal = static_cast< size_t >( std::max( origin_idx, terminal_idx ) );
 
-    SampleDataSet::ErrorType err = M_samples->addConstraint( origin, terminal );
+    FormationData::ErrorType err = M_data->addConstraint( origin, terminal );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
@@ -1161,30 +1140,30 @@ EditData::addConstraint( const int origin_idx,
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-rcsc::formation::SampleDataSet::ErrorType
+rcsc::FormationData::ErrorType
 EditData::replaceConstraint( const int idx,
                              const int origin_idx,
                              const int terminal_idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->replaceConstraint( static_cast< size_t >( idx ),
+    FormationData::ErrorType err
+        = M_data->replaceConstraint( static_cast< size_t >( idx ),
                                         static_cast< size_t >( origin_idx ),
                                         static_cast< size_t >( terminal_idx ) );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
@@ -1195,28 +1174,28 @@ EditData::replaceConstraint( const int idx,
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-rcsc::formation::SampleDataSet::ErrorType
+rcsc::FormationData::ErrorType
 EditData::deleteConstraint( const int origin_idx,
                             const int terminal_idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
-        return SampleDataSet::NO_FORMATION;
+        return FormationData::NO_FORMATION;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->removeConstraint( static_cast< size_t >( origin_idx ),
+    FormationData::ErrorType err
+        = M_data->removeConstraint( static_cast< size_t >( origin_idx ),
                                        static_cast< size_t >( terminal_idx ) );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         return err;
     }
@@ -1226,7 +1205,7 @@ EditData::deleteConstraint( const int origin_idx,
 
     train();
 
-    return SampleDataSet::NO_ERROR;
+    return FormationData::NO_ERROR;
 }
 
 /*-------------------------------------------------------------------*/
@@ -1237,7 +1216,7 @@ bool
 EditData::setCurrentIndex( const int idx )
 {
     if ( ! M_formation
-         || ! M_samples )
+         || ! M_data )
     {
         return false;
     }
@@ -1248,7 +1227,7 @@ EditData::setCurrentIndex( const int idx )
         return true;
     }
 
-    const SampleData * d = M_samples->data( idx );
+    const FormationData::Data * d = M_data->data( idx );
     if ( ! d )
     {
         std::cerr << __FILE__ << ':' << __LINE__ << ':'

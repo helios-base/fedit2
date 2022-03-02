@@ -85,7 +85,6 @@
 #include "xpm/train.xpm"
 
 using namespace rcsc;
-using namespace formation;
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -1263,7 +1262,7 @@ MainWindow::openConfFile( const QString & filepath )
     M_sample_view->setData( M_edit_data );
     M_constraint_view->setData( M_edit_data );
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
     M_edit_canvas->update(); //emit viewUpdated();
     M_sample_view->updateData();
@@ -1396,7 +1395,7 @@ MainWindow::openDataFile( const QString & filepath )
 
     this->statusBar()->showMessage( tr( "Opened %1" ).arg( filepath ), 2000 );
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
     M_edit_canvas->update(); //emit viewUpdated();
     M_sample_view->updateData();
@@ -1415,37 +1414,37 @@ MainWindow::showWarningMessage( const int err )
     QString msg;
 
     switch ( err ) {
-    case SampleDataSet::NO_FORMATION:
+    case FormationData::NO_FORMATION:
         msg = tr( "No formation." );
         break;
-    case SampleDataSet::TOO_MANY_DATA:
+    case FormationData::TOO_MANY_DATA:
         msg = tr( "Too many data." );
         break;
-    case SampleDataSet::TOO_NEAR_DATA:
+    case FormationData::TOO_NEAR_DATA:
         msg = tr( "Too near data." );
         break;
-    case SampleDataSet::ILLEGAL_SYMMETRY_DATA:
+    case FormationData::ILLEGAL_SYMMETRY_DATA:
         msg = tr( "Illegal symmetry data." );
         break;
-    case SampleDataSet::TOO_NEAR_SYMMETRY_DATA:
+    case FormationData::TOO_NEAR_SYMMETRY_DATA:
         msg = tr( "Too near symmetry data." );
         break;
-    case SampleDataSet::INSERT_RANGE_OVER:
+    case FormationData::INSERT_RANGE_OVER:
         msg = tr( "Insert range over." );
         break;
-    case SampleDataSet::INVALID_INDEX:
+    case FormationData::INVALID_INDEX:
         msg = tr( "Invalid index." );
         break;
-    case SampleDataSet::DUPLICATED_INDEX:
+    case FormationData::DUPLICATED_INDEX:
         msg = tr( "Origin and terminal of the constraint has a same index." );
         break;
-    case SampleDataSet::DUPLICATED_CONSTRAINT:
+    case FormationData::DUPLICATED_CONSTRAINT:
         msg = tr( "The constraint already exists." );
         break;
-    case SampleDataSet::INTERSECTS_CONSTRAINT:
+    case FormationData::INTERSECTS_CONSTRAINT:
         msg = tr( "Exists intersected constraints." );
         break;
-    case SampleDataSet::NO_ERROR:
+    case FormationData::NO_ERROR:
         //msg = tr( "No error." );
         return;
         break;
@@ -1511,7 +1510,7 @@ MainWindow::newFile()
     M_edit_data->createFormation( name );
 
     if ( ! M_edit_data->formation()
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         std::cerr << "***ERROR*** Failed to initialize formation data"
                   << std::endl;
@@ -1524,7 +1523,7 @@ MainWindow::newFile()
     M_sample_view->setData( M_edit_data );
     M_constraint_view->setData( M_edit_data );
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     M_edit_canvas->update(); // emit viewUpdated();
@@ -1681,7 +1680,7 @@ void
 MainWindow::saveDataAs()
 {
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
@@ -1704,7 +1703,7 @@ MainWindow::saveDataAs()
         filepath += tr( ".dat" );
     }
 
-    if ( M_edit_data->samples()->save( filepath.toStdString() ) )
+    if ( M_edit_data->data()->save( filepath.toStdString() ) )
     {
         this->statusBar()->showMessage( tr( "Saved %1" ).arg( filepath ), 2000 );
     }
@@ -1768,20 +1767,20 @@ MainWindow::addData()
 {
     std::cerr << "(MainWindow::addData)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
 
-    SampleDataSet::ErrorType err = M_edit_data->addData();
+    FormationData::ErrorType err = M_edit_data->addData();
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
     }
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1799,7 +1798,7 @@ MainWindow::insertData()
 {
     std::cerr << "(MainWindow::insertData)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
@@ -1807,14 +1806,14 @@ MainWindow::insertData()
     int index = M_index_spin_box->value() - 1;
     if ( index == -1 ) index = 0;
 
-    SampleDataSet::ErrorType err  = M_edit_data->insertData( index );
-    if ( err != SampleDataSet::NO_ERROR )
+    FormationData::ErrorType err  = M_edit_data->insertData( index );
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
     }
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1832,21 +1831,21 @@ MainWindow::replaceData()
 {
     std::cerr << "(MainWindow::replaceData)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
 
     int index = M_index_spin_box->value() - 1;
-    SampleDataSet::ErrorType err  = M_edit_data->replaceData( index );
+    FormationData::ErrorType err  = M_edit_data->replaceData( index );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
     }
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1863,7 +1862,7 @@ void
 MainWindow::deleteData()
 {
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
@@ -1881,8 +1880,8 @@ MainWindow::deleteData()
 
     std::cerr << "deleteData index=" << index << std::endl;
 
-    SampleDataSet::ErrorType err = M_edit_data->deleteData( index );
-    if ( err != SampleDataSet::NO_ERROR )
+    FormationData::ErrorType err = M_edit_data->deleteData( index );
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
@@ -1890,7 +1889,7 @@ MainWindow::deleteData()
 
     M_edit_data->setCurrentIndex( -1 );
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1911,20 +1910,20 @@ MainWindow::changeSampleIndex( int old_visual_index,
               << " old_vis_idx=" << old_visual_index
               << " new_vis_idx=" << new_visual_index << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
 
-    SampleDataSet::ErrorType err = M_edit_data->changeDataIndex( old_visual_index - 1,
+    FormationData::ErrorType err = M_edit_data->changeDataIndex( old_visual_index - 1,
                                                                  new_visual_index - 1 );
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
     }
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     selectSample( M_edit_data->currentIndex() );
@@ -1957,14 +1956,14 @@ MainWindow::train()
 {
     std::cerr << "(MainWindow::train)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->samples() )
+         || ! M_edit_data->data() )
     {
         return;
     }
 
     M_edit_data->train();
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     M_edit_canvas->update(); // emit viewUpdated();
@@ -2239,8 +2238,8 @@ MainWindow::deleteSample( int index )
 {
     std::cerr << "(MainWindow::deleteSample) index=" << index << std::endl;
 
-    SampleDataSet::ErrorType err = M_edit_data->deleteData( index );
-    if ( err != SampleDataSet::NO_ERROR )
+    FormationData::ErrorType err = M_edit_data->deleteData( index );
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
@@ -2248,7 +2247,7 @@ MainWindow::deleteSample( int index )
 
     M_edit_data->setCurrentIndex( -1 );
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -2274,15 +2273,15 @@ MainWindow::replaceBall( int index,
         return;
     }
 
-    SampleDataSet::ErrorType err  = M_edit_data->replaceBall( index, x, y );
+    FormationData::ErrorType err  = M_edit_data->replaceBall( index, x, y );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
     }
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -2310,15 +2309,15 @@ MainWindow::replacePlayer( int index,
         return;
     }
 
-    SampleDataSet::ErrorType err  = M_edit_data->replacePlayer( index, unum, x, y );
+    FormationData::ErrorType err  = M_edit_data->replacePlayer( index, unum, x, y );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
     }
 
-    const int data_count = M_edit_data->samples()->dataCont().size();
+    const int data_count = M_edit_data->data()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -2339,9 +2338,9 @@ MainWindow::deleteConstraint( int origin_idx,
               << " origin=" << origin_idx
               << " terminal=" << terminal_idx << std::endl;
 
-    SampleDataSet::ErrorType err = M_edit_data->deleteConstraint( origin_idx,
+    FormationData::ErrorType err = M_edit_data->deleteConstraint( origin_idx,
                                                                   terminal_idx );
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
@@ -2364,11 +2363,11 @@ MainWindow::replaceConstraint( int idx,
               << " origin=" << origin_idx
               << " terminal=" << terminal_idx << std::endl;
 
-    SampleDataSet::ErrorType err = M_edit_data->replaceConstraint( idx,
+    FormationData::ErrorType err = M_edit_data->replaceConstraint( idx,
                                                                    origin_idx,
                                                                    terminal_idx );
 
-    if ( err != SampleDataSet::NO_ERROR )
+    if ( err != FormationData::NO_ERROR )
     {
         showWarningMessage( err );
         return;
@@ -2410,12 +2409,12 @@ void
 MainWindow::showConstraintEditDialog()
 {
     if ( ! M_edit_data
-         || M_edit_data->samples()->dataCont().size() < 2 )
+         || M_edit_data->data()->dataCont().size() < 2 )
     {
         return;
     }
 
-    showConstraintEditDialog( 0, M_edit_data->samples()->dataCont().size() - 1 );
+    showConstraintEditDialog( 0, M_edit_data->data()->dataCont().size() - 1 );
 }
 
 /*-------------------------------------------------------------------*/
@@ -2431,7 +2430,7 @@ MainWindow::showConstraintEditDialog( int first_index,
               << std::endl;
 
     if ( ! M_edit_data
-         || M_edit_data->samples()->dataCont().size() < 2 )
+         || M_edit_data->data()->dataCont().size() < 2 )
     {
         return;
     }
@@ -2451,9 +2450,9 @@ MainWindow::showConstraintEditDialog( int first_index,
                   << " terminal=" << terminal
                   << std::endl;
 
-        SampleDataSet::ErrorType err = M_edit_data->addConstraint( origin, terminal );
+        FormationData::ErrorType err = M_edit_data->addConstraint( origin, terminal );
 
-        if ( err != SampleDataSet::NO_ERROR )
+        if ( err != FormationData::NO_ERROR )
         {
             M_edit_data->releaseObject();
             M_edit_canvas->update();

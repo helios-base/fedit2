@@ -60,10 +60,10 @@ private:
     bool M_conf_changed;
     QString M_saved_datetime;
 
-    rcsc::formation::SampleData M_state; //!< current state on the edit canvas.
+    rcsc::FormationData::Data M_state; //!< current state on the edit canvas.
 
     rcsc::Formation::Ptr M_formation;
-    rcsc::formation::SampleDataSet::Ptr M_samples; //!< training data
+    rcsc::FormationData::Ptr M_data; //!< training data
     rcsc::Triangulation M_triangulation;
 
     rcsc::Formation::Ptr M_background_formation;
@@ -96,74 +96,74 @@ public:
 
     const
     QString & filePath() const
-      {
-          return M_filepath;
-      }
+    {
+        return M_filepath;
+    }
 
     bool isConfChanged() const
-      {
-          return M_conf_changed;
-      }
+    {
+        return M_conf_changed;
+    }
 
     const
-    rcsc::formation::SampleData & state() const
-      {
-          return M_state;
-      }
+    rcsc::FormationData::Data & state() const
+    {
+        return M_state;
+    }
 
     rcsc::Formation::ConstPtr formation() const
-      {
-          return M_formation;
-      }
-    rcsc::formation::SampleDataSet::Ptr samples() const
-      {
-          return M_samples;
-      }
+    {
+        return M_formation;
+    }
+    rcsc::FormationData::Ptr data() const
+    {
+        return M_data;
+    }
     const
     rcsc::Triangulation & triangulation() const
-      {
-          return M_triangulation;
-      }
+    {
+        return M_triangulation;
+    }
 
     rcsc::Formation::ConstPtr backgroundFormation() const
-      {
-          return M_background_formation;
-      }
+    {
+        return M_background_formation;
+    }
     const
     rcsc::Triangulation & backgroundTriangulation() const
-      {
-          return M_background_triangulation;
-      }
+    {
+        return M_background_triangulation;
+    }
 
     int currentIndex() const
-      {
-          return M_current_index;
-      }
+    {
+        return M_current_index;
+    }
 
     SelectType selectType() const
-      {
-          return M_select_type;
-      }
+    {
+        return M_select_type;
+    }
     size_t selectIndex() const
-      {
-          return M_select_index;
-      }
+    {
+        return M_select_index;
+    }
 
     size_t constraintOriginIndex() const
-      {
-          return M_constraint_origin_index;
-      }
+    {
+        return M_constraint_origin_index;
+    }
 
     size_t constraintTerminalIndex() const
-      {
-          return M_constraint_terminal_index;
-      }
+    {
+        return M_constraint_terminal_index;
+    }
 
     const
     rcsc::Vector2D & constraintTerminal() const
-      {
-          return M_constraint_terminal;
-      }
+    {
+        return M_constraint_terminal;
+    }
 
     bool openConf( const QString & filepath );
     bool saveConf();
@@ -179,8 +179,8 @@ private:
 
     void reverseY( std::vector< rcsc::Vector2D > * players );
 
-    rcsc::formation::SampleDataSet::ErrorType replaceDataImpl( const int idx,
-                                                               const rcsc::formation::SampleData & data );
+    rcsc::FormationData::ErrorType replaceDataImpl( const int idx,
+                                                    const rcsc::FormationData::Data & data );
 public:
 
     void updateRoleData( const int unum,
@@ -208,27 +208,27 @@ public:
                        const double & y );
     bool releaseObject();
 
-    rcsc::formation::SampleDataSet::ErrorType addData();
-    rcsc::formation::SampleDataSet::ErrorType insertData( const int idx );
-    rcsc::formation::SampleDataSet::ErrorType replaceData( const int idx );
-    rcsc::formation::SampleDataSet::ErrorType replaceBall( const int idx,
-                                                           const double x,
-                                                           const double y );
-    rcsc::formation::SampleDataSet::ErrorType replacePlayer( const int idx,
-                                                             const int unum,
-                                                             const double x,
-                                                             const double y );
-    rcsc::formation::SampleDataSet::ErrorType deleteData( const int idx );
-    rcsc::formation::SampleDataSet::ErrorType changeDataIndex( const int old_idx,
-                                                               const int new_idx );
+    rcsc::FormationData::ErrorType addData();
+    rcsc::FormationData::ErrorType insertData( const int idx );
+    rcsc::FormationData::ErrorType replaceData( const int idx );
+    rcsc::FormationData::ErrorType replaceBall( const int idx,
+                                                const double x,
+                                                const double y );
+    rcsc::FormationData::ErrorType replacePlayer( const int idx,
+                                                  const int unum,
+                                                  const double x,
+                                                  const double y );
+    rcsc::FormationData::ErrorType deleteData( const int idx );
+    rcsc::FormationData::ErrorType changeDataIndex( const int old_idx,
+                                                    const int new_idx );
 
-    rcsc::formation::SampleDataSet::ErrorType addConstraint( const int origin_idx,
-                                                             const int terminal_idx );
-    rcsc::formation::SampleDataSet::ErrorType replaceConstraint( const int idx,
-                                                                 const int origin_idx,
-                                                                 const int terminal_idx );
-    rcsc::formation::SampleDataSet::ErrorType deleteConstraint( const int origin_idx,
-                                                                const int terminal_idx );
+    rcsc::FormationData::ErrorType addConstraint( const int origin_idx,
+                                                  const int terminal_idx );
+    rcsc::FormationData::ErrorType replaceConstraint( const int idx,
+                                                      const int origin_idx,
+                                                      const int terminal_idx );
+    rcsc::FormationData::ErrorType deleteConstraint( const int origin_idx,
+                                                     const int terminal_idx );
 
 
     bool setCurrentIndex( const int idx );
