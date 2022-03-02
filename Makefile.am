@@ -1,6 +1,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
-SUBDIRS = src tool
+SUBDIRS = src
+# tool
 
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 libtool: $(LIBTOOL_DEPS)

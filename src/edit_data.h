@@ -177,6 +177,10 @@ private:
     void updatePlayerPosition();
     void updateTriangulation();
 
+    void reverseY( std::vector< rcsc::Vector2D > * players );
+
+    rcsc::formation::SampleDataSet::ErrorType replaceDataImpl( const int idx,
+                                                               const rcsc::formation::SampleData & data );
 public:
 
     void updateRoleData( const int unum,
@@ -208,12 +212,12 @@ public:
     rcsc::formation::SampleDataSet::ErrorType insertData( const int idx );
     rcsc::formation::SampleDataSet::ErrorType replaceData( const int idx );
     rcsc::formation::SampleDataSet::ErrorType replaceBall( const int idx,
-                                                           const double & x,
-                                                           const double & y );
+                                                           const double x,
+                                                           const double y );
     rcsc::formation::SampleDataSet::ErrorType replacePlayer( const int idx,
                                                              const int unum,
-                                                             const double & x,
-                                                             const double & y );
+                                                             const double x,
+                                                             const double y );
     rcsc::formation::SampleDataSet::ErrorType deleteData( const int idx );
     rcsc::formation::SampleDataSet::ErrorType changeDataIndex( const int old_idx,
                                                                const int new_idx );

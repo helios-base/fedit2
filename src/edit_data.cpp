@@ -839,13 +839,25 @@ EditData::addData()
         return SampleDataSet::NO_FORMATION;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->addData( *M_formation,
-                              M_state,
-                              Options::instance().symmetryMode() );
+    // add data
+    SampleDataSet::ErrorType err = M_samples->addData( M_state );
     if ( err != SampleDataSet::NO_ERROR )
     {
 
+    }
+
+    // add symmetry data
+    if ( Options::instance().symmetryMode()
+         && M_state.ball_.absY() >= 0.5 )
+    {
+        SampleData reversed = M_state;
+        reversed.ball_.y *= -1.0;
+        reverseY( &reversed.players_ );
+        err = M_samples->addData( reversed );
+        if ( err != SampleDataSet::NO_ERROR )
+        {
+
+        }
     }
 
     M_state = M_samples->dataCont().back();
@@ -874,16 +886,25 @@ EditData::insertData( const int idx )
         return SampleDataSet::INVALID_INDEX;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->insertData( *M_formation,
-                                 static_cast< size_t >( idx ),
-                                 M_state,
-                                 Options::instance().symmetryMode() );
-
+    SampleDataSet::ErrorType err = M_samples->insertData( static_cast< size_t >( idx ), M_state );
     if ( err != SampleDataSet::NO_ERROR )
     {
         return err;
     }
+
+    if ( Options::instance().symmetryMode() )
+    {
+        SampleData reversed_data = M_state;
+        reversed_data.ball_.y *= -1.0;
+        reverseY( &reversed_data.players_ );
+
+        err = M_samples->insertData( static_cast< size_t >( idx + 1 ), reversed_data );
+        if ( err != SampleDataSet::NO_ERROR )
+        {
+            return err;
+        }
+    }
+
 
     M_current_index = idx;
 
@@ -899,22 +920,79 @@ EditData::insertData( const int idx )
 SampleDataSet::ErrorType
 EditData::replaceData( const int idx )
 {
+    return replaceDataImpl( idx, M_state );
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+SampleDataSet::ErrorType
+EditData::replaceDataImpl( const int idx,
+                           const SampleData & data )
+{
     if ( ! M_formation
          || ! M_samples )
     {
         return SampleDataSet::NO_FORMATION;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->replaceData( *M_formation,
-                                  static_cast< size_t >( idx ),
-                                  M_state,
-                                  Options::instance().symmetryMode() );
+
+    const SampleData * original_data = M_samples->data( static_cast< size_t >( idx ) );
+    if ( ! original_data )
+    {
+        return SampleDataSet::INVALID_INDEX;
+    }
+    const Vector2D original_ball = original_data->ball_;
+
+    // replace data
+    SampleDataSet::ErrorType err = M_samples->replaceData( static_cast< size_t >( idx ), data );
 
     if ( err != SampleDataSet::NO_ERROR )
     {
         return err;
     }
+
+    // replace the symmetry data
+    if ( Options::instance().symmetryMode()
+         && data.ball_.absY() >= 0.5 )
+    {
+        size_t reversed_idx = size_t( -1 );
+
+        for ( size_t i = 0; i < M_samples->dataCont().size(); ++i )
+        {
+            const SampleData * r = M_samples->data( i );
+            if ( r
+                 && std::fabs( r->ball_.x - original_ball.x ) < 1.0e-5
+                 && std::fabs( r->ball_.y + original_ball.y ) < 1.0e-5 )
+            {
+                reversed_idx = i;
+                break;
+            }
+        }
+
+        SampleData reversed_data = data;
+        reversed_data.ball_.y *= -1.0;
+        reverseY( &reversed_data.players_ );
+
+        if ( reversed_idx != size_t( -1 ) )
+        {
+            err = M_samples->replaceData( reversed_idx, reversed_data );
+            if ( err != SampleDataSet::NO_ERROR )
+            {
+                return err;
+            }
+        }
+        else
+        {
+            err = M_samples->addData( reversed_data );
+            if ( err != SampleDataSet::NO_ERROR )
+            {
+                std::cerr << __FILE__ << ':' << __LINE__ << " ERROR?" << std::endl;
+            }
+        }
+    }
+
 
     train();
 
@@ -927,8 +1005,8 @@ EditData::replaceData( const int idx )
  */
 SampleDataSet::ErrorType
 EditData::replaceBall( const int idx,
-                       const double & x,
-                       const double & y )
+                       const double x,
+                       const double y )
 {
     if ( ! M_formation
          || ! M_samples )
@@ -946,20 +1024,7 @@ EditData::replaceBall( const int idx,
     SampleData tmp = *d;
     tmp.ball_.assign( x, y );
 
-    SampleDataSet::ErrorType err
-        = M_samples->replaceData( *M_formation,
-                                  static_cast< size_t >( idx ),
-                                  tmp,
-                                  Options::instance().symmetryMode() );
-
-    if ( err != SampleDataSet::NO_ERROR )
-    {
-        return err;
-    }
-
-    train();
-
-    return SampleDataSet::NO_ERROR;
+    return replaceDataImpl( idx, tmp );
 }
 
 /*-------------------------------------------------------------------*/
@@ -969,8 +1034,8 @@ EditData::replaceBall( const int idx,
 SampleDataSet::ErrorType
 EditData::replacePlayer( const int idx,
                          const int unum,
-                         const double & x,
-                         const double & y )
+                         const double x,
+                         const double y )
 {
     if ( ! M_formation
          || ! M_samples )
@@ -998,20 +1063,7 @@ EditData::replacePlayer( const int idx,
         return SampleDataSet::INVALID_INDEX;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->replaceData( *M_formation,
-                                  static_cast< size_t >( idx ),
-                                  tmp,
-                                  Options::instance().symmetryMode() );
-
-    if ( err != SampleDataSet::NO_ERROR )
-    {
-        return err;
-    }
-
-    train();
-
-    return SampleDataSet::NO_ERROR;
+    return replaceDataImpl( idx, tmp );
 }
 
 /*-------------------------------------------------------------------*/
@@ -1027,8 +1079,7 @@ EditData::deleteData( const int idx )
         return SampleDataSet::NO_FORMATION;
     }
 
-    SampleDataSet::ErrorType err
-        = M_samples->removeData( static_cast< size_t >( idx ) );
+    SampleDataSet::ErrorType err = M_samples->removeData( static_cast< size_t >( idx ) );
 
     if ( err != SampleDataSet::NO_ERROR )
     {
@@ -1225,6 +1276,53 @@ EditData::setCurrentIndex( const int idx )
 
  */
 void
+EditData::reverseY( std::vector< Vector2D > * players )
+{
+    if ( ! M_formation )
+    {
+        std::cerr << "(EditData::reverseY) ***ERROR*** No formation." << std::endl;
+        return;
+    }
+
+    std::vector< Vector2D > old_players = *players;
+
+    int unum = 1;
+    for ( std::vector< Vector2D >::iterator p = players->begin();
+          p != players->end();
+          ++p, ++unum )
+    {
+        if ( M_formation->isCenterType( unum ) )
+        {
+            p->y *= -1.0;
+        }
+        else if ( M_formation->isSymmetryType( unum ) )
+        {
+            int symmetry_unum = M_formation->getSymmetryNumber( unum );
+            if ( symmetry_unum == 0 ) continue;
+            p->x = old_players[symmetry_unum - 1].x;
+            p->y = old_players[symmetry_unum - 1].y * -1.0;
+        }
+        else if ( M_formation->isSideType( unum ) )
+        {
+            p->y *= -1.0;
+            for ( int iunum = 1; iunum <= 11; ++iunum )
+            {
+                if ( M_formation->getSymmetryNumber( iunum ) == unum )
+                {
+                    p->x = old_players[iunum - 1].x;
+                    p->y = old_players[iunum - 1].y * -1.0;
+                }
+            }
+        }
+    }
+
+}
+
+/*-------------------------------------------------------------------*/
+/*!
+
+ */
+void
 EditData::reverseY()
 {
     if ( ! M_formation )
@@ -1237,37 +1335,7 @@ EditData::reverseY()
 
     M_state.ball_.y *= -1.0;
 
-    std::vector< Vector2D > old_positions = M_state.players_;
-
-    int unum = 1;
-    for ( std::vector< Vector2D >::iterator p = M_state.players_.begin();
-          p != M_state.players_.end();
-          ++p, ++unum )
-    {
-        if ( M_formation->isCenterType( unum ) )
-        {
-            p->y *= -1.0;
-        }
-        else if ( M_formation->isSymmetryType( unum ) )
-        {
-            int symmetry_unum = M_formation->getSymmetryNumber( unum );
-            if ( symmetry_unum == 0 ) continue;
-            p->x = old_positions[symmetry_unum - 1].x;
-            p->y = old_positions[symmetry_unum - 1].y * -1.0;
-        }
-        else if ( M_formation->isSideType( unum ) )
-        {
-            p->y *= -1.0;
-            for ( int iunum = 1; iunum <= 11; ++iunum )
-            {
-                if ( M_formation->getSymmetryNumber( iunum ) == unum )
-                {
-                    p->x = old_positions[iunum - 1].x;
-                    p->y = old_positions[iunum - 1].y * -1.0;
-                }
-            }
-        }
-    }
+    reverseY( &M_state.players_ );
 }
 
 /*-------------------------------------------------------------------*/
