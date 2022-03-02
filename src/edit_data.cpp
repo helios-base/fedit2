@@ -114,8 +114,8 @@ EditData::init()
         M_state.players_[i].assign( -3.0 * i + 3.0, -37.0 );
     }
 
-    M_constraint_origin_index = size_t( -1 );
-    M_constraint_terminal_index = size_t( -1 );
+    M_constraint_origin_index = -1;
+    M_constraint_terminal_index = -1;
     M_constraint_terminal = Vector2D::INVALIDATED;
 
     M_select_type = NO_SELECT;
@@ -526,11 +526,12 @@ EditData::moveBallTo( const double & x,
 
         if ( M_samples )
         {
-            SampleDataSet::IndexData d = M_samples->nearestData( pos, 1.0 );
-            if ( d.second )
+            const int idx = M_samples->nearestDataIndex( pos, 1.0 );
+            const SampleData * data = M_samples->data( idx );
+            if ( data )
             {
-                M_current_index = d.first;
-                M_state.ball_ = d.second->ball_;
+                M_current_index = idx;
+                M_state.ball_ = data->ball_;
             }
         }
     }
@@ -603,18 +604,19 @@ EditData::setConstraintTerminal( const double & x,
 {
     Vector2D pos = round_coordinates( x, y );
 
-    M_constraint_terminal_index = size_t( -1 );
+    M_constraint_terminal_index = -1;
     M_constraint_terminal = pos;
 
     // automatically select terminal vertex
     if ( M_samples )
     {
-        SampleDataSet::IndexData d = M_samples->nearestData( pos, 1.0 );
-        if ( M_constraint_origin_index != d.first
-             && d.second )
+        const int idx = M_samples->nearestDataIndex( pos, 1.0 );
+        const SampleData * data = M_samples->data( idx );
+        if ( M_constraint_origin_index != idx
+             && data )
         {
-            M_constraint_terminal_index = d.first;
-            M_constraint_terminal = d.second->ball_;
+            M_constraint_terminal_index = idx;
+            M_constraint_terminal = data->ball_;
         }
     }
 }
@@ -633,25 +635,21 @@ EditData::setConstraintIndex( const int origin_idx,
         return;
     }
 
-    const size_t origin = static_cast< size_t >( origin_idx );
-    const size_t terminal = static_cast< size_t >( terminal_idx );
-
     if ( origin_idx < 0 )
     {
         M_select_type = NO_SELECT;
         M_select_index = 0;
-        M_constraint_origin_index = size_t( -1 );
-        M_constraint_terminal_index = size_t( -1 );
+        M_constraint_origin_index = -1;
+        M_constraint_terminal_index = -1;
         M_constraint_terminal = Vector2D::INVALIDATED;
         return;
     }
 
-    if ( M_samples->dataCont().size() < origin + 1 )
+    if ( static_cast< int >( M_samples->dataCont().size() ) < origin_idx + 1 )
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << ':'
-                  << " EditData::setConstraintIndex() origin index over range."
-                  << " origin=" << origin
-                  << " terminal=" << terminal
+        std::cerr << "(EditData::setConstraintIndex) origin index over range."
+                  << " origin=" << origin_idx
+                  << " terminal=" << terminal_idx
                   << std::endl;
         return;
     }
@@ -659,37 +657,36 @@ EditData::setConstraintIndex( const int origin_idx,
     if ( terminal_idx < 0 )
     {
         M_select_type = SELECT_SAMPLE;
-        M_select_index = origin;
-        M_constraint_origin_index = origin;
-        M_constraint_terminal_index = size_t( -1 );
+        M_select_index = origin_idx;
+        M_constraint_origin_index = origin_idx;
+        M_constraint_terminal_index = -1;
         return;
     }
 
-    if ( M_samples->dataCont().size() < terminal + 1 )
+    if ( static_cast< int >( M_samples->dataCont().size() ) < terminal_idx + 1 )
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << ':'
-                  << " EditData::setConstraintIndex() terminal index over range."
-                  << " origin=" << origin
-                  << " terminal=" << terminal
+        std::cerr << "(EditData::setConstraintIndex) terminal index over range."
+                  << " origin=" << origin_idx
+                  << " terminal=" << terminal_idx
                   << std::endl;
         return;
     }
 
-    if ( origin == terminal )
+    if ( origin_idx == terminal_idx )
     {
         M_select_type = SELECT_SAMPLE;
-        M_select_index = origin;
-        M_constraint_origin_index = origin;
+        M_select_index = origin_idx;
+        M_constraint_origin_index = origin_idx;
         return;
     }
 
     M_select_type = SELECT_SAMPLE;
-    M_select_index = origin;
-    M_constraint_origin_index = origin;
-    M_constraint_terminal_index = terminal;
+    M_select_index = origin_idx;
+    M_constraint_origin_index = origin_idx;
+    M_constraint_terminal_index = terminal_idx;
 
     SampleDataSet::DataCont::const_iterator it = M_samples->dataCont().begin();
-    std::advance( it, terminal );
+    std::advance( it, terminal_idx );
 
     M_constraint_terminal = it->ball_;
 }
@@ -803,7 +800,7 @@ EditData::selectObject( const double & x,
     }
     else if ( M_select_type == SELECT_SAMPLE )
     {
-        M_constraint_terminal_index = size_t( -1 );
+        M_constraint_terminal_index = -1;
         M_constraint_terminal = Vector2D::INVALIDATED;
     }
 
@@ -820,8 +817,8 @@ EditData::releaseObject()
     if ( M_select_type != NO_SELECT )
     {
         M_select_type = NO_SELECT;
-        M_constraint_origin_index = size_t( -1 );
-        M_constraint_terminal_index = size_t( -1 );
+        M_constraint_origin_index = -1;
+        M_constraint_terminal_index = -1;
         M_constraint_terminal = Vector2D::INVALIDATED;
         return true;
     }
@@ -1271,28 +1268,6 @@ EditData::reverseY()
             }
         }
     }
-
-#if 0
-    //
-    // update index
-    //
-    if ( Options::instance().dataAutoSelect() )
-    {
-        int index = 0;
-        const SampleDataSet::DataCont::const_iterator end = M_samples.dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = M_samples.dataCont().begin();
-              it != end;
-              ++it, ++index )
-        {
-            SampleDataSet::IndexData d = M_samples.nearestData( pos, 1.0 );
-            if ( d.second )
-            {
-                M_current_index = d.first;
-                M_state = *(d.second);
-            }
-        }
-    }
-#endif
 }
 
 /*-------------------------------------------------------------------*/

@@ -72,10 +72,10 @@ private:
     int M_current_index;
 
     SelectType M_select_type;
-    size_t M_select_index;
+    int M_select_index;
 
-    size_t M_constraint_origin_index;
-    size_t M_constraint_terminal_index;
+    int M_constraint_origin_index;
+    int M_constraint_terminal_index;
     rcsc::Vector2D M_constraint_terminal;
 
     // not used
