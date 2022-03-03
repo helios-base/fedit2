@@ -101,12 +101,12 @@ void
 EditData::init()
 {
     M_conf_changed = false;
-    M_data.reset();
+    M_formation_data.reset();
 
-    M_state.ball_.assign( 0.0, 0.0 );
-    for ( size_t i = 0; i < M_state.players_.size(); ++i )
+    M_current_state.ball_.assign( 0.0, 0.0 );
+    for ( size_t i = 0; i < M_current_state.players_.size(); ++i )
     {
-        M_state.players_[i].assign( -3.0 * i + 3.0, -37.0 );
+        M_current_state.players_[i].assign( -3.0 * i + 3.0, -37.0 );
     }
 
     M_constraint_origin_index = -1;
@@ -141,7 +141,7 @@ EditData::createFormation( const QString & type_name )
     }
 
     M_conf_changed = true;
-    M_data = M_formation->data();
+    M_formation_data = M_formation->data();
 
     M_formation->createDefaultData();
     train();
@@ -196,7 +196,7 @@ EditData::openConf( const QString & filepath )
         return false;
     }
 
-    M_data.reset();
+    M_formation_data.reset();
 
     M_formation = Formation::create( fin );
     if ( ! M_formation )
@@ -218,7 +218,7 @@ EditData::openConf( const QString & filepath )
 
     init();
     M_filepath = filepath;
-    M_data = M_formation->data();
+    M_formation_data = M_formation->data();
     updateTriangulation();
     updatePlayerPosition();
     return true;
@@ -239,15 +239,15 @@ EditData::openData( const QString & filepath )
 
     M_triangulation.clear();
 
-    M_data = FormationData::Ptr( new FormationData() );
-    if ( ! M_data->open( filepath.toStdString() ) )
+    M_formation_data = FormationData::Ptr( new FormationData() );
+    if ( ! M_formation_data->open( filepath.toStdString() ) )
     {
         return false;
     }
 
     M_current_index = -1;
 
-    M_formation->setData( M_data );
+    M_formation->setData( M_formation_data );
     train();
 
     return true;
@@ -381,10 +381,10 @@ EditData::updatePlayerPosition()
         return;
     }
 
-    M_formation->getPositions( M_state.ball_, M_state.players_ );
+    M_formation->getPositions( M_current_state.ball_, M_current_state.players_ );
 
-    for ( std::vector< Vector2D >::iterator it = M_state.players_.begin();
-          it != M_state.players_.end();
+    for ( std::vector< Vector2D >::iterator it = M_current_state.players_.begin();
+          it != M_current_state.players_.end();
           ++it )
     {
         *it = round_coordinates( it->x, it->y );
@@ -398,19 +398,19 @@ EditData::updatePlayerPosition()
 void
 EditData::updateTriangulation()
 {
-    if ( ! M_data )
+    if ( ! M_formation_data )
     {
         return;
     }
 
     M_triangulation.clear();
 
-    for ( const FormationData::Data & d : M_data->dataCont() )
+    for ( const FormationData::Data & d : M_formation_data->dataCont() )
     {
         M_triangulation.addPoint( d.ball_ );
     }
 
-    for ( const FormationData::Constraint & c : M_data->constraints() )
+    for ( const FormationData::Constraint & c : M_formation_data->constraints() )
     {
         M_triangulation.addConstraint( static_cast< size_t >( c.first->index_ ),
                                        static_cast< size_t >( c.second->index_ ) );
@@ -420,8 +420,8 @@ EditData::updateTriangulation()
     //M_triangulation.updateHalfEdges();
 
     std::cerr << "updateTriangulation"
-//               << "\n  vertices=" << M_triangulation.indexedVertices().size()
-//               << "\n  edges=" << M_triangulation.halfEdges().size()
+        //               << "\n  vertices=" << M_triangulation.indexedVertices().size()
+        //               << "\n  edges=" << M_triangulation.halfEdges().size()
               << "\n  edges=" << M_triangulation.edges().size()
               << "\n  triangles=" << M_triangulation.triangles().size()
               << std::endl;
@@ -496,23 +496,23 @@ EditData::moveBallTo( const double & x,
 {
     Vector2D pos = round_coordinates( x, y );
 
-    M_state.ball_ = pos;
+    M_current_state.ball_ = pos;
 
     if ( Options::instance().dataAutoSelect() )
     {
         if ( pos.absY() < 1.0 )
         {
-            M_state.ball_.y = 0.0;
+            M_current_state.ball_.y = 0.0;
         }
 
-        if ( M_data )
+        if ( M_formation_data )
         {
-            const int idx = M_data->nearestDataIndex( pos, 1.0 );
-            const FormationData::Data * data = M_data->data( idx );
+            const int idx = M_formation_data->nearestDataIndex( pos, 1.0 );
+            const FormationData::Data * data = M_formation_data->data( idx );
             if ( data )
             {
                 M_current_index = idx;
-                M_state.ball_ = data->ball_;
+                M_current_state.ball_ = data->ball_;
             }
         }
     }
@@ -541,10 +541,10 @@ EditData::movePlayerTo( const int unum,
     {
         Vector2D pos = round_coordinates( x, y );
 
-        M_state.players_.at( unum - 1 ) = pos;
+        M_current_state.players_.at( unum - 1 ) = pos;
 
         if ( Options::instance().symmetryMode()
-             && M_state.ball_.absY() < 0.5
+             && M_current_state.ball_.absY() < 0.5
              && M_formation )
         {
             if ( M_formation->isSymmetryType( unum ) )
@@ -552,7 +552,7 @@ EditData::movePlayerTo( const int unum,
                 int u = M_formation->getSymmetryNumber( unum );
                 if ( u != 0 )
                 {
-                    M_state.players_.at( u - 1 ).assign( x, -y );
+                    M_current_state.players_.at( u - 1 ).assign( x, -y );
                 }
             }
             else // if ( M_formation->isSideType( unum ) )
@@ -561,7 +561,7 @@ EditData::movePlayerTo( const int unum,
                 {
                     if ( M_formation->getSymmetryNumber( u ) == unum )
                     {
-                        M_state.players_.at( u - 1 ).assign( x, -y );
+                        M_current_state.players_.at( u - 1 ).assign( x, -y );
                     }
                 }
             }
@@ -589,10 +589,10 @@ EditData::setConstraintTerminal( const double & x,
     M_constraint_terminal = pos;
 
     // automatically select terminal vertex
-    if ( M_data )
+    if ( M_formation_data )
     {
-        const int idx = M_data->nearestDataIndex( pos, 1.0 );
-        const FormationData::Data * data = M_data->data( idx );
+        const int idx = M_formation_data->nearestDataIndex( pos, 1.0 );
+        const FormationData::Data * data = M_formation_data->data( idx );
         if ( M_constraint_origin_index != idx
              && data )
         {
@@ -611,7 +611,7 @@ void
 EditData::setConstraintIndex( const int origin_idx,
                               const int terminal_idx )
 {
-    if ( ! M_data )
+    if ( ! M_formation_data )
     {
         return;
     }
@@ -626,7 +626,7 @@ EditData::setConstraintIndex( const int origin_idx,
         return;
     }
 
-    if ( static_cast< int >( M_data->dataCont().size() ) < origin_idx + 1 )
+    if ( static_cast< int >( M_formation_data->dataCont().size() ) < origin_idx + 1 )
     {
         std::cerr << "(EditData::setConstraintIndex) origin index over range."
                   << " origin=" << origin_idx
@@ -644,7 +644,7 @@ EditData::setConstraintIndex( const int origin_idx,
         return;
     }
 
-    if ( static_cast< int >( M_data->dataCont().size() ) < terminal_idx + 1 )
+    if ( static_cast< int >( M_formation_data->dataCont().size() ) < terminal_idx + 1 )
     {
         std::cerr << "(EditData::setConstraintIndex) terminal index over range."
                   << " origin=" << origin_idx
@@ -666,7 +666,7 @@ EditData::setConstraintIndex( const int origin_idx,
     M_constraint_origin_index = origin_idx;
     M_constraint_terminal_index = terminal_idx;
 
-    FormationData::DataCont::const_iterator it = M_data->dataCont().begin();
+    FormationData::DataCont::const_iterator it = M_formation_data->dataCont().begin();
     std::advance( it, terminal_idx );
 
     M_constraint_terminal = it->ball_;
@@ -717,10 +717,10 @@ EditData::selectObject( const double & x,
         //
         // data
         //
-        if ( M_data )
+        if ( M_formation_data )
         {
             size_t index = 0;
-            for ( const FormationData::Data & d : M_data->dataCont() )
+            for ( const FormationData::Data & d : M_formation_data->dataCont() )
             {
                 double d2 = d.ball_.dist2( pos );
                 if ( d2 < dist2_thr
@@ -741,7 +741,7 @@ EditData::selectObject( const double & x,
         // ball
         //
         {
-            double d2 = M_state.ball_.dist2( pos );
+            double d2 = M_current_state.ball_.dist2( pos );
             if ( d2 < dist2_thr )
             {
                 //std::cerr << "selection update ball" << std::endl;
@@ -754,8 +754,8 @@ EditData::selectObject( const double & x,
         // players
         //
         size_t index = 0;
-        for ( std::vector< Vector2D >::iterator it = M_state.players_.begin();
-              it != M_state.players_.end();
+        for ( std::vector< Vector2D >::iterator it = M_current_state.players_.begin();
+              it != M_current_state.players_.end();
               ++it, ++index )
         {
             double d2 = it->dist2( pos );
@@ -763,7 +763,7 @@ EditData::selectObject( const double & x,
                  && d2 < mindist2 )
             {
                 M_select_type = SELECT_PLAYER;
-                M_select_index = index; //std::distance( M_state.players_.begin(), it );
+                M_select_index = index; //std::distance( M_current_state.players_.begin(), it );
                 mindist2 = d2;
             }
         }
@@ -771,11 +771,11 @@ EditData::selectObject( const double & x,
 
     if ( M_select_type == SELECT_BALL )
     {
-        M_state.ball_ = pos;
+        M_current_state.ball_ = pos;
     }
     else if ( M_select_type == SELECT_PLAYER )
     {
-        M_state.players_[M_select_index] = pos;
+        M_current_state.players_[M_select_index] = pos;
     }
     else if ( M_select_type == SELECT_SAMPLE )
     {
@@ -813,13 +813,13 @@ std::string
 EditData::addData()
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
     // add data
-    std::string err = M_data->addData( M_state );
+    std::string err = M_formation_data->addData( M_current_state );
     if ( ! err.empty() )
     {
 
@@ -827,20 +827,20 @@ EditData::addData()
 
     // add symmetry data
     if ( Options::instance().symmetryMode()
-         && M_state.ball_.absY() >= 0.5 )
+         && M_current_state.ball_.absY() >= 0.5 )
     {
-        FormationData::Data reversed = M_state;
+        FormationData::Data reversed = M_current_state;
         reversed.ball_.y *= -1.0;
         reverseY( &reversed.players_ );
-        err = M_data->addData( reversed );
+        err = M_formation_data->addData( reversed );
         if ( ! err.empty() )
         {
 
         }
     }
 
-    M_state = M_data->dataCont().back();
-    M_current_index = M_data->dataCont().size() - 1;
+    M_current_state = M_formation_data->dataCont().back();
+    M_current_index = M_formation_data->dataCont().size() - 1;
 
     train();
 
@@ -855,7 +855,7 @@ std::string
 EditData::insertData( const int idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
@@ -865,7 +865,7 @@ EditData::insertData( const int idx )
         return std::string( "Invalid index" );
     }
 
-    std::string err = M_data->insertData( static_cast< size_t >( idx ), M_state );
+    std::string err = M_formation_data->insertData( static_cast< size_t >( idx ), M_current_state );
     if ( ! err.empty() )
     {
         return err;
@@ -873,11 +873,11 @@ EditData::insertData( const int idx )
 
     if ( Options::instance().symmetryMode() )
     {
-        FormationData::Data reversed_data = M_state;
+        FormationData::Data reversed_data = M_current_state;
         reversed_data.ball_.y *= -1.0;
         reverseY( &reversed_data.players_ );
 
-        err = M_data->insertData( static_cast< size_t >( idx + 1 ), reversed_data );
+        err = M_formation_data->insertData( static_cast< size_t >( idx + 1 ), reversed_data );
         if ( ! err.empty() )
         {
             return err;
@@ -899,7 +899,7 @@ EditData::insertData( const int idx )
 std::string
 EditData::replaceData( const int idx )
 {
-    return replaceDataImpl( idx, M_state );
+    return replaceDataImpl( idx, M_current_state );
 }
 
 /*-------------------------------------------------------------------*/
@@ -911,13 +911,13 @@ EditData::replaceDataImpl( const int idx,
                            const FormationData::Data & data )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
 
-    const FormationData::Data * original_data = M_data->data( static_cast< size_t >( idx ) );
+    const FormationData::Data * original_data = M_formation_data->data( static_cast< size_t >( idx ) );
     if ( ! original_data )
     {
         return std::string( "Invalid index" );
@@ -926,7 +926,7 @@ EditData::replaceDataImpl( const int idx,
 
     // replace data
     {
-        std::string err = M_data->replaceData( static_cast< size_t >( idx ), data );
+        std::string err = M_formation_data->replaceData( static_cast< size_t >( idx ), data );
 
         if ( ! err.empty() )
         {
@@ -940,9 +940,9 @@ EditData::replaceDataImpl( const int idx,
     {
         size_t reversed_idx = size_t( -1 );
 
-        for ( size_t i = 0; i < M_data->dataCont().size(); ++i )
+        for ( size_t i = 0; i < M_formation_data->dataCont().size(); ++i )
         {
-            const FormationData::Data * r = M_data->data( i );
+            const FormationData::Data * r = M_formation_data->data( i );
             if ( r
                  && std::fabs( r->ball_.x - original_ball.x ) < 1.0e-5
                  && std::fabs( r->ball_.y + original_ball.y ) < 1.0e-5 )
@@ -958,7 +958,7 @@ EditData::replaceDataImpl( const int idx,
 
         if ( reversed_idx != size_t( -1 ) )
         {
-            std::string err = M_data->replaceData( reversed_idx, reversed_data );
+            std::string err = M_formation_data->replaceData( reversed_idx, reversed_data );
             if ( ! err.empty() )
             {
                 return err;
@@ -966,7 +966,7 @@ EditData::replaceDataImpl( const int idx,
         }
         else
         {
-            std::string err = M_data->addData( reversed_data );
+            std::string err = M_formation_data->addData( reversed_data );
             if ( ! err.empty() )
             {
                 std::cerr << "(EditData::replaceDataImpl) ERROR?" << std::endl;
@@ -989,12 +989,12 @@ EditData::replaceBall( const int idx,
                        const double y )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
-    const FormationData::Data * d = M_data->data( static_cast< size_t >( idx ) );
+    const FormationData::Data * d = M_formation_data->data( static_cast< size_t >( idx ) );
 
     if ( ! d )
     {
@@ -1018,12 +1018,12 @@ EditData::replacePlayer( const int idx,
                          const double y )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
-    const FormationData::Data * d = M_data->data( static_cast< size_t >( idx ) );
+    const FormationData::Data * d = M_formation_data->data( static_cast< size_t >( idx ) );
 
     if ( ! d )
     {
@@ -1054,12 +1054,12 @@ std::string
 EditData::deleteData( const int idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
-    std::string err = M_data->removeData( static_cast< size_t >( idx ) );
+    std::string err = M_formation_data->removeData( static_cast< size_t >( idx ) );
 
     if ( ! err.empty() )
     {
@@ -1082,7 +1082,7 @@ EditData::changeDataIndex( const int old_idx,
                            const int new_idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
@@ -1095,7 +1095,7 @@ EditData::changeDataIndex( const int old_idx,
         new_index += 1;
     }
 
-    std::string err = M_data->changeDataIndex( old_index, new_index );
+    std::string err = M_formation_data->changeDataIndex( old_index, new_index );
 
     if ( ! err.empty() )
     {
@@ -1120,7 +1120,7 @@ EditData::addConstraint( const int origin_idx,
                          const int terminal_idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
@@ -1128,7 +1128,7 @@ EditData::addConstraint( const int origin_idx,
     size_t origin = static_cast< size_t >( std::min( origin_idx, terminal_idx ) );
     size_t terminal = static_cast< size_t >( std::max( origin_idx, terminal_idx ) );
 
-    std::string err = M_data->addConstraint( origin, terminal );
+    std::string err = M_formation_data->addConstraint( origin, terminal );
 
     if ( ! err.empty() )
     {
@@ -1152,14 +1152,14 @@ EditData::replaceConstraint( const int idx,
                              const int terminal_idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
-    std::string err = M_data->replaceConstraint( static_cast< size_t >( idx ),
-                                                 static_cast< size_t >( origin_idx ),
-                                                 static_cast< size_t >( terminal_idx ) );
+    std::string err = M_formation_data->replaceConstraint( static_cast< size_t >( idx ),
+                                                           static_cast< size_t >( origin_idx ),
+                                                           static_cast< size_t >( terminal_idx ) );
 
     if ( ! err.empty() )
     {
@@ -1184,13 +1184,13 @@ EditData::deleteConstraint( const int origin_idx,
                             const int terminal_idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return std::string( "No formation" );
     }
 
-    std::string err= M_data->removeConstraint( static_cast< size_t >( origin_idx ),
-                                               static_cast< size_t >( terminal_idx ) );
+    std::string err= M_formation_data->removeConstraint( static_cast< size_t >( origin_idx ),
+                                                         static_cast< size_t >( terminal_idx ) );
 
     if ( ! err.empty() )
     {
@@ -1213,7 +1213,7 @@ bool
 EditData::setCurrentIndex( const int idx )
 {
     if ( ! M_formation
-         || ! M_data )
+         || ! M_formation_data )
     {
         return false;
     }
@@ -1224,7 +1224,7 @@ EditData::setCurrentIndex( const int idx )
         return true;
     }
 
-    const FormationData::Data * d = M_data->data( idx );
+    const FormationData::Data * d = M_formation_data->data( idx );
     if ( ! d )
     {
         std::cerr << __FILE__ << ':' << __LINE__ << ':'
@@ -1237,11 +1237,11 @@ EditData::setCurrentIndex( const int idx )
 
     if ( Options::instance().playerAutoMove() )
     {
-        M_state = *d;
+        M_current_state = *d;
     }
     else
     {
-        M_state.ball_ = d->ball_;
+        M_current_state.ball_ = d->ball_;
     }
 
     return true;
@@ -1309,9 +1309,9 @@ EditData::reverseY()
         return;
     }
 
-    M_state.ball_.y *= -1.0;
+    M_current_state.ball_.y *= -1.0;
 
-    reverseY( &M_state.players_ );
+    reverseY( &M_current_state.players_ );
 }
 
 /*-------------------------------------------------------------------*/

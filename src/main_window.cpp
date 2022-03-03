@@ -1262,7 +1262,7 @@ MainWindow::openConfFile( const QString & filepath )
     M_sample_view->setData( M_edit_data );
     M_constraint_view->setData( M_edit_data );
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
     M_edit_canvas->update(); //emit viewUpdated();
     M_sample_view->updateData();
@@ -1395,7 +1395,7 @@ MainWindow::openDataFile( const QString & filepath )
 
     this->statusBar()->showMessage( tr( "Opened %1" ).arg( filepath ), 2000 );
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
     M_edit_canvas->update(); //emit viewUpdated();
     M_sample_view->updateData();
@@ -1467,7 +1467,7 @@ MainWindow::newFile()
     M_edit_data->createFormation( name );
 
     if ( ! M_edit_data->formation()
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         std::cerr << "***ERROR*** Failed to initialize formation data"
                   << std::endl;
@@ -1480,7 +1480,7 @@ MainWindow::newFile()
     M_sample_view->setData( M_edit_data );
     M_constraint_view->setData( M_edit_data );
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     M_edit_canvas->update(); // emit viewUpdated();
@@ -1637,7 +1637,7 @@ void
 MainWindow::saveDataAs()
 {
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
@@ -1660,7 +1660,7 @@ MainWindow::saveDataAs()
         filepath += tr( ".dat" );
     }
 
-    if ( M_edit_data->data()->save( filepath.toStdString() ) )
+    if ( M_edit_data->formationData()->save( filepath.toStdString() ) )
     {
         this->statusBar()->showMessage( tr( "Saved %1" ).arg( filepath ), 2000 );
     }
@@ -1724,7 +1724,7 @@ MainWindow::addData()
 {
     std::cerr << "(MainWindow::addData)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
@@ -1736,7 +1736,7 @@ MainWindow::addData()
         return;
     }
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1754,7 +1754,7 @@ MainWindow::insertData()
 {
     std::cerr << "(MainWindow::insertData)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
@@ -1769,7 +1769,7 @@ MainWindow::insertData()
         return;
     }
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1787,7 +1787,7 @@ MainWindow::replaceData()
 {
     std::cerr << "(MainWindow::replaceData)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
@@ -1801,7 +1801,7 @@ MainWindow::replaceData()
         return;
     }
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1818,7 +1818,7 @@ void
 MainWindow::deleteData()
 {
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
@@ -1845,7 +1845,7 @@ MainWindow::deleteData()
 
     M_edit_data->setCurrentIndex( -1 );
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -1866,7 +1866,7 @@ MainWindow::changeSampleIndex( int old_visual_index,
               << " old_vis_idx=" << old_visual_index
               << " new_vis_idx=" << new_visual_index << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
@@ -1879,7 +1879,7 @@ MainWindow::changeSampleIndex( int old_visual_index,
         return;
     }
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     selectSample( M_edit_data->currentIndex() );
@@ -1912,14 +1912,14 @@ MainWindow::train()
 {
     std::cerr << "(MainWindow::train)" << std::endl;
     if ( ! M_edit_data
-         || ! M_edit_data->data() )
+         || ! M_edit_data->formationData() )
     {
         return;
     }
 
     M_edit_data->train();
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     M_edit_canvas->update(); // emit viewUpdated();
@@ -2203,7 +2203,7 @@ MainWindow::deleteSample( int index )
 
     M_edit_data->setCurrentIndex( -1 );
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -2236,7 +2236,7 @@ MainWindow::replaceBall( int index,
         return;
     }
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -2271,7 +2271,7 @@ MainWindow::replacePlayer( int index,
         return;
     }
 
-    const int data_count = M_edit_data->data()->dataCont().size();
+    const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     updateDataIndex();
@@ -2361,12 +2361,12 @@ void
 MainWindow::showConstraintEditDialog()
 {
     if ( ! M_edit_data
-         || M_edit_data->data()->dataCont().size() < 2 )
+         || M_edit_data->formationData()->dataCont().size() < 2 )
     {
         return;
     }
 
-    showConstraintEditDialog( 0, M_edit_data->data()->dataCont().size() - 1 );
+    showConstraintEditDialog( 0, M_edit_data->formationData()->dataCont().size() - 1 );
 }
 
 /*-------------------------------------------------------------------*/
@@ -2382,7 +2382,7 @@ MainWindow::showConstraintEditDialog( int first_index,
               << std::endl;
 
     if ( ! M_edit_data
-         || M_edit_data->data()->dataCont().size() < 2 )
+         || M_edit_data->formationData()->dataCont().size() < 2 )
     {
         return;
     }

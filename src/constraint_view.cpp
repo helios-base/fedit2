@@ -116,7 +116,7 @@ ConstraintView::updateData()
 {
     std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
-         || ! ptr->data() )
+         || ! ptr->formationData() )
     {
         M_origin_delegate->setRange( 0, 0 );
         M_terminal_delegate->setRange( 0, 0 );
@@ -127,9 +127,9 @@ ConstraintView::updateData()
     // update range
     //
 
-    if ( ! ptr->data()->constraints().empty() )
+    if ( ! ptr->formationData()->constraints().empty() )
     {
-        int maximum = ptr->data()->dataCont().size();
+        int maximum = ptr->formationData()->dataCont().size();
         M_origin_delegate->setRange( 1,  maximum );
         M_terminal_delegate->setRange( 1, maximum );
     }
@@ -138,7 +138,7 @@ ConstraintView::updateData()
     // update constraints
     //
 
-    const int data_count = ptr->data()->constraints().size();
+    const int data_count = ptr->formationData()->constraints().size();
 
     while ( this->rowCount() > data_count )
     {
@@ -146,7 +146,7 @@ ConstraintView::updateData()
     }
 
     int idx = 0;
-    for ( const rcsc::FormationData::Constraint & c : ptr->data()->constraints() )
+    for ( const rcsc::FormationData::Constraint & c : ptr->formationData()->constraints() )
     {
         QTableWidgetItem * item = this->item( idx, 0 );
         if ( ! item )

@@ -388,7 +388,7 @@ EditCanvas::drawContainedArea( QPainter & painter )
     //std::cerr << "triangle size = " << ptr->triangulation().triangleMap().size()
     //          << std::endl;
 
-    const Triangulation::Triangle * tri = ptr->triangulation().findTriangleContains( ptr->state().ball_ );
+    const Triangulation::Triangle * tri = ptr->triangulation().findTriangleContains( ptr->currentState().ball_ );
 
     if ( ! tri )
     {
@@ -507,7 +507,7 @@ EditCanvas::drawData( QPainter & painter )
         painter.setPen( M_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        for ( const FormationData::Data & data : ptr->data()->dataCont() )
+        for ( const FormationData::Data & data : ptr->formationData()->dataCont() )
         {
             painter.drawRect( QRectF( data.ball_.x - r, data.ball_.y - r, d, d ) );
         }
@@ -526,7 +526,7 @@ EditCanvas::drawData( QPainter & painter )
         painter.setWorldMatrixEnabled( false );
 
         int count = 0;
-        for ( const FormationData::Data & data : ptr->data()->dataCont() )
+        for ( const FormationData::Data & data : ptr->formationData()->dataCont() )
         {
             painter.drawText( transform.map( QPointF( data.ball_.x + 0.7, data.ball_.y - 0.7 ) ),
                               QString::number( count ) );
@@ -542,7 +542,7 @@ EditCanvas::drawData( QPainter & painter )
 
     if ( 0 <= ptr->currentIndex() )
     {
-        FormationData::DataCont::const_iterator it = ptr->data()->dataCont().begin();
+        FormationData::DataCont::const_iterator it = ptr->formationData()->dataCont().begin();
         std::advance( it, ptr->currentIndex() );
 
         painter.setPen( QPen( Qt::yellow, 0, Qt::SolidLine) );
@@ -593,12 +593,12 @@ EditCanvas::drawPlayers( QPainter & painter )
 
     const std::vector< Vector2D >::const_iterator selected
         = ( ptr->selectType() == EditData::SELECT_PLAYER
-            ? ( ptr->state().players_.begin() + ptr->selectIndex() )
-            : ptr->state().players_.end() );
+            ? ( ptr->currentState().players_.begin() + ptr->selectIndex() )
+            : ptr->currentState().players_.end() );
 
     int unum = 1;
-    for ( std::vector< Vector2D >::const_iterator p = ptr->state().players_.begin(),
-              end = ptr->state().players_.end();
+    for ( std::vector< Vector2D >::const_iterator p = ptr->currentState().players_.begin(),
+              end = ptr->currentState().players_.end();
           p != end;
           ++p, ++unum )
     {
@@ -659,7 +659,7 @@ EditCanvas::drawBall( QPainter & painter )
     painter.setBrush( M_ball_brush );
 
 
-    const Vector2D bpos = ptr->state().ball_;
+    const Vector2D bpos = ptr->currentState().ball_;
     const bool enlarge = Options::instance().enlarge();
     const double r = ( enlarge
                        ? ( ptr->selectType() == EditData::SELECT_BALL
@@ -699,7 +699,7 @@ EditCanvas::drawShootLines( QPainter & painter )
     painter.setPen( M_shoot_line_pen );
     painter.setBrush( Qt::NoBrush );
 
-    const Vector2D ball = ptr->state().ball_;
+    const Vector2D ball = ptr->currentState().ball_;
     const double goal_line_x = -ServerParam::i().pitchHalfLength() - 0.001;
     const double goal_half_width = ServerParam::i().goalHalfWidth() - 0.1;
     const double bdecay = ServerParam::i().ballDecay();
@@ -788,7 +788,7 @@ EditCanvas::drawFreeKickCircle( QPainter & painter )
     painter.setPen( M_free_kick_circle_pen );
     painter.setBrush( Qt::NoBrush );
 
-    const Vector2D ball = ptr->state().ball_;
+    const Vector2D ball = ptr->currentState().ball_;
     const double r = ServerParam::DEFAULT_CENTER_CIRCLE_R;
 
     painter.drawEllipse( QRectF( ball.x - r, ball.y - r, r*2, r*2 ) );
@@ -807,12 +807,12 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
         return;
     }
 
-    if ( ptr->state().players_.empty() )
+    if ( ptr->currentState().players_.empty() )
     {
         return;
     }
 
-    const Vector2D goalie_pos = ptr->state().players_.front();
+    const Vector2D goalie_pos = ptr->currentState().players_.front();
     const double catch_area = ServerParam::i().catchableArea();
     const double max_accel = ServerParam::i().maxDashPower() * ServerParam::i().defaultDashPowerRate() * ServerParam::i().defaultEffortMax();
     const double decay = ServerParam::i().defaultPlayerDecay();
@@ -880,7 +880,7 @@ EditCanvas::drawConstraintSelection( QPainter & painter )
         setAntialiasFlag( painter, false );
     }
 
-    FormationData::DataCont::const_iterator it = ptr->data()->dataCont().begin();
+    FormationData::DataCont::const_iterator it = ptr->formationData()->dataCont().begin();
     std::advance( it, ptr->constraintOriginIndex() );
 
     painter.setPen( QPen( Qt::blue, 0, Qt::SolidLine ) );
@@ -923,7 +923,7 @@ EditCanvas::drawBackgroundContainedArea( QPainter & painter )
         return;
     }
 
-    const Triangulation::Triangle * tri = ptr->backgroundTriangulation().findTriangleContains( ptr->state().ball_ );
+    const Triangulation::Triangle * tri = ptr->backgroundTriangulation().findTriangleContains( ptr->currentState().ball_ );
 
     if ( ! tri )
     {
@@ -1077,7 +1077,7 @@ EditCanvas::drawBackgroundPlayers( QPainter & painter )
 
     std::vector< Vector2D > players;
     players.reserve( 11 );
-    f->getPositions( ptr->state().ball_, players );
+    f->getPositions( ptr->currentState().ball_, players );
 
     int unum = 1;
     for ( std::vector< Vector2D >::const_iterator p = players.begin();

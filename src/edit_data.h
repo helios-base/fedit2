@@ -59,10 +59,10 @@ private:
     bool M_conf_changed;
     QString M_saved_datetime;
 
-    rcsc::FormationData::Data M_state; //!< current state on the edit canvas.
+    rcsc::FormationData::Data M_current_state; //!< current state on the edit canvas.
 
     rcsc::Formation::Ptr M_formation;
-    rcsc::FormationData::Ptr M_data; //!< training data
+    rcsc::FormationData::Ptr M_formation_data; //!< training data
     rcsc::Triangulation M_triangulation;
 
     rcsc::Formation::Ptr M_background_formation;
@@ -104,19 +104,18 @@ public:
         return M_conf_changed;
     }
 
-    const
-    rcsc::FormationData::Data & state() const
+    const rcsc::FormationData::Data & currentState() const
     {
-        return M_state;
+        return M_current_state;
     }
 
     rcsc::Formation::ConstPtr formation() const
     {
         return M_formation;
     }
-    rcsc::FormationData::Ptr data() const
+    rcsc::FormationData::Ptr formationData() const
     {
-        return M_data;
+        return M_formation_data;
     }
     const
     rcsc::Triangulation & triangulation() const
