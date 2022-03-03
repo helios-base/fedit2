@@ -178,8 +178,8 @@ private:
 
     void reverseY( std::vector< rcsc::Vector2D > * players );
 
-    rcsc::FormationData::ErrorType replaceDataImpl( const int idx,
-                                                    const rcsc::FormationData::Data & data );
+    std::string replaceDataImpl( const int idx,
+                                 const rcsc::FormationData::Data & data );
 public:
 
     void updateRoleData( const int unum,
@@ -207,27 +207,27 @@ public:
                        const double & y );
     bool releaseObject();
 
-    rcsc::FormationData::ErrorType addData();
-    rcsc::FormationData::ErrorType insertData( const int idx );
-    rcsc::FormationData::ErrorType replaceData( const int idx );
-    rcsc::FormationData::ErrorType replaceBall( const int idx,
-                                                const double x,
-                                                const double y );
-    rcsc::FormationData::ErrorType replacePlayer( const int idx,
-                                                  const int unum,
-                                                  const double x,
-                                                  const double y );
-    rcsc::FormationData::ErrorType deleteData( const int idx );
-    rcsc::FormationData::ErrorType changeDataIndex( const int old_idx,
-                                                    const int new_idx );
+    std::string addData();
+    std::string insertData( const int idx );
+    std::string replaceData( const int idx );
+    std::string replaceBall( const int idx,
+                             const double x,
+                             const double y );
+    std::string replacePlayer( const int idx,
+                               const int unum,
+                               const double x,
+                               const double y );
+    std::string deleteData( const int idx );
+    std::string changeDataIndex( const int old_idx,
+                                 const int new_idx );
 
-    rcsc::FormationData::ErrorType addConstraint( const int origin_idx,
-                                                  const int terminal_idx );
-    rcsc::FormationData::ErrorType replaceConstraint( const int idx,
-                                                      const int origin_idx,
-                                                      const int terminal_idx );
-    rcsc::FormationData::ErrorType deleteConstraint( const int origin_idx,
-                                                     const int terminal_idx );
+    std::string addConstraint( const int origin_idx,
+                               const int terminal_idx );
+    std::string replaceConstraint( const int idx,
+                                   const int origin_idx,
+                                   const int terminal_idx );
+    std::string deleteConstraint( const int origin_idx,
+                                  const int terminal_idx );
 
 
     bool setCurrentIndex( const int idx );

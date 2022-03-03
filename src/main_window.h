@@ -187,7 +187,7 @@ private:
     bool openBackgroundConfFile( const QString & filepath );
     bool openDataFile( const QString & filepath );
 
-    void showWarningMessage( const int err );
+    void showWarningMessage( const std::string & err );
 
     void updateEditModel();
 

@@ -1409,54 +1409,11 @@ MainWindow::openDataFile( const QString & filepath )
 
  */
 void
-MainWindow::showWarningMessage( const int err )
+MainWindow::showWarningMessage( const std::string & err )
 {
-    QString msg;
-
-    switch ( err ) {
-    case FormationData::NO_FORMATION:
-        msg = tr( "No formation." );
-        break;
-    case FormationData::TOO_MANY_DATA:
-        msg = tr( "Too many data." );
-        break;
-    case FormationData::TOO_NEAR_DATA:
-        msg = tr( "Too near data." );
-        break;
-    case FormationData::ILLEGAL_SYMMETRY_DATA:
-        msg = tr( "Illegal symmetry data." );
-        break;
-    case FormationData::TOO_NEAR_SYMMETRY_DATA:
-        msg = tr( "Too near symmetry data." );
-        break;
-    case FormationData::INSERT_RANGE_OVER:
-        msg = tr( "Insert range over." );
-        break;
-    case FormationData::INVALID_INDEX:
-        msg = tr( "Invalid index." );
-        break;
-    case FormationData::DUPLICATED_INDEX:
-        msg = tr( "Origin and terminal of the constraint has a same index." );
-        break;
-    case FormationData::DUPLICATED_CONSTRAINT:
-        msg = tr( "The constraint already exists." );
-        break;
-    case FormationData::INTERSECTS_CONSTRAINT:
-        msg = tr( "Exists intersected constraints." );
-        break;
-    case FormationData::NO_ERROR:
-        //msg = tr( "No error." );
-        return;
-        break;
-    default:
-        msg = tr( "Unsupported error. error code=%1" ).arg( static_cast< int >( err ) );
-        break;
-    }
-
-
     QMessageBox::warning( this,
                           tr( "Warning" ),
-                          msg,
+                          QString::fromStdString( err ),
                           QMessageBox::Ok,
                           QMessageBox::NoButton );
 }
@@ -1772,9 +1729,8 @@ MainWindow::addData()
         return;
     }
 
-    FormationData::ErrorType err = M_edit_data->addData();
-
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->addData();
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -1806,8 +1762,8 @@ MainWindow::insertData()
     int index = M_index_spin_box->value() - 1;
     if ( index == -1 ) index = 0;
 
-    FormationData::ErrorType err  = M_edit_data->insertData( index );
-    if ( err != FormationData::NO_ERROR )
+    const std::string err  = M_edit_data->insertData( index );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -1837,9 +1793,9 @@ MainWindow::replaceData()
     }
 
     int index = M_index_spin_box->value() - 1;
-    FormationData::ErrorType err  = M_edit_data->replaceData( index );
 
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->replaceData( index );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -1880,8 +1836,8 @@ MainWindow::deleteData()
 
     std::cerr << "deleteData index=" << index << std::endl;
 
-    FormationData::ErrorType err = M_edit_data->deleteData( index );
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->deleteData( index );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -1915,9 +1871,9 @@ MainWindow::changeSampleIndex( int old_visual_index,
         return;
     }
 
-    FormationData::ErrorType err = M_edit_data->changeDataIndex( old_visual_index - 1,
-                                                                 new_visual_index - 1 );
-    if ( err != FormationData::NO_ERROR )
+    std::string err = M_edit_data->changeDataIndex( old_visual_index - 1,
+                                                    new_visual_index - 1 );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -2238,8 +2194,8 @@ MainWindow::deleteSample( int index )
 {
     std::cerr << "(MainWindow::deleteSample) index=" << index << std::endl;
 
-    FormationData::ErrorType err = M_edit_data->deleteData( index );
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->deleteData( index );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -2273,9 +2229,8 @@ MainWindow::replaceBall( int index,
         return;
     }
 
-    FormationData::ErrorType err  = M_edit_data->replaceBall( index, x, y );
-
-    if ( err != FormationData::NO_ERROR )
+    const std::string err  = M_edit_data->replaceBall( index, x, y );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -2309,9 +2264,8 @@ MainWindow::replacePlayer( int index,
         return;
     }
 
-    FormationData::ErrorType err  = M_edit_data->replacePlayer( index, unum, x, y );
-
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->replacePlayer( index, unum, x, y );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -2338,9 +2292,8 @@ MainWindow::deleteConstraint( int origin_idx,
               << " origin=" << origin_idx
               << " terminal=" << terminal_idx << std::endl;
 
-    FormationData::ErrorType err = M_edit_data->deleteConstraint( origin_idx,
-                                                                  terminal_idx );
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->deleteConstraint( origin_idx, terminal_idx );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -2363,11 +2316,10 @@ MainWindow::replaceConstraint( int idx,
               << " origin=" << origin_idx
               << " terminal=" << terminal_idx << std::endl;
 
-    FormationData::ErrorType err = M_edit_data->replaceConstraint( idx,
-                                                                   origin_idx,
-                                                                   terminal_idx );
-
-    if ( err != FormationData::NO_ERROR )
+    const std::string err = M_edit_data->replaceConstraint( idx,
+                                                            origin_idx,
+                                                            terminal_idx );
+    if ( ! err.empty() )
     {
         showWarningMessage( err );
         return;
@@ -2450,9 +2402,8 @@ MainWindow::showConstraintEditDialog( int first_index,
                   << " terminal=" << terminal
                   << std::endl;
 
-        FormationData::ErrorType err = M_edit_data->addConstraint( origin, terminal );
-
-        if ( err != FormationData::NO_ERROR )
+        const std::string err = M_edit_data->addConstraint( origin, terminal );
+        if ( ! err.empty() )
         {
             M_edit_data->releaseObject();
             M_edit_canvas->update();

@@ -809,18 +809,18 @@ EditData::releaseObject()
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::addData()
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
     // add data
-    FormationData::ErrorType err = M_data->addData( M_state );
-    if ( err != FormationData::NO_ERROR )
+    std::string err = M_data->addData( M_state );
+    if ( ! err.empty() )
     {
 
     }
@@ -833,7 +833,7 @@ EditData::addData()
         reversed.ball_.y *= -1.0;
         reverseY( &reversed.players_ );
         err = M_data->addData( reversed );
-        if ( err != FormationData::NO_ERROR )
+        if ( ! err.empty() )
         {
 
         }
@@ -844,29 +844,29 @@ EditData::addData()
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::insertData( const int idx )
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
     if ( idx < 0 )
     {
-        return FormationData::INVALID_INDEX;
+        return std::string( "Invalid index" );
     }
 
-    FormationData::ErrorType err = M_data->insertData( static_cast< size_t >( idx ), M_state );
-    if ( err != FormationData::NO_ERROR )
+    std::string err = M_data->insertData( static_cast< size_t >( idx ), M_state );
+    if ( ! err.empty() )
     {
         return err;
     }
@@ -878,7 +878,7 @@ EditData::insertData( const int idx )
         reverseY( &reversed_data.players_ );
 
         err = M_data->insertData( static_cast< size_t >( idx + 1 ), reversed_data );
-        if ( err != FormationData::NO_ERROR )
+        if ( ! err.empty() )
         {
             return err;
         }
@@ -889,14 +889,14 @@ EditData::insertData( const int idx )
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::replaceData( const int idx )
 {
     return replaceDataImpl( idx, M_state );
@@ -906,30 +906,32 @@ EditData::replaceData( const int idx )
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::replaceDataImpl( const int idx,
                            const FormationData::Data & data )
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
 
     const FormationData::Data * original_data = M_data->data( static_cast< size_t >( idx ) );
     if ( ! original_data )
     {
-        return FormationData::INVALID_INDEX;
+        return std::string( "Invalid index" );
     }
     const Vector2D original_ball = original_data->ball_;
 
     // replace data
-    FormationData::ErrorType err = M_data->replaceData( static_cast< size_t >( idx ), data );
-
-    if ( err != FormationData::NO_ERROR )
     {
-        return err;
+        std::string err = M_data->replaceData( static_cast< size_t >( idx ), data );
+
+        if ( ! err.empty() )
+        {
+            return err;
+        }
     }
 
     // replace the symmetry data
@@ -956,33 +958,32 @@ EditData::replaceDataImpl( const int idx,
 
         if ( reversed_idx != size_t( -1 ) )
         {
-            err = M_data->replaceData( reversed_idx, reversed_data );
-            if ( err != FormationData::NO_ERROR )
+            std::string err = M_data->replaceData( reversed_idx, reversed_data );
+            if ( ! err.empty() )
             {
                 return err;
             }
         }
         else
         {
-            err = M_data->addData( reversed_data );
-            if ( err != FormationData::NO_ERROR )
+            std::string err = M_data->addData( reversed_data );
+            if ( ! err.empty() )
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << " ERROR?" << std::endl;
+                std::cerr << "(EditData::replaceDataImpl) ERROR?" << std::endl;
             }
         }
     }
 
-
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::replaceBall( const int idx,
                        const double x,
                        const double y )
@@ -990,14 +991,14 @@ EditData::replaceBall( const int idx,
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
     const FormationData::Data * d = M_data->data( static_cast< size_t >( idx ) );
 
     if ( ! d )
     {
-        return FormationData::INVALID_INDEX;
+        return std::string( "Invalid index" );
     }
 
     FormationData::Data tmp = *d;
@@ -1010,7 +1011,7 @@ EditData::replaceBall( const int idx,
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::replacePlayer( const int idx,
                          const int unum,
                          const double x,
@@ -1019,14 +1020,14 @@ EditData::replacePlayer( const int idx,
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
     const FormationData::Data * d = M_data->data( static_cast< size_t >( idx ) );
 
     if ( ! d )
     {
-        return FormationData::INVALID_INDEX;
+        return std::string( "Invalid index" );
     }
 
     FormationData::Data tmp = *d;
@@ -1039,7 +1040,7 @@ EditData::replacePlayer( const int idx,
         std::cerr << e.what()
                   << ": EditData::replacePlayer() illegal player number. "
                   << unum << std::endl;
-        return FormationData::INVALID_INDEX;
+        return std::string( "Illegal player number" );
     }
 
     return replaceDataImpl( idx, tmp );
@@ -1049,18 +1050,18 @@ EditData::replacePlayer( const int idx,
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::deleteData( const int idx )
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
-    FormationData::ErrorType err = M_data->removeData( static_cast< size_t >( idx ) );
+    std::string err = M_data->removeData( static_cast< size_t >( idx ) );
 
-    if ( err != FormationData::NO_ERROR )
+    if ( ! err.empty() )
     {
         return err;
     }
@@ -1069,21 +1070,21 @@ EditData::deleteData( const int idx )
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-FormationData::ErrorType
+std::string
 EditData::changeDataIndex( const int old_idx,
                            const int new_idx )
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
     size_t old_index = static_cast< size_t >( old_idx );
@@ -1094,60 +1095,58 @@ EditData::changeDataIndex( const int old_idx,
         new_index += 1;
     }
 
-    FormationData::ErrorType err = M_data->changeDataIndex( old_index, new_index );
+    std::string err = M_data->changeDataIndex( old_index, new_index );
 
-    if ( err != FormationData::NO_ERROR )
+    if ( ! err.empty() )
     {
         return err;
     }
 
-    std::cerr << "move data from " << old_idx << " to " << new_idx
-              << std::endl;
+    std::cerr << "move data from " << old_idx << " to " << new_idx << std::endl;
 
     M_current_index = new_idx;
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-rcsc::FormationData::ErrorType
+std::string
 EditData::addConstraint( const int origin_idx,
                          const int terminal_idx )
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
     size_t origin = static_cast< size_t >( std::min( origin_idx, terminal_idx ) );
     size_t terminal = static_cast< size_t >( std::max( origin_idx, terminal_idx ) );
 
-    FormationData::ErrorType err = M_data->addConstraint( origin, terminal );
+    std::string err = M_data->addConstraint( origin, terminal );
 
-    if ( err != FormationData::NO_ERROR )
+    if ( ! err.empty() )
     {
         return err;
     }
 
-    std::cerr << "add constraint (" << origin << ',' << terminal << ')'
-              << std::endl;
+    std::cerr << "add constraint (" << origin << ',' << terminal << ')' << std::endl;
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-rcsc::FormationData::ErrorType
+std::string
 EditData::replaceConstraint( const int idx,
                              const int origin_idx,
                              const int terminal_idx )
@@ -1155,15 +1154,14 @@ EditData::replaceConstraint( const int idx,
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
-    FormationData::ErrorType err
-        = M_data->replaceConstraint( static_cast< size_t >( idx ),
-                                        static_cast< size_t >( origin_idx ),
-                                        static_cast< size_t >( terminal_idx ) );
+    std::string err = M_data->replaceConstraint( static_cast< size_t >( idx ),
+                                                 static_cast< size_t >( origin_idx ),
+                                                 static_cast< size_t >( terminal_idx ) );
 
-    if ( err != FormationData::NO_ERROR )
+    if ( ! err.empty() )
     {
         return err;
     }
@@ -1174,28 +1172,27 @@ EditData::replaceConstraint( const int idx,
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-rcsc::FormationData::ErrorType
+std::string
 EditData::deleteConstraint( const int origin_idx,
                             const int terminal_idx )
 {
     if ( ! M_formation
          || ! M_data )
     {
-        return FormationData::NO_FORMATION;
+        return std::string( "No formation" );
     }
 
-    FormationData::ErrorType err
-        = M_data->removeConstraint( static_cast< size_t >( origin_idx ),
-                                       static_cast< size_t >( terminal_idx ) );
+    std::string err= M_data->removeConstraint( static_cast< size_t >( origin_idx ),
+                                               static_cast< size_t >( terminal_idx ) );
 
-    if ( err != FormationData::NO_ERROR )
+    if ( ! err.empty() )
     {
         return err;
     }
@@ -1205,7 +1202,7 @@ EditData::deleteConstraint( const int origin_idx,
 
     train();
 
-    return FormationData::NO_ERROR;
+    return std::string();
 }
 
 /*-------------------------------------------------------------------*/
