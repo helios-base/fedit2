@@ -57,7 +57,7 @@
 #include "sample_view.h"
 #include "options.h"
 
-#include <rcsc/formation/sample_data.h>
+#include <rcsc/formation/formation_data.h>
 
 //#include <rcsc/formation/formation_bpn.h>
 //#include <rcsc/formation/formation_cdt.h>

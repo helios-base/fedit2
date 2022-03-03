@@ -34,9 +34,8 @@
 
 #include <QString>
 
-#include <rcsc/formation/sample_data.h>
+#include <rcsc/formation/formation_data.h>
 #include <rcsc/formation/formation.h>
-//#include <rcsc/geom/cdt/triangulation.h>
 #include <rcsc/geom/triangulation.h>
 #include <rcsc/geom/vector_2d.h>
 
