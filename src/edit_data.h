@@ -182,10 +182,10 @@ private:
                                  const rcsc::FormationData::Data & data );
 public:
 
-    void updateRoleData( const int unum,
-                         const int symmetry_unum,
+    void updateRoleData( const int num,
+                         const int paird_unum,
                          const std::string & role_name );
-    void updateRoleType( const int unum,
+    void updateRoleType( const int num,
                          const int type_index );
     // void updateMarkerData( const int unum,
     //                        const bool marker,
@@ -193,7 +193,7 @@ public:
 
     void moveBallTo( const double x,
                      const double y );
-    void movePlayerTo( const int unum,
+    void movePlayerTo( const int num,
                        const double x,
                        const double y );
     // void setConstraintTerminal( const double x,

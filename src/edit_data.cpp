@@ -603,7 +603,7 @@ EditData::movePlayerTo( const int num,
 
         M_current_state.players_.at( num - 1 ) = pos;
 
-        if ( Options::instance().symmetryMode()
+        if ( Options::instance().pairMode()
              && M_current_state.ball_.absY() < 0.5
              && M_formation )
         {
@@ -883,8 +883,8 @@ EditData::addData()
 
     }
 
-    // add symmetry data
-    if ( Options::instance().symmetryMode()
+    // add paired data
+    if ( Options::instance().pairMode()
          && M_current_state.ball_.absY() >= 0.5 )
     {
         FormationData::Data reversed = M_current_state;
@@ -929,7 +929,7 @@ EditData::insertData( const int idx )
         return err;
     }
 
-    if ( Options::instance().symmetryMode() )
+    if ( Options::instance().pairMode() )
     {
         FormationData::Data reversed_data = M_current_state;
         reversed_data.ball_.y *= -1.0;
@@ -992,8 +992,8 @@ EditData::replaceDataImpl( const int idx,
         }
     }
 
-    // replace the symmetry data
-    if ( Options::instance().symmetryMode()
+    // replace the paired data
+    if ( Options::instance().pairMode()
          && data.ball_.absY() >= 0.5 )
     {
         size_t reversed_idx = size_t( -1 );

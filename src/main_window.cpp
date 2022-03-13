@@ -361,7 +361,7 @@ MainWindow::createToolBars()
 
         M_tool_bar->addAction( M_save_act );
         M_tool_bar->addAction( M_toggle_player_auto_move_act );
-        M_tool_bar->addAction( M_toggle_symmetry_mode_act );
+        M_tool_bar->addAction( M_toggle_pair_mode_act );
         //M_tool_bar->addAction( M_toggle_constraint_edit_mode_act );
 
         M_tool_bar->addSeparator();
@@ -599,19 +599,19 @@ MainWindow::createActionsEdit()
     this->addAction( M_toggle_data_auto_select_act );
 
     //
-    M_toggle_symmetry_mode_act = new QAction( QIcon( QPixmap( symmetry_xpm ) ),
-                                              tr( "Symmetry" ),
-                                              this );
-    M_toggle_symmetry_mode_act->setShortcut( Qt::Key_M );
-    M_toggle_symmetry_mode_act->setToolTip( tr( "Toggle symmetry mode" ) );
-    M_toggle_symmetry_mode_act->setStatusTip( tr( "Toggle symmetry mode." )
-                                              + M_toggle_symmetry_mode_act->shortcut().toString()
-                                              + tr( ")" ) );
-    connect( M_toggle_symmetry_mode_act, SIGNAL( toggled( bool ) ),
-             this, SLOT( setSymmetryMode( bool ) ) );
-    M_toggle_symmetry_mode_act->setCheckable( true );
-    M_toggle_symmetry_mode_act->setChecked( true );
-    this->addAction( M_toggle_symmetry_mode_act );
+    M_toggle_pair_mode_act = new QAction( QIcon( QPixmap( symmetry_xpm ) ),
+                                          tr( "Pair Mode" ),
+                                          this );
+    M_toggle_pair_mode_act->setShortcut( Qt::Key_M );
+    M_toggle_pair_mode_act->setToolTip( tr( "Toggle pair mode" ) );
+    M_toggle_pair_mode_act->setStatusTip( tr( "Toggle pair mode." )
+                                          + M_toggle_pair_mode_act->shortcut().toString()
+                                          + tr( ")" ) );
+    connect( M_toggle_pair_mode_act, SIGNAL( toggled( bool ) ),
+             this, SLOT( setPairMode( bool ) ) );
+    M_toggle_pair_mode_act->setCheckable( true );
+    M_toggle_pair_mode_act->setChecked( true );
+    this->addAction( M_toggle_pair_mode_act );
 
     // //
     // M_toggle_constraint_edit_mode_act = new QAction( tr( "Edit Constraint" ),
@@ -1006,7 +1006,7 @@ MainWindow::createMenuEdit()
 
     menu->addAction( M_toggle_player_auto_move_act );
     menu->addAction( M_toggle_data_auto_select_act );
-    menu->addAction( M_toggle_symmetry_mode_act );
+    menu->addAction( M_toggle_pair_mode_act );
     // menu->addAction( M_toggle_constraint_edit_mode_act );
 
     menu->addSeparator();
@@ -1702,9 +1702,9 @@ MainWindow::setDataAutoSelect( bool on )
 
  */
 void
-MainWindow::setSymmetryMode( bool on )
+MainWindow::setPairMode( bool on )
 {
-    Options::instance().setSymmetryMode( on );
+    Options::instance().setPairMode( on );
 }
 
 /*-------------------------------------------------------------------*/

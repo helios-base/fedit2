@@ -155,7 +155,7 @@ EditDialog::createWidgets()
 
     {
         const int unum_width = this->fontMetrics().width( tr( "Unum" ) ) + 4;
-        const int symmetry_width = this->fontMetrics().width( tr( "0000" ) ) + 4;
+        const int pair_width = this->fontMetrics().width( tr( "0000" ) ) + 4;
         const int role_width = this->fontMetrics().width( tr( "CenterForwardXXXX" ) ) + 4;
         const int coord_width = this->fontMetrics().width( tr( "-00.0000" ) ) + 4;
         // const int marker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
@@ -167,7 +167,7 @@ EditDialog::createWidgets()
         layout->setMargin( 1 );
         layout->setSpacing( 0 );
         layout->setColumnMinimumWidth( 0, unum_width );
-        layout->setColumnMinimumWidth( 1, symmetry_width );
+        layout->setColumnMinimumWidth( 1, pair_width );
         // layout->setColumnMinimumWidth( 5, marker_width );
         // layout->setColumnMinimumWidth( 6, smarker_width );
 
@@ -206,11 +206,11 @@ EditDialog::createWidgets()
             layout->addWidget( label, row, col, Qt::AlignCenter );
             ++col;
 
-            M_symmetry_unum[i] = new QLineEdit( tr( "0" ) );
-            M_symmetry_unum[i]->setMinimumSize( symmetry_width, 24 );
-            M_symmetry_unum[i]->setMaximumSize( symmetry_width, 24 );
-            M_symmetry_unum[i]->setValidator( new QIntValidator( -1, 11, M_symmetry_unum[i] ) );
-            layout->addWidget( M_symmetry_unum[i], row, col, Qt::AlignCenter );
+            M_paired_number[i] = new QLineEdit( tr( "0" ) );
+            M_paired_number[i]->setMinimumSize( pair_width, 24 );
+            M_paired_number[i]->setMaximumSize( pair_width, 24 );
+            M_paired_number[i]->setValidator( new QIntValidator( -1, 11, M_paired_number[i] ) );
+            layout->addWidget( M_paired_number[i], row, col, Qt::AlignCenter );
             ++col;
 
             M_role_type[i] = new QComboBox();
@@ -346,17 +346,13 @@ EditDialog::updateData()
     for ( size_t i = 0; i < 11; ++i )
     {
         int unum = i + 1;
-        //const bool symmetry = ( p->symmetryUnum() > 0 );
-        M_symmetry_unum[i]->setText( QString::number( f->pairedNumber( unum ) ) );
+        M_paired_number[i]->setText( QString::number( f->pairedNumber( unum ) ) );
 
         M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ).type() ) );
         M_role_name[i]->setText( QString::fromStdString( f->roleName( unum ) ) );
 
         M_pos_x[i]->setText( QString::number( s.players_[i].x, 'f', 2 ) );
         M_pos_y[i]->setText( QString::number( s.players_[i].y, 'f', 2 ) );
-
-        //M_role_name[i]->setReadOnly( symmetry );
-        //M_role_name[i]->setEnabled( ! symmetry );
 
         // M_marker[i]->setCheckState( f->isMarker( unum )
         //                             ? Qt::Checked
@@ -414,10 +410,10 @@ EditDialog::applyToField()
 
     bool data_auto_select = Options::instance().dataAutoSelect();
     bool player_auto_move = Options::instance().playerAutoMove();
-    bool symmetry_mode = Options::instance().symmetryMode();
+    bool pair_mode = Options::instance().pairMode();
     Options::instance().setDataAutoSelect( false );
     Options::instance().setPlayerAutoMove( false );
-    Options::instance().setSymmetryMode( false );
+    Options::instance().setPairMode( false );
 
     // ball
     {
@@ -435,11 +431,11 @@ EditDialog::applyToField()
     for ( int unum = 1; unum <= 11; ++unum )
     {
         bool ok = false;
-        int symmetry_unum = M_symmetry_unum[unum-1]->text().toInt( &ok );
+        int paired_number = M_paired_number[unum-1]->text().toInt( &ok );
         if ( ! ok )
         {
             std::cerr << __FILE__ << ':' << __LINE__
-                      << " *** ERROR *** Invalid symmetry number."
+                      << " *** ERROR *** Invalid pair number."
                       << std::endl;
             continue;
         }
@@ -453,7 +449,7 @@ EditDialog::applyToField()
         }
         else
         {
-            ptr->updateRoleData( unum, symmetry_unum, role_name );
+            ptr->updateRoleData( unum, paired_number, role_name );
         }
 
         bool ok_x = false;
@@ -476,7 +472,7 @@ EditDialog::applyToField()
 
     Options::instance().setDataAutoSelect( data_auto_select );
     Options::instance().setPlayerAutoMove( player_auto_move );
-    Options::instance().setSymmetryMode( symmetry_mode );
+    Options::instance().setPairMode( pair_mode );
 
     emit viewUpdated();
 

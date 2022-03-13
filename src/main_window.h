@@ -100,7 +100,7 @@ private:
 
     QAction * M_toggle_player_auto_move_act;
     QAction * M_toggle_data_auto_select_act;
-    QAction * M_toggle_symmetry_mode_act;
+    QAction * M_toggle_pair_mode_act;
     //QAction * M_toggle_constraint_edit_mode_act;
 
     // view actions
@@ -207,7 +207,7 @@ private slots:
     // edit
     void setPlayerAutoMove( bool on );
     void setDataAutoSelect( bool on );
-    void setSymmetryMode( bool on );
+    void setPairMode( bool on );
     //void setConstraintEditMode( bool on );
 
     void addData();
