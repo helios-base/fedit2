@@ -51,7 +51,7 @@ nodist_fedit2_SOURCES = \
 
 
 fedit2_CPPFLAGS = -I$(top_srcdir) $(QT_CPPFLAGS)
-fedit2_CXXFLAGS = $(QT_CXXFLAGS) -Wall -W
+fedit2_CXXFLAGS = $(QT_CXXFLAGS) -Wall -W -Wno-deprecated-copy
 fedit2_LDFLAGS = $(QT_LDFLAGS)
 fedit2_LDADD = $(QT_LDADD)
 
