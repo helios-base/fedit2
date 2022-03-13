@@ -81,7 +81,7 @@ EditCanvas::EditCanvas( QWidget * parent )
     M_player_pen( QColor( 0, 0, 0 ), 0, Qt::SolidLine ),
     M_select_pen( Qt::white, 0, Qt::SolidLine ),
     M_player_brush( QColor( 255, 215, 0 ), Qt::SolidPattern ),
-    M_symmetry_brush( QColor( 0, 255, 95 ), Qt::SolidPattern ),
+    M_paired_brush( QColor( 0, 255, 95 ), Qt::SolidPattern ),
     M_player_font( "Sans Serif", 10 ),
     // background graphic context
     M_background_contained_area_brush( QColor( 31, 143, 31 ), Qt::SolidPattern ),
@@ -89,7 +89,7 @@ EditCanvas::EditCanvas( QWidget * parent )
     M_background_player_pen( QColor( 127, 127, 127 ), 0, Qt::SolidLine ),
     M_background_left_team_brush( QColor( 192, 251, 0 ), Qt::SolidPattern ),
     M_background_right_team_brush( QColor( 127, 20, 20 ), Qt::SolidPattern ),
-    M_background_symmetry_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
+    M_background_paired_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
     M_background_font_pen( QColor( 0, 63, 127 ), 0, Qt::SolidLine ),
     // additional info
     M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine ),
@@ -591,33 +591,34 @@ EditCanvas::drawPlayers( QPainter & painter )
 
     const QTransform transform = painter.worldTransform();
 
-    const std::vector< Vector2D >::const_iterator selected
+    const Vector2D selected_pos
         = ( ptr->selectType() == EditData::SELECT_PLAYER
-            ? ( ptr->currentState().players_.begin() + ptr->selectIndex() )
-            : ptr->currentState().players_.end() );
+            ? ptr->currentState().players_[ptr->selectIndex()]
+            : Vector2D::INVALIDATED );
 
-    int unum = 1;
-    for ( std::vector< Vector2D >::const_iterator p = ptr->currentState().players_.begin(),
-              end = ptr->currentState().players_.end();
-          p != end;
-          ++p, ++unum )
+    int unum = 0;
+    for ( const Vector2D & p : ptr->currentState().players_ )
     {
-        if ( p == selected )
+        ++unum;
+
+        if ( p == selected_pos )
         {
             painter.setPen( M_select_pen );
-            painter.setBrush( f->isSymmetryType( unum )
-                              ? M_symmetry_brush
-                              : M_player_brush );
-            painter.drawEllipse( QRectF( p->x - r - 0.5, p->y - r - 0.5,
+            // painter.setBrush( f->isPairedType( unum )
+            //                   ? M_paired_brush
+            //                   : M_player_brush );
+            painter.setBrush( M_player_brush );
+            painter.drawEllipse( QRectF( p.x - r - 0.5, p.y - r - 0.5,
                                          d + 1.0, d + 1.0 ) );
         }
         else
         {
             painter.setPen( M_player_pen );
-            painter.setBrush( f->isSymmetryType( unum )
-                              ? M_symmetry_brush
-                              : M_player_brush );
-            painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
+            // painter.setBrush( f->isPairedType( unum )
+            //                   ? M_paired_brush
+            //                   : M_player_brush );
+            painter.setBrush( M_player_brush );
+            painter.drawEllipse( QRectF( p.x - r, p.y - r, d, d ) );
         }
 
         painter.setBrush( Qt::NoBrush );
@@ -625,18 +626,18 @@ EditCanvas::drawPlayers( QPainter & painter )
         if ( unum == 1 )
         {
             // catchable area circle
-            painter.drawEllipse( QRectF( p->x - cr, p->y - cr, cd, cd ) );
+            painter.drawEllipse( QRectF( p.x - cr, p.y - cr, cd, cd ) );
         }
         else if ( ! enlarge )
         {
             // kickable area circle
-            painter.drawEllipse( QRectF( p->x - kr, p->y - kr, kd, kd ) );
+            painter.drawEllipse( QRectF( p.x - kr, p.y - kr, kd, kd ) );
         }
 
 
         painter.setPen( Qt::white );
         painter.setWorldMatrixEnabled( false );
-        painter.drawText( transform.map( QPointF( p->x + r, p->y ) ),
+        painter.drawText( transform.map( QPointF( p.x + r, p.y ) ),
                           QString::number( unum ) );
         painter.setWorldMatrixEnabled( true );
     }
@@ -991,15 +992,12 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setPen( M_background_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        const Triangulation::SegmentCont::const_iterator e_end = ptr->backgroundTriangulation().edges().end();
-        for ( Triangulation::SegmentCont::const_iterator e = ptr->backgroundTriangulation().edges().begin();
-              e != e_end;
-              ++e )
+        for ( const auto & e : ptr->backgroundTriangulation().edges() )
         {
-            painter.drawLine( QLineF( points[e->first].x,
-                                      points[e->first].y,
-                                      points[e->second].x,
-                                      points[e->second].y ) );
+            painter.drawLine( QLineF( points[e.first].x,
+                                      points[e.first].y,
+                                      points[e.second].x,
+                                      points[e.second].y ) );
         }
     }
     else
@@ -1012,9 +1010,10 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setPen( M_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
+        // for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
+        for ( const Vector2D & p : ptr->backgroundTriangulation().points() )
         {
-            painter.drawRect( QRectF( data.ball_.x - r, data.ball_.y - r, d, d ) );
+            painter.drawRect( QRectF( p.x - r, p.y - r, d, d ) );
         }
     }
 
@@ -1030,9 +1029,10 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setWorldMatrixEnabled( false );
 
         int count = 0;
-        for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
+        //for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
+        for ( const Vector2D & p : ptr->backgroundTriangulation().points() )
         {
-            painter.drawText( transform.map( QPointF( data.ball_.x + 0.7, data.ball_.y - 0.7 ) ),
+            painter.drawText( transform.map( QPointF( p.x + 0.7, p.y - 0.7 ) ),
                               QString::number( count ) );
             ++count;
         }
@@ -1084,13 +1084,13 @@ EditCanvas::drawBackgroundPlayers( QPainter & painter )
           p != players.end();
           ++p, ++unum )
     {
-        if ( f->isSymmetryType( unum ) )
-        {
-            painter.setPen( M_background_player_pen );
-            painter.setBrush( M_background_symmetry_brush );
-            painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
-        }
-        else
+        // if ( f->isPairedType( unum ) )
+        // {
+        //     painter.setPen( M_background_player_pen );
+        //     painter.setBrush( M_background_paired_brush );
+        //     painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
+        // }
+        // else
         {
             painter.setPen( M_background_player_pen );
             painter.setBrush( M_background_left_team_brush );

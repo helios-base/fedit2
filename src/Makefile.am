@@ -5,9 +5,6 @@ bin_PROGRAMS = fedit2
 fedit2_SOURCES = \
 	command.cpp \
 	config_dialog.cpp \
-	constraint_delegate.cpp \
-	constraint_edit_dialog.cpp \
-	constraint_view.cpp \
 	coordinate_delegate.cpp \
 	edit_canvas.cpp \
 	edit_data.cpp \
@@ -17,13 +14,16 @@ fedit2_SOURCES = \
 	options.cpp \
 	main.cpp
 
+
+#	constraint_delegate.cpp
+#	constraint_edit_dialog.cpp
+#	constraint_view.cpp
+
+
 noinst_HEADERS = \
 	mouse_state.h \
 	command.h \
 	config_dialog.h \
-	constraint_delegate.h \
-	constraint_edit_dialog.h \
-	constraint_view.h \
 	coordinate_delegate.h \
 	edit_canvas.h \
 	edit_data.h \
@@ -32,16 +32,22 @@ noinst_HEADERS = \
 	main_window.h \
 	options.h
 
+#	constraint_delegate.h
+#	constraint_edit_dialog.h
+#	constraint_view.h
+
+
 nodist_fedit2_SOURCES = \
 	moc_config_dialog.cpp \
-	moc_constraint_delegate.cpp \
-	moc_constraint_edit_dialog.cpp \
-	moc_constraint_view.cpp \
 	moc_coordinate_delegate.cpp \
 	moc_edit_dialog.cpp \
 	moc_edit_canvas.cpp \
 	moc_sample_view.cpp \
 	moc_main_window.cpp
+
+#	moc_constraint_delegate.cpp
+#	moc_constraint_edit_dialog.cpp
+#	moc_constraint_view.cpp
 
 
 fedit2_CPPFLAGS = -I$(top_srcdir) $(QT_CPPFLAGS)

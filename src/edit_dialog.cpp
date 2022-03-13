@@ -158,8 +158,8 @@ EditDialog::createWidgets()
         const int symmetry_width = this->fontMetrics().width( tr( "0000" ) ) + 4;
         const int role_width = this->fontMetrics().width( tr( "CenterForwardXXXX" ) ) + 4;
         const int coord_width = this->fontMetrics().width( tr( "-00.0000" ) ) + 4;
-        const int marker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
-        const int smarker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
+        // const int marker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
+        // const int smarker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
 
         QGridLayout * layout = new QGridLayout();
         top_vbox->addLayout( layout );
@@ -168,8 +168,8 @@ EditDialog::createWidgets()
         layout->setSpacing( 0 );
         layout->setColumnMinimumWidth( 0, unum_width );
         layout->setColumnMinimumWidth( 1, symmetry_width );
-        layout->setColumnMinimumWidth( 5, marker_width );
-        layout->setColumnMinimumWidth( 6, smarker_width );
+        // layout->setColumnMinimumWidth( 5, marker_width );
+        // layout->setColumnMinimumWidth( 6, smarker_width );
 
         // header
         int row = 0;
@@ -184,16 +184,16 @@ EditDialog::createWidgets()
         layout->addWidget( new QLabel( tr( "Role Name" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "X" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Y" ) ), 0, col, Qt::AlignCenter ); ++col;
-        {
-            QLabel * l = new QLabel( tr( "M" ) );
-            l->setToolTip( tr( "Marker Type" ) );
-            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
-        }
-        {
-            QLabel * l = new QLabel( tr( "SPM" ) );
-            l->setToolTip( tr( "SetPlay Marker Type" ) );
-            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
-        }
+        // {
+        //     QLabel * l = new QLabel( tr( "M" ) );
+        //     l->setToolTip( tr( "Marker Type" ) );
+        //     layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        // }
+        // {
+        //     QLabel * l = new QLabel( tr( "SPM" ) );
+        //     l->setToolTip( tr( "SetPlay Marker Type" ) );
+        //     layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        // }
 
         row = 1;
         for ( int i = 0; i < 11; ++i, ++row )
@@ -238,13 +238,13 @@ EditDialog::createWidgets()
             layout->addWidget( M_pos_y[i], row, col, Qt::AlignCenter );
             ++col;
 
-            M_marker[i] = new QCheckBox();
-            layout->addWidget( M_marker[i], row, col, Qt::AlignCenter );
-            ++col;
+            // M_marker[i] = new QCheckBox();
+            // layout->addWidget( M_marker[i], row, col, Qt::AlignCenter );
+            // ++col;
 
-            M_setplay_marker[i] = new QCheckBox();
-            layout->addWidget( M_setplay_marker[i], row, col, Qt::AlignCenter );
-            ++col;
+            // M_setplay_marker[i] = new QCheckBox();
+            // layout->addWidget( M_setplay_marker[i], row, col, Qt::AlignCenter );
+            // ++col;
         }
     }
 
@@ -347,10 +347,10 @@ EditDialog::updateData()
     {
         int unum = i + 1;
         //const bool symmetry = ( p->symmetryUnum() > 0 );
-        M_symmetry_unum[i]->setText( QString::number( f->getSymmetryNumber( unum ) ) );
+        M_symmetry_unum[i]->setText( QString::number( f->pairedNumber( unum ) ) );
 
         M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ).type() ) );
-        M_role_name[i]->setText( QString::fromStdString( f->getRoleName( unum ) ) );
+        M_role_name[i]->setText( QString::fromStdString( f->roleName( unum ) ) );
 
         M_pos_x[i]->setText( QString::number( s.players_[i].x, 'f', 2 ) );
         M_pos_y[i]->setText( QString::number( s.players_[i].y, 'f', 2 ) );
@@ -358,12 +358,12 @@ EditDialog::updateData()
         //M_role_name[i]->setReadOnly( symmetry );
         //M_role_name[i]->setEnabled( ! symmetry );
 
-        M_marker[i]->setCheckState( f->isMarker( unum )
-                                    ? Qt::Checked
-                                    : Qt::Unchecked );
-        M_setplay_marker[i]->setCheckState( f->isSetPlayMarker( unum )
-                                            ? Qt::Checked
-                                            : Qt::Unchecked );
+        // M_marker[i]->setCheckState( f->isMarker( unum )
+        //                             ? Qt::Checked
+        //                             : Qt::Unchecked );
+        // M_setplay_marker[i]->setCheckState( f->isSetPlayMarker( unum )
+        //                                     ? Qt::Checked
+        //                                     : Qt::Unchecked );
     }
 }
 
@@ -467,9 +467,9 @@ EditDialog::applyToField()
 
         ptr->updateRoleType( unum, M_role_type[unum-1]->currentIndex() );
 
-        ptr->updateMarkerData( unum,
-                               ( M_marker[unum-1]->checkState() == Qt::Checked ),
-                               ( M_setplay_marker[unum-1]->checkState() == Qt::Checked ) );
+        // ptr->updateMarkerData( unum,
+        //                        ( M_marker[unum-1]->checkState() == Qt::Checked ),
+        //                        ( M_setplay_marker[unum-1]->checkState() == Qt::Checked ) );
     }
 
     updateData();

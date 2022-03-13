@@ -49,11 +49,11 @@
 
 #include "command.h"
 #include "config_dialog.h"
-#include "constraint_edit_dialog.h"
+//#include "constraint_edit_dialog.h"
 #include "edit_canvas.h"
 #include "edit_data.h"
 #include "edit_dialog.h"
-#include "constraint_view.h"
+//#include "constraint_view.h"
 #include "sample_view.h"
 #include "options.h"
 
@@ -102,14 +102,14 @@ MainWindow::MainWindow()
     createEditCanvas();
     createEditDialog();
     createSampleView();
-    createConstraintView();
+    // createConstraintView();
 
     M_config_dialog = new ConfigDialog( this );
     M_config_dialog->setVisible( false );
 
     QToolBox * tool_box = createToolBox();
     tool_box->addItem( M_sample_view, tr( "Samples" ) );
-    tool_box->addItem( M_constraint_view, tr( "Constraints" ) );
+    // tool_box->addItem( M_constraint_view, tr( "Constraints" ) );
 
     M_splitter = new QSplitter( this );
     M_splitter->addWidget( tool_box );
@@ -286,8 +286,8 @@ MainWindow::createEditCanvas()
 
     connect( M_edit_canvas, SIGNAL( mouseMoved( const QPointF & ) ),
              this, SLOT( setPositionLabel( const QPointF & ) ) );
-    connect( M_edit_canvas, SIGNAL( constraintSelected( int, int ) ),
-             this, SLOT( showConstraintEditDialog( int, int ) ) );
+    // connect( M_edit_canvas, SIGNAL( constraintSelected( int, int ) ),
+    //          this, SLOT( showConstraintEditDialog( int, int ) ) );
     connect( this, SIGNAL( viewUpdated() ),
              M_edit_canvas, SLOT( update() ) );
 }
@@ -327,16 +327,16 @@ MainWindow::createSampleView()
 /*!
 
  */
-void
-MainWindow::createConstraintView()
-{
-    M_constraint_view = new ConstraintView( this );
+// void
+// MainWindow::createConstraintView()
+// {
+//     M_constraint_view = new ConstraintView( this );
 
-    connect( M_constraint_view, SIGNAL( constraintDeleteRequested( int, int ) ),
-             this, SLOT( deleteConstraint( int, int ) ) );
-    connect( M_constraint_view, SIGNAL( constraintReplaced( int, int, int ) ),
-             this, SLOT( replaceConstraint( int, int, int ) ) );
-}
+//     connect( M_constraint_view, SIGNAL( constraintDeleteRequested( int, int ) ),
+//              this, SLOT( deleteConstraint( int, int ) ) );
+//     connect( M_constraint_view, SIGNAL( constraintReplaced( int, int, int ) ),
+//              this, SLOT( replaceConstraint( int, int, int ) ) );
+// }
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -465,7 +465,7 @@ MainWindow::createActionsFile()
 #else
     M_open_conf_act->setShortcut( Qt::CTRL + Qt::Key_O );
 #endif
-    M_open_conf_act->setStatusTip( tr( "Open formation file. (" )
+    M_open_conf_act->setStatusTip( tr( "Open the formation file (" )
                                    + M_open_conf_act->shortcut().toString()
                                    + tr( ")" ) );
     connect( M_open_conf_act, SIGNAL( triggered() ), this, SLOT( openConf() ) );
@@ -487,14 +487,14 @@ MainWindow::createActionsFile()
 
     //
     M_open_data_act = new QAction( QIcon( QPixmap( open_xpm ) ),
-                                   tr( "&Open data file." ),
+                                   tr( "&Open training data" ),
                                    this );
 #ifdef Q_WS_MAC
     M_open_data_act->setShortcut( Qt::META + Qt::ALT + Qt::Key_O );
 #else
     M_open_data_act->setShortcut( Qt::CTRL + Qt::ALT + Qt::Key_O );
 #endif
-    M_open_data_act->setStatusTip( tr( "Open data file. (" )
+    M_open_data_act->setStatusTip( tr( "Open the training data file. (" )
                                    + M_open_data_act->shortcut().toString()
                                    + tr( ")" ) );
     connect( M_open_data_act, SIGNAL( triggered() ), this, SLOT( openData() ) );
@@ -508,19 +508,19 @@ MainWindow::createActionsFile()
 #else
     M_save_act->setShortcut( Qt::CTRL + Qt::Key_S );
 #endif
-    M_save_act->setStatusTip( tr( "Save formation data" ) );
+    M_save_act->setStatusTip( tr( "Save the formation file" ) );
     connect( M_save_act, SIGNAL( triggered() ), this, SLOT( saveConf() ) );
 
     //
     M_save_as_act = new QAction( tr( "&Save formation as..." ),
                                  this );
-    M_save_as_act->setStatusTip( tr( "Save formation data to the new file" ) );
+    M_save_as_act->setStatusTip( tr( "Save the formation to a new file" ) );
     connect( M_save_as_act, SIGNAL( triggered() ), this, SLOT( saveConfAs() ) );
 
     //
     M_save_data_as_act = new QAction( tr( "&Save training data as..." ),
                                       this );
-    M_save_data_as_act->setStatusTip( tr( "Save training data to the new file" ) );
+    M_save_data_as_act->setStatusTip( tr( "Save the training data to a new file" ) );
     connect( M_save_data_as_act, SIGNAL( triggered() ), this, SLOT( saveDataAs() ) );
 
     //
@@ -613,19 +613,19 @@ MainWindow::createActionsEdit()
     M_toggle_symmetry_mode_act->setChecked( true );
     this->addAction( M_toggle_symmetry_mode_act );
 
-    //
-    M_toggle_constraint_edit_mode_act = new QAction( tr( "Edit Constraint" ),
-                                                     this );
-    //M_toggle_constraint_edit_mode_act->setShortcut( Qt::Key_C );
-    M_toggle_constraint_edit_mode_act->setToolTip( tr( "Toggle constraint edge edit mode" ) );
-    M_toggle_constraint_edit_mode_act->setStatusTip( tr( "Toggle constraint edge edit mode." )
-                                                     + M_toggle_constraint_edit_mode_act->shortcut().toString()
-                                                     + tr( ")" ) );
-    connect( M_toggle_constraint_edit_mode_act, SIGNAL( toggled( bool ) ),
-             this, SLOT( setConstraintEditMode( bool ) ) );
-    M_toggle_constraint_edit_mode_act->setCheckable( true );
-    M_toggle_constraint_edit_mode_act->setChecked( false );
-    this->addAction( M_toggle_constraint_edit_mode_act );
+    // //
+    // M_toggle_constraint_edit_mode_act = new QAction( tr( "Edit Constraint" ),
+    //                                                  this );
+    // //M_toggle_constraint_edit_mode_act->setShortcut( Qt::Key_C );
+    // M_toggle_constraint_edit_mode_act->setToolTip( tr( "Toggle constraint edge edit mode" ) );
+    // M_toggle_constraint_edit_mode_act->setStatusTip( tr( "Toggle constraint edge edit mode." )
+    //                                                  + M_toggle_constraint_edit_mode_act->shortcut().toString()
+    //                                                  + tr( ")" ) );
+    // connect( M_toggle_constraint_edit_mode_act, SIGNAL( toggled( bool ) ),
+    //          this, SLOT( setConstraintEditMode( bool ) ) );
+    // M_toggle_constraint_edit_mode_act->setCheckable( true );
+    // M_toggle_constraint_edit_mode_act->setChecked( false );
+    // this->addAction( M_toggle_constraint_edit_mode_act );
 
     //
     M_add_data_act = new QAction( QIcon( QPixmap( record_xpm ) ),
@@ -681,20 +681,20 @@ MainWindow::createActionsEdit()
     connect( M_reverse_y_act, SIGNAL( triggered() ), this, SLOT( reverseY() ) );
     this->addAction( M_reverse_y_act );
 
-    //
-    M_add_constraint_act = new QAction( tr( "Add constraint" ),
-                                        this );
-#ifdef Q_WS_MAC
-    M_add_constraint_act->setShortcut( Qt::META + Qt::Key_C );
-#else
-    M_add_constraint_act->setShortcut( Qt::CTRL + Qt::Key_C );
-#endif
-    M_add_constraint_act->setStatusTip( tr( "Add constraint. (" )
-                                        + M_add_constraint_act->shortcut().toString()
-                                        + tr( ")" ) );
-    connect( M_add_constraint_act, SIGNAL( triggered() ),
-             this, SLOT( showConstraintEditDialog() ) );
-    this->addAction( M_add_constraint_act );
+//     //
+//     M_add_constraint_act = new QAction( tr( "Add constraint" ),
+//                                         this );
+// #ifdef Q_WS_MAC
+//     M_add_constraint_act->setShortcut( Qt::META + Qt::Key_C );
+// #else
+//     M_add_constraint_act->setShortcut( Qt::CTRL + Qt::Key_C );
+// #endif
+//     M_add_constraint_act->setStatusTip( tr( "Add constraint. (" )
+//                                         + M_add_constraint_act->shortcut().toString()
+//                                         + tr( ")" ) );
+//     connect( M_add_constraint_act, SIGNAL( triggered() ),
+//              this, SLOT( showConstraintEditDialog() ) );
+//     this->addAction( M_add_constraint_act );
 
     //
     M_train_act = new QAction( QIcon( QPixmap( train_xpm ) ),
@@ -1007,7 +1007,7 @@ MainWindow::createMenuEdit()
     menu->addAction( M_toggle_player_auto_move_act );
     menu->addAction( M_toggle_data_auto_select_act );
     menu->addAction( M_toggle_symmetry_mode_act );
-    menu->addAction( M_toggle_constraint_edit_mode_act );
+    // menu->addAction( M_toggle_constraint_edit_mode_act );
 
     menu->addSeparator();
 
@@ -1023,7 +1023,7 @@ MainWindow::createMenuEdit()
     }
 
     menu->addAction( M_reverse_y_act );
-    menu->addAction( M_add_constraint_act );
+    // menu->addAction( M_add_constraint_act );
 }
 
 /*-------------------------------------------------------------------*/
@@ -1241,7 +1241,8 @@ MainWindow::openConfFile( const QString & filepath )
         return false;
     }
 
-    if ( ! M_edit_data->formation() )
+    if ( ! M_edit_data->formation()
+         || ! M_edit_data->formationData() )
     {
         M_edit_data.reset();
         QMessageBox::warning( this,
@@ -1260,13 +1261,13 @@ MainWindow::openConfFile( const QString & filepath )
     M_edit_canvas->setData( M_edit_data );
     M_edit_dialog->setData( M_edit_data );
     M_sample_view->setData( M_edit_data );
-    M_constraint_view->setData( M_edit_data );
+    // M_constraint_view->setData( M_edit_data );
 
     const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
     M_edit_canvas->update(); //emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
     M_edit_dialog->updateData();
 
     return true;
@@ -1399,7 +1400,7 @@ MainWindow::openDataFile( const QString & filepath )
     M_index_spin_box->setRange( 0, data_count );
     M_edit_canvas->update(); //emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 
     return true;
 }
@@ -1434,7 +1435,7 @@ MainWindow::newFile()
 
     QStringList names;
     // names.push_back( QString::fromStdString( FormationCDT::name() ) );
-    names.push_back( QString::fromStdString( FormationDT::name() ) );
+    names.push_back( QString::fromStdString( FormationDT::NAME ) );
     // names.push_back( QString::fromStdString( FormationKNN::name() ) );
     //     names.push_back( QString::fromAscii( FormationBPN::name().c_str() ) );
     //     names.push_back( QString::fromAscii( FormationRBF::name().c_str() ) );
@@ -1478,14 +1479,14 @@ MainWindow::newFile()
     M_edit_canvas->setData( M_edit_data );
     M_edit_dialog->setData( M_edit_data );
     M_sample_view->setData( M_edit_data );
-    M_constraint_view->setData( M_edit_data );
+    // M_constraint_view->setData( M_edit_data );
 
     const int data_count = M_edit_data->formationData()->dataCont().size();
     M_index_spin_box->setRange( 0, data_count );
 
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
     M_edit_dialog->updateData();
 }
 
@@ -1547,7 +1548,7 @@ MainWindow::openData()
     QString filter( tr( "Formation data file (*.dat);;"
                         "All files (*)" ) );
     QString filepath = QFileDialog::getOpenFileName( this,
-                                                     tr( "Open Data" ),
+                                                     tr( "Open Training Data" ),
                                                      tr( "" ),
                                                      filter );
     if ( filepath.isEmpty() )
@@ -1660,7 +1661,8 @@ MainWindow::saveDataAs()
         filepath += tr( ".dat" );
     }
 
-    if ( M_edit_data->formationData()->save( filepath.toStdString() ) )
+    //if ( M_edit_data->formationData()->save( filepath.toStdString() ) )
+    if ( M_edit_data->saveDataAs( filepath ) )
     {
         this->statusBar()->showMessage( tr( "Saved %1" ).arg( filepath ), 2000 );
     }
@@ -1709,11 +1711,11 @@ MainWindow::setSymmetryMode( bool on )
 /*!
 
  */
-void
-MainWindow::setConstraintEditMode( bool on )
-{
-    Options::instance().setConstraintEditMode( on );
-}
+// void
+// MainWindow::setConstraintEditMode( bool on )
+// {
+//     Options::instance().setConstraintEditMode( on );
+// }
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -1742,7 +1744,7 @@ MainWindow::addData()
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -1775,7 +1777,7 @@ MainWindow::insertData()
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -1807,7 +1809,7 @@ MainWindow::replaceData()
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -1851,7 +1853,7 @@ MainWindow::deleteData()
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -1885,7 +1887,7 @@ MainWindow::changeSampleIndex( int old_visual_index,
     selectSample( M_edit_data->currentIndex() );
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -1924,7 +1926,7 @@ MainWindow::train()
 
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -2209,7 +2211,7 @@ MainWindow::deleteSample( int index )
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -2242,7 +2244,7 @@ MainWindow::replaceBall( int index,
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
@@ -2277,57 +2279,57 @@ MainWindow::replacePlayer( int index,
     updateDataIndex();
     M_edit_canvas->update(); // emit viewUpdated();
     M_sample_view->updateData();
-    M_constraint_view->updateData();
+    // M_constraint_view->updateData();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-void
-MainWindow::deleteConstraint( int origin_idx,
-                              int terminal_idx )
-{
-    std::cerr << "(MainWindow::deleteConstraint)"
-              << " origin=" << origin_idx
-              << " terminal=" << terminal_idx << std::endl;
+// void
+// MainWindow::deleteConstraint( int origin_idx,
+//                               int terminal_idx )
+// {
+//     std::cerr << "(MainWindow::deleteConstraint)"
+//               << " origin=" << origin_idx
+//               << " terminal=" << terminal_idx << std::endl;
 
-    const std::string err = M_edit_data->deleteConstraint( origin_idx, terminal_idx );
-    if ( ! err.empty() )
-    {
-        showWarningMessage( err );
-        return;
-    }
+//     const std::string err = M_edit_data->deleteConstraint( origin_idx, terminal_idx );
+//     if ( ! err.empty() )
+//     {
+//         showWarningMessage( err );
+//         return;
+//     }
 
-    M_edit_canvas->update(); // emit viewUpdated();
-    M_constraint_view->updateData();
-}
+//     M_edit_canvas->update(); // emit viewUpdated();
+//     M_constraint_view->updateData();
+// }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-void
-MainWindow::replaceConstraint( int idx,
-                               int origin_idx,
-                               int terminal_idx )
-{
-    std::cerr << "(MainWindow::ReplaceConstraint) idx=" << idx
-              << " origin=" << origin_idx
-              << " terminal=" << terminal_idx << std::endl;
+// void
+// MainWindow::replaceConstraint( int idx,
+//                                int origin_idx,
+//                                int terminal_idx )
+// {
+//     std::cerr << "(MainWindow::ReplaceConstraint) idx=" << idx
+//               << " origin=" << origin_idx
+//               << " terminal=" << terminal_idx << std::endl;
 
-    const std::string err = M_edit_data->replaceConstraint( idx,
-                                                            origin_idx,
-                                                            terminal_idx );
-    if ( ! err.empty() )
-    {
-        showWarningMessage( err );
-        return;
-    }
+//     const std::string err = M_edit_data->replaceConstraint( idx,
+//                                                             origin_idx,
+//                                                             terminal_idx );
+//     if ( ! err.empty() )
+//     {
+//         showWarningMessage( err );
+//         return;
+//     }
 
-    M_edit_canvas->update();
-    M_constraint_view->updateData();
-}
+//     M_edit_canvas->update();
+//     M_constraint_view->updateData();
+// }
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -2357,69 +2359,69 @@ MainWindow::updateDataIndex()
 /*!
 
  */
-void
-MainWindow::showConstraintEditDialog()
-{
-    if ( ! M_edit_data
-         || M_edit_data->formationData()->dataCont().size() < 2 )
-    {
-        return;
-    }
+// void
+// MainWindow::showConstraintEditDialog()
+// {
+//     if ( ! M_edit_data
+//          || M_edit_data->formationData()->dataCont().size() < 2 )
+//     {
+//         return;
+//     }
 
-    showConstraintEditDialog( 0, M_edit_data->formationData()->dataCont().size() - 1 );
-}
+//     showConstraintEditDialog( 0, M_edit_data->formationData()->dataCont().size() - 1 );
+// }
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-void
-MainWindow::showConstraintEditDialog( int first_index,
-                                      int second_index )
-{
-    std::cerr << "(MainWindow::showConstraintEditDialog)"
-              << " first=" << first_index << " second=" << second_index
-              << std::endl;
+// void
+// MainWindow::showConstraintEditDialog( int first_index,
+//                                       int second_index )
+// {
+//     std::cerr << "(MainWindow::showConstraintEditDialog)"
+//               << " first=" << first_index << " second=" << second_index
+//               << std::endl;
 
-    if ( ! M_edit_data
-         || M_edit_data->formationData()->dataCont().size() < 2 )
-    {
-        return;
-    }
+//     if ( ! M_edit_data
+//          || M_edit_data->formationData()->dataCont().size() < 2 )
+//     {
+//         return;
+//     }
 
-    ConstraintEditDialog dlg( this,
-                              M_edit_canvas,
-                              M_edit_data,
-                              first_index,
-                              second_index );
-    int result = dlg.exec();
-    if ( result == QDialog::Accepted )
-    {
-        int origin = dlg.originIndex() - 1;
-        int terminal = dlg.terminalIndex() - 1;
-        std::cerr << "  --> Accepted"
-                  << " origin=" << origin
-                  << " terminal=" << terminal
-                  << std::endl;
+//     ConstraintEditDialog dlg( this,
+//                               M_edit_canvas,
+//                               M_edit_data,
+//                               first_index,
+//                               second_index );
+//     int result = dlg.exec();
+//     if ( result == QDialog::Accepted )
+//     {
+//         int origin = dlg.originIndex() - 1;
+//         int terminal = dlg.terminalIndex() - 1;
+//         std::cerr << "  --> Accepted"
+//                   << " origin=" << origin
+//                   << " terminal=" << terminal
+//                   << std::endl;
 
-        const std::string err = M_edit_data->addConstraint( origin, terminal );
-        if ( ! err.empty() )
-        {
-            M_edit_data->releaseObject();
-            M_edit_canvas->update();
-            showWarningMessage( err );
-        }
-        else
-        {
-            M_sample_view->updateData();
-            M_constraint_view->updateData();
-            M_edit_data->releaseObject();
-            M_edit_canvas->update();
-        }
-    }
-    else
-    {
-        M_edit_data->releaseObject();
-        M_edit_canvas->update();
-    }
-}
+//         const std::string err = M_edit_data->addConstraint( origin, terminal );
+//         if ( ! err.empty() )
+//         {
+//             M_edit_data->releaseObject();
+//             M_edit_canvas->update();
+//             showWarningMessage( err );
+//         }
+//         else
+//         {
+//             M_sample_view->updateData();
+//             M_constraint_view->updateData();
+//             M_edit_data->releaseObject();
+//             M_edit_canvas->update();
+//         }
+//     }
+//     else
+//     {
+//         M_edit_data->releaseObject();
+//         M_edit_canvas->update();
+//     }
+// }

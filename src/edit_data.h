@@ -168,6 +168,7 @@ public:
     bool saveConfAs( const QString & filepath );
 
     bool openData( const QString & filepath );
+    bool saveDataAs( const QString & filepath );
 
     bool openBackgroundConf( const QString & filepath );
 
@@ -186,24 +187,24 @@ public:
                          const std::string & role_name );
     void updateRoleType( const int unum,
                          const int type_index );
-    void updateMarkerData( const int unum,
-                           const bool marker,
-                           const bool setplay_marker );
+    // void updateMarkerData( const int unum,
+    //                        const bool marker,
+    //                        const bool setplay_marker );
 
-    void moveBallTo( const double & x,
-                     const double & y );
+    void moveBallTo( const double x,
+                     const double y );
     void movePlayerTo( const int unum,
-                       const double & x,
-                       const double & y );
-    void setConstraintTerminal( const double & x,
-                                const double & y );
-    void setConstraintIndex( const int origin_idx,
-                             const int terminal_idx );
-    bool moveSelectObjectTo( const double & x,
-                             const double & y );
+                       const double x,
+                       const double y );
+    // void setConstraintTerminal( const double x,
+    //                             const double y );
+    // void setConstraintIndex( const int origin_idx,
+    //                          const int terminal_idx );
+    bool moveSelectObjectTo( const double x,
+                             const double y );
 
-    bool selectObject( const double & x,
-                       const double & y );
+    bool selectObject( const double x,
+                       const double y );
     bool releaseObject();
 
     std::string addData();
@@ -220,13 +221,13 @@ public:
     std::string changeDataIndex( const int old_idx,
                                  const int new_idx );
 
-    std::string addConstraint( const int origin_idx,
-                               const int terminal_idx );
-    std::string replaceConstraint( const int idx,
-                                   const int origin_idx,
-                                   const int terminal_idx );
-    std::string deleteConstraint( const int origin_idx,
-                                  const int terminal_idx );
+    // std::string addConstraint( const int origin_idx,
+    //                            const int terminal_idx );
+    // std::string replaceConstraint( const int idx,
+    //                                const int origin_idx,
+    //                                const int terminal_idx );
+    // std::string deleteConstraint( const int origin_idx,
+    //                               const int terminal_idx );
 
 
     bool setCurrentIndex( const int idx );
