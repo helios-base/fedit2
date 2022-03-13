@@ -601,23 +601,24 @@ EditCanvas::drawPlayers( QPainter & painter )
     {
         ++unum;
 
+        const bool paired = ( f->pairedNumber( unum ) > 0
+                              && f->roleType( unum ).side() == RoleType::Right );
+
         if ( p == selected_pos )
         {
             painter.setPen( M_select_pen );
-            // painter.setBrush( f->isPairedType( unum )
-            //                   ? M_paired_brush
-            //                   : M_player_brush );
-            painter.setBrush( M_player_brush );
+            painter.setBrush( paired
+                              ? M_paired_brush
+                              : M_player_brush );
             painter.drawEllipse( QRectF( p.x - r - 0.5, p.y - r - 0.5,
                                          d + 1.0, d + 1.0 ) );
         }
         else
         {
             painter.setPen( M_player_pen );
-            // painter.setBrush( f->isPairedType( unum )
-            //                   ? M_paired_brush
-            //                   : M_player_brush );
-            painter.setBrush( M_player_brush );
+            painter.setBrush( paired
+                              ? M_paired_brush
+                              : M_player_brush );
             painter.drawEllipse( QRectF( p.x - r, p.y - r, d, d ) );
         }
 
@@ -1084,13 +1085,16 @@ EditCanvas::drawBackgroundPlayers( QPainter & painter )
           p != players.end();
           ++p, ++unum )
     {
-        // if ( f->isPairedType( unum ) )
-        // {
-        //     painter.setPen( M_background_player_pen );
-        //     painter.setBrush( M_background_paired_brush );
-        //     painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
-        // }
-        // else
+        const bool paired = ( f->pairedNumber( unum ) > 0
+                              && f->roleType( unum ).side() == RoleType::Right );
+
+        if ( paired )
+        {
+            painter.setPen( M_background_player_pen );
+            painter.setBrush( M_background_paired_brush );
+            painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
+        }
+        else
         {
             painter.setPen( M_background_player_pen );
             painter.setBrush( M_background_left_team_brush );
