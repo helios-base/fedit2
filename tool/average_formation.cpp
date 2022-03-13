@@ -1,4 +1,5 @@
 
+#include <rcsc/formation/formation_parser.h>
 #include <rcsc/formation/formation.h>
 #include <rcsc/formation/formation_dt.h>
 
@@ -6,7 +7,6 @@
 #include <fstream>
 
 using namespace rcsc;
-using namespace rcsc::formation;
 
 class AverageConfGenerator {
 private:
@@ -33,6 +33,15 @@ public:
 Formation::Ptr
 AverageConfGenerator::openFormation( const char * filepath )
 {
+    FormationParser::Ptr parser = FormationParser::create( filepath );
+
+    if ( ! parser )
+    {
+        std::cerr << "(openFormation) Could not create a parser for [" << filepath << "]" << std::endl;
+        return Formation::Ptr();
+    }
+
+
     std::ifstream fin( filepath );
 
     if ( ! fin )
@@ -40,19 +49,7 @@ AverageConfGenerator::openFormation( const char * filepath )
         return Formation::Ptr();
     }
 
-    Formation::Ptr ptr = Formation::create( fin );
-
-    if ( ! ptr )
-    {
-        return Formation::Ptr();
-    }
-
-    fin.seekg( 0 );
-    if ( ! ptr->read( fin ) )
-    {
-        return Formation::Ptr();
-    }
-    fin.close();
+    Formation::Ptr ptr = parser->parse( fin );
 
     return ptr;
 
@@ -73,8 +70,6 @@ AverageConfGenerator::openBaseFormation( const char * filepath )
                   << filepath << "]" << std::endl;
         return false;
     }
-
-
 
     return true;
 }
@@ -106,15 +101,14 @@ bool
 AverageConfGenerator::generate( const char * base_filepath,
                                 const char * target_filepath )
 {
-
     if ( ! openBaseFormation( base_filepath )
          || ! openTargetFormation( target_filepath ) )
     {
         return false;
     }
 
-    SampleDataSet::ConstPtr samples = M_base_formation-> samples();
-    if ( ! samples )
+    FormationData::ConstPtr base_data = M_base_formation->toData();
+    if ( ! base_data )
     {
         std::cerr << "Could not get the sample data of base formation."
                   << std::endl;
@@ -126,66 +120,51 @@ AverageConfGenerator::generate( const char * base_filepath,
     //
     // set role info
     //
-    for ( int unum = 1; unum <= 11; ++unum )
+    for ( int num = 1; num <= 11; ++num )
     {
-        int symmetry_unum = 0;
-        if ( M_base_formation->isSideType( unum ) )
-        {
-            symmetry_unum = -1;
-        }
-        else if ( M_base_formation->isCenterType( unum ) )
-        {
-            symmetry_unum = 0;
-        }
-        else if ( M_base_formation->isSymmetryType( unum ) )
-        {
-            symmetry_unum = M_base_formation->getSymmetryNumber( unum );
-        }
+        std::string role_name = M_base_formation->roleName( num );
+        RoleType role_type  = M_base_formation->roleType( num );
+        int paired_num = M_base_formation->pairedNumber( num );
 
-        average_formation->updateRole( unum,
-                                       symmetry_unum,
-                                       M_base_formation->getRoleName( unum ) );
-        average_formation->updateRoleType( unum,
-                                           M_base_formation->roleType( unum ).type() );
-        average_formation->updateMarker( unum,
-                                         M_base_formation->isMarker( unum ),
-                                         M_base_formation->isSetPlayMarker( unum ) );
+        average_formation->setRole( num, role_name, role_type, paired_num );
     }
 
     //
-    // create new sample data set
+    // create new data set
     //
 
-    SampleDataSet::Ptr average_samples( new SampleDataSet() );
+    FormationData average_data;
 
-    for ( SampleDataSet::DataCont::const_iterator it = samples->dataCont().begin();
-          it != samples->dataCont().end();
-          ++it )
+    for ( const FormationData::Data & base : base_data->dataCont() )
     {
-        SampleData new_data;
-        new_data.ball_ = it->ball_;
+        FormationData::Data new_data;
+        new_data.ball_ = base.ball_;
 
-        M_target_formation->getPositions( it->ball_, new_data.players_ );
+        M_target_formation->getPositions( base.ball_, new_data.players_ );
 
-        for ( int unum = 1; unum <= 11; ++unum )
+        for ( int num = 1; num <= 11; ++num )
         {
-            new_data.players_[unum-1] += it->players_[unum-1];
-            new_data.players_[unum-1] *= 0.5;
+            new_data.players_[num-1] += base.players_[num-1];
+            new_data.players_[num-1] *= 0.5;
         }
 
-        average_samples->addData( *average_formation,
-                                  new_data,
-                                  false );
+        average_data.addData( new_data );
     }
 
 
     //
-    // generate formation
+    // train formation model
     //
-    average_formation->setSamples( average_samples );
-    average_formation->train();
+    if ( ! average_formation->train( average_data ) )
+    {
+        return false;
+    }
 
+    //
+    // print
+    //
     average_formation->print( std::cout );
+
     return true;
 }
 
