@@ -181,6 +181,7 @@ EditDialog::createWidgets()
             layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
         }
         layout->addWidget( new QLabel( tr( "Type" ) ), 0, col, Qt::AlignCenter ); ++col;
+        layout->addWidget( new QLabel( tr( "Side" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Role Name" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "X" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Y" ) ), 0, col, Qt::AlignCenter ); ++col;
@@ -209,7 +210,7 @@ EditDialog::createWidgets()
             M_paired_number[i] = new QLineEdit( tr( "0" ) );
             M_paired_number[i]->setMinimumSize( pair_width, 24 );
             M_paired_number[i]->setMaximumSize( pair_width, 24 );
-            M_paired_number[i]->setValidator( new QIntValidator( -1, 11, M_paired_number[i] ) );
+            M_paired_number[i]->setValidator( new QIntValidator( 0, 11, M_paired_number[i] ) );
             layout->addWidget( M_paired_number[i], row, col, Qt::AlignCenter );
             ++col;
 
@@ -219,6 +220,13 @@ EditDialog::createWidgets()
             M_role_type[i]->addItem( tr( "MF" ) );
             M_role_type[i]->addItem( tr( "FW" ) );
             layout->addWidget( M_role_type[i], row, col, Qt::AlignCenter );
+            ++col;
+
+            M_role_side[i] = new QComboBox();
+            M_role_side[i]->addItem( tr( "C" ) );
+            M_role_side[i]->addItem( tr( "L" ) );
+            M_role_side[i]->addItem( tr( "R" ) );
+            layout->addWidget( M_role_side[i], row, col, Qt::AlignCenter );
             ++col;
 
             M_role_name[i] = new QLineEdit( tr( "Role" ) );
@@ -348,7 +356,13 @@ EditDialog::updateData()
         int unum = i + 1;
         M_paired_number[i]->setText( QString::number( f->pairedNumber( unum ) ) );
 
-        M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ).type() ) );
+        const rcsc::RoleType role_type = f->roleType( unum );
+        M_role_type[i]->setCurrentIndex( static_cast< int >( role_type.type() ) );
+        M_role_side[i]->setCurrentIndex( role_type.side() == rcsc::RoleType::Left
+                                         ? 1
+                                         : role_type.side() == rcsc::RoleType::Right
+                                         ? 2
+                                         : 0 );
         M_role_name[i]->setText( QString::fromStdString( f->roleName( unum ) ) );
 
         M_pos_x[i]->setText( QString::number( s.players_[i].x, 'f', 2 ) );
@@ -395,16 +409,73 @@ EditDialog::resetChanges()
 }
 
 /*-------------------------------------------------------------------*/
+bool
+EditDialog::checkConsistency()
+{
+    for ( int num = 1; num <= 11; ++num )
+    {
+        bool ok = false;
+        const int paired_number = M_paired_number[num-1]->text().toInt( &ok );
+        if ( ! ok ) return false;
+        if ( paired_number == num )
+        {
+            std::cerr << "(EditDialog) ERROR: number(" << num << ") == paired_number(" << paired_number << ")" << std::endl;
+            return false;
+        }
+
+        if ( 1 <= paired_number && paired_number <= 11 )
+        {
+            const int n = M_paired_number[paired_number-1]->text().toInt( &ok );
+            if ( ! ok ) return false;
+            if ( n != num )
+            {
+                std::cerr << "(EditDialog) ERROR: number(" << num << ") != paired(" << n << ")" << std::endl;
+                return false;
+            }
+
+            if ( M_role_side[num-1]->currentText() == "C" )
+            {
+                std::cerr << "(EditDialog) ERROR: Center type has a paired number(" << paired_number << ")" << std::endl;
+                return false;
+            }
+
+            if ( M_role_side[num-1]->currentText() == M_role_side[paired_number-1]->currentText() )
+            {
+                std::cerr << "(EditDialog) ERROR: paired players(" << num << "," << paired_number << ") have same side" << std::endl;
+                return false;
+            }
+        }
+
+        if ( M_role_name[num-1]->text().isEmpty() )
+        {            std::cerr << "(EditDialog) ERROR: empty role name" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/*-------------------------------------------------------------------*/
 /*!
 
 */
 void
 EditDialog::applyToField()
 {
+    if ( ! checkConsistency() )
+    {
+        QMessageBox::warning( this,
+                              tr( "Error" ),
+                              tr( "Illegal data detected." ),
+                              QMessageBox::Ok,
+                              QMessageBox::NoButton );
+        return;
+    }
+
     std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
-        std::cerr << "EditDialog::applyToField  no data" << std::endl;
+        std::cerr << "(EditDialog::applyToField) no data" << std::endl;
         return;
     }
 
@@ -431,12 +502,10 @@ EditDialog::applyToField()
     for ( int unum = 1; unum <= 11; ++unum )
     {
         bool ok = false;
-        int paired_number = M_paired_number[unum-1]->text().toInt( &ok );
+        const int paired_number = M_paired_number[unum-1]->text().toInt( &ok );
         if ( ! ok )
         {
-            std::cerr << __FILE__ << ':' << __LINE__
-                      << " *** ERROR *** Invalid pair number."
-                      << std::endl;
+            std::cerr << "(EditDialog::applyToField) Invalid pair number." << std::endl;
             continue;
         }
 
@@ -461,7 +530,9 @@ EditDialog::applyToField()
             ptr->movePlayerTo( unum, x, y );
         }
 
-        ptr->updateRoleType( unum, M_role_type[unum-1]->currentIndex() );
+        ptr->updateRoleType( unum,
+                             M_role_type[unum-1]->currentIndex(),
+                             M_role_side[unum-1]->currentIndex() );
 
         // ptr->updateMarkerData( unum,
         //                        ( M_marker[unum-1]->checkState() == Qt::Checked ),

@@ -186,7 +186,8 @@ public:
                          const int paird_unum,
                          const std::string & role_name );
     void updateRoleType( const int num,
-                         const int type_index );
+                         const int type_index,
+                         const int side_index );
     // void updateMarkerData( const int unum,
     //                        const bool marker,
     //                        const bool setplay_marker );

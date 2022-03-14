@@ -511,7 +511,8 @@ EditData::updateRoleData( const int num,
  */
 void
 EditData::updateRoleType( const int num,
-                          const int type_index )
+                          const int type_index,
+                          const int side_index )
 {
     if ( ! M_formation )
     {
@@ -520,6 +521,9 @@ EditData::updateRoleType( const int num,
 
     RoleType role_type = M_formation->roleType( num );
     role_type.setType( static_cast< RoleType::Type >( type_index ) );
+    role_type.setSide( side_index == 1 ? RoleType::Left :
+                       side_index == 2 ? RoleType::Right :
+                       RoleType::Center );
 
     M_formation->setRoleType( num, role_type );
 
