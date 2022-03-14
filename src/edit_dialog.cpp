@@ -210,7 +210,7 @@ EditDialog::createWidgets()
             M_paired_number[i] = new QLineEdit( tr( "0" ) );
             M_paired_number[i]->setMinimumSize( pair_width, 24 );
             M_paired_number[i]->setMaximumSize( pair_width, 24 );
-            M_paired_number[i]->setValidator( new QIntValidator( 0, 11, M_paired_number[i] ) );
+            M_paired_number[i]->setValidator( new QIntValidator( -1, 11, M_paired_number[i] ) );
             layout->addWidget( M_paired_number[i], row, col, Qt::AlignCenter );
             ++col;
 
@@ -447,7 +447,8 @@ EditDialog::checkConsistency()
         }
 
         if ( M_role_name[num-1]->text().isEmpty() )
-        {            std::cerr << "(EditDialog) ERROR: empty role name" << std::endl;
+        {
+            std::cerr << "(EditDialog) ERROR: empty role name" << std::endl;
             return false;
         }
     }
