@@ -1,4 +1,5 @@
 
+#include <rcsc/formation/formation_parser.h>
 #include <rcsc/formation/formation.h>
 #include <rcsc/formation/formation_dt.h>
 
@@ -14,31 +15,26 @@ using namespace rcsc;
 Formation::Ptr
 openFormation( const char * filepath )
 {
-    std::ifstream fin( filepath );
+    FormationParser::Ptr parser = FormationParser::create( filepath );
 
+    if ( ! parser )
+    {
+        std::cerr << "(openFormation) Could not create a parser for [" << filepath << "]" << std::endl;
+        return Formation::Ptr();
+    }
+
+    std::ifstream fin( filepath );
     if ( ! fin )
     {
         return Formation::Ptr();
     }
 
-    Formation::Ptr ptr = Formation::create( fin );
-
-    if ( ! ptr )
-    {
-        return Formation::Ptr();
-    }
-
-    fin.seekg( 0 );
-    if ( ! ptr->readOld( fin ) )
-    //if ( ! ptr->readCSV( fin ) )
-    {
-        return Formation::Ptr();
-    }
-    fin.close();
+    Formation::Ptr ptr = parser->parse( fin );
 
     return ptr;
 
 }
+
 /*-------------------------------------------------------------------*/
 /*!
 
@@ -73,11 +69,7 @@ main( int argc, char ** argv )
         return 1;
     }
 
-    //std::string new_filepath = filepath + ".csv";
-    //std::ofstream fout( new_filepath.c_str() );
-    //f->printCSV( fout );
-    //fout.close();
-    f->printCSV( std::cout );
+    f->print( std::cout );
 
     return 0;
 }

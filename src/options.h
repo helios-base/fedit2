@@ -88,7 +88,7 @@ private:
     //
     bool M_player_auto_move;
     bool M_data_auto_select;
-    bool M_symmetry_mode;
+    bool M_pair_mode;
     bool M_constraint_edit_mode;
 
     //
@@ -252,13 +252,13 @@ public:
           return M_data_auto_select;
       }
 
-    void setSymmetryMode( bool on )
+    void setPairMode( bool on )
       {
-          M_symmetry_mode = on;
+          M_pair_mode = on;
       }
-    bool symmetryMode() const
+    bool pairMode() const
       {
-          return M_symmetry_mode;
+          return M_pair_mode;
       }
 
     void setConstraintEditMode( bool on )

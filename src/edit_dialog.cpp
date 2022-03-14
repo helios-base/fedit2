@@ -155,11 +155,11 @@ EditDialog::createWidgets()
 
     {
         const int unum_width = this->fontMetrics().width( tr( "Unum" ) ) + 4;
-        const int symmetry_width = this->fontMetrics().width( tr( "0000" ) ) + 4;
+        const int pair_width = this->fontMetrics().width( tr( "0000" ) ) + 4;
         const int role_width = this->fontMetrics().width( tr( "CenterForwardXXXX" ) ) + 4;
         const int coord_width = this->fontMetrics().width( tr( "-00.0000" ) ) + 4;
-        const int marker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
-        const int smarker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
+        // const int marker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
+        // const int smarker_width = this->fontMetrics().width( tr( "SPM" ) ) + 4;
 
         QGridLayout * layout = new QGridLayout();
         top_vbox->addLayout( layout );
@@ -167,33 +167,34 @@ EditDialog::createWidgets()
         layout->setMargin( 1 );
         layout->setSpacing( 0 );
         layout->setColumnMinimumWidth( 0, unum_width );
-        layout->setColumnMinimumWidth( 1, symmetry_width );
-        layout->setColumnMinimumWidth( 5, marker_width );
-        layout->setColumnMinimumWidth( 6, smarker_width );
+        layout->setColumnMinimumWidth( 1, pair_width );
+        // layout->setColumnMinimumWidth( 5, marker_width );
+        // layout->setColumnMinimumWidth( 6, smarker_width );
 
         // header
         int row = 0;
         int col = 0;
         layout->addWidget( new QLabel( tr( "Unum" ) ), 0, col, Qt::AlignCenter ); ++col;
         {
-            QLabel * l = new QLabel( tr( "R" ) );
-            l->setToolTip( tr( "Symmetry Reference Number" ) );
+            QLabel * l = new QLabel( tr( "Pair" ) );
+            l->setToolTip( tr( "Paired Number" ) );
             layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
         }
         layout->addWidget( new QLabel( tr( "Type" ) ), 0, col, Qt::AlignCenter ); ++col;
+        layout->addWidget( new QLabel( tr( "Side" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Role Name" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "X" ) ), 0, col, Qt::AlignCenter ); ++col;
         layout->addWidget( new QLabel( tr( "Y" ) ), 0, col, Qt::AlignCenter ); ++col;
-        {
-            QLabel * l = new QLabel( tr( "M" ) );
-            l->setToolTip( tr( "Marker Type" ) );
-            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
-        }
-        {
-            QLabel * l = new QLabel( tr( "SPM" ) );
-            l->setToolTip( tr( "SetPlay Marker Type" ) );
-            layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
-        }
+        // {
+        //     QLabel * l = new QLabel( tr( "M" ) );
+        //     l->setToolTip( tr( "Marker Type" ) );
+        //     layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        // }
+        // {
+        //     QLabel * l = new QLabel( tr( "SPM" ) );
+        //     l->setToolTip( tr( "SetPlay Marker Type" ) );
+        //     layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
+        // }
 
         row = 1;
         for ( int i = 0; i < 11; ++i, ++row )
@@ -206,11 +207,11 @@ EditDialog::createWidgets()
             layout->addWidget( label, row, col, Qt::AlignCenter );
             ++col;
 
-            M_symmetry_unum[i] = new QLineEdit( tr( "0" ) );
-            M_symmetry_unum[i]->setMinimumSize( symmetry_width, 24 );
-            M_symmetry_unum[i]->setMaximumSize( symmetry_width, 24 );
-            M_symmetry_unum[i]->setValidator( new QIntValidator( -1, 11, M_symmetry_unum[i] ) );
-            layout->addWidget( M_symmetry_unum[i], row, col, Qt::AlignCenter );
+            M_paired_number[i] = new QLineEdit( tr( "0" ) );
+            M_paired_number[i]->setMinimumSize( pair_width, 24 );
+            M_paired_number[i]->setMaximumSize( pair_width, 24 );
+            M_paired_number[i]->setValidator( new QIntValidator( -1, 11, M_paired_number[i] ) );
+            layout->addWidget( M_paired_number[i], row, col, Qt::AlignCenter );
             ++col;
 
             M_role_type[i] = new QComboBox();
@@ -219,6 +220,13 @@ EditDialog::createWidgets()
             M_role_type[i]->addItem( tr( "MF" ) );
             M_role_type[i]->addItem( tr( "FW" ) );
             layout->addWidget( M_role_type[i], row, col, Qt::AlignCenter );
+            ++col;
+
+            M_role_side[i] = new QComboBox();
+            M_role_side[i]->addItem( tr( "C" ) );
+            M_role_side[i]->addItem( tr( "L" ) );
+            M_role_side[i]->addItem( tr( "R" ) );
+            layout->addWidget( M_role_side[i], row, col, Qt::AlignCenter );
             ++col;
 
             M_role_name[i] = new QLineEdit( tr( "Role" ) );
@@ -238,13 +246,13 @@ EditDialog::createWidgets()
             layout->addWidget( M_pos_y[i], row, col, Qt::AlignCenter );
             ++col;
 
-            M_marker[i] = new QCheckBox();
-            layout->addWidget( M_marker[i], row, col, Qt::AlignCenter );
-            ++col;
+            // M_marker[i] = new QCheckBox();
+            // layout->addWidget( M_marker[i], row, col, Qt::AlignCenter );
+            // ++col;
 
-            M_setplay_marker[i] = new QCheckBox();
-            layout->addWidget( M_setplay_marker[i], row, col, Qt::AlignCenter );
-            ++col;
+            // M_setplay_marker[i] = new QCheckBox();
+            // layout->addWidget( M_setplay_marker[i], row, col, Qt::AlignCenter );
+            // ++col;
         }
     }
 
@@ -334,7 +342,7 @@ EditDialog::updateData()
     M_type_name->setText( QString::fromStdString( f->methodName() ) );
 
     // ball info
-    const rcsc::formation::SampleData & s = ptr->state();
+    const rcsc::FormationData::Data & s = ptr->currentState();
 
     M_ball_pos_x->setText( QString::number( s.ball_.x, 'f', 2 ) );
     M_ball_pos_y->setText( QString::number( s.ball_.y, 'f', 2 ) );
@@ -346,24 +354,26 @@ EditDialog::updateData()
     for ( size_t i = 0; i < 11; ++i )
     {
         int unum = i + 1;
-        //const bool symmetry = ( p->symmetryUnum() > 0 );
-        M_symmetry_unum[i]->setText( QString::number( f->getSymmetryNumber( unum ) ) );
+        M_paired_number[i]->setText( QString::number( f->pairedNumber( unum ) ) );
 
-        M_role_type[i]->setCurrentIndex( static_cast< int >( f->roleType( unum ).type() ) );
-        M_role_name[i]->setText( QString::fromStdString( f->getRoleName( unum ) ) );
+        const rcsc::RoleType role_type = f->roleType( unum );
+        M_role_type[i]->setCurrentIndex( static_cast< int >( role_type.type() ) );
+        M_role_side[i]->setCurrentIndex( role_type.side() == rcsc::RoleType::Left
+                                         ? 1
+                                         : role_type.side() == rcsc::RoleType::Right
+                                         ? 2
+                                         : 0 );
+        M_role_name[i]->setText( QString::fromStdString( f->roleName( unum ) ) );
 
         M_pos_x[i]->setText( QString::number( s.players_[i].x, 'f', 2 ) );
         M_pos_y[i]->setText( QString::number( s.players_[i].y, 'f', 2 ) );
 
-        //M_role_name[i]->setReadOnly( symmetry );
-        //M_role_name[i]->setEnabled( ! symmetry );
-
-        M_marker[i]->setCheckState( f->isMarker( unum )
-                                    ? Qt::Checked
-                                    : Qt::Unchecked );
-        M_setplay_marker[i]->setCheckState( f->isSetPlayMarker( unum )
-                                            ? Qt::Checked
-                                            : Qt::Unchecked );
+        // M_marker[i]->setCheckState( f->isMarker( unum )
+        //                             ? Qt::Checked
+        //                             : Qt::Unchecked );
+        // M_setplay_marker[i]->setCheckState( f->isSetPlayMarker( unum )
+        //                                     ? Qt::Checked
+        //                                     : Qt::Unchecked );
     }
 }
 
@@ -399,25 +409,83 @@ EditDialog::resetChanges()
 }
 
 /*-------------------------------------------------------------------*/
+bool
+EditDialog::checkConsistency()
+{
+    for ( int num = 1; num <= 11; ++num )
+    {
+        bool ok = false;
+        const int paired_number = M_paired_number[num-1]->text().toInt( &ok );
+        if ( ! ok ) return false;
+        if ( paired_number == num )
+        {
+            std::cerr << "(EditDialog) ERROR: number(" << num << ") == paired_number(" << paired_number << ")" << std::endl;
+            return false;
+        }
+
+        if ( 1 <= paired_number && paired_number <= 11 )
+        {
+            const int n = M_paired_number[paired_number-1]->text().toInt( &ok );
+            if ( ! ok ) return false;
+            if ( n != num )
+            {
+                std::cerr << "(EditDialog) ERROR: number(" << num << ") != paired(" << n << ")" << std::endl;
+                return false;
+            }
+
+            if ( M_role_side[num-1]->currentText() == "C" )
+            {
+                std::cerr << "(EditDialog) ERROR: Center type has a paired number(" << paired_number << ")" << std::endl;
+                return false;
+            }
+
+            if ( M_role_side[num-1]->currentText() == M_role_side[paired_number-1]->currentText() )
+            {
+                std::cerr << "(EditDialog) ERROR: paired players(" << num << "," << paired_number << ") have same side" << std::endl;
+                return false;
+            }
+        }
+
+        if ( M_role_name[num-1]->text().isEmpty() )
+        {
+            std::cerr << "(EditDialog) ERROR: empty role name" << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/*-------------------------------------------------------------------*/
 /*!
 
 */
 void
 EditDialog::applyToField()
 {
+    if ( ! checkConsistency() )
+    {
+        QMessageBox::warning( this,
+                              tr( "Error" ),
+                              tr( "Illegal data detected." ),
+                              QMessageBox::Ok,
+                              QMessageBox::NoButton );
+        return;
+    }
+
     std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr )
     {
-        std::cerr << "EditDialog::applyToField  no data" << std::endl;
+        std::cerr << "(EditDialog::applyToField) no data" << std::endl;
         return;
     }
 
     bool data_auto_select = Options::instance().dataAutoSelect();
     bool player_auto_move = Options::instance().playerAutoMove();
-    bool symmetry_mode = Options::instance().symmetryMode();
+    bool pair_mode = Options::instance().pairMode();
     Options::instance().setDataAutoSelect( false );
     Options::instance().setPlayerAutoMove( false );
-    Options::instance().setSymmetryMode( false );
+    Options::instance().setPairMode( false );
 
     // ball
     {
@@ -435,12 +503,10 @@ EditDialog::applyToField()
     for ( int unum = 1; unum <= 11; ++unum )
     {
         bool ok = false;
-        int symmetry_unum = M_symmetry_unum[unum-1]->text().toInt( &ok );
+        const int paired_number = M_paired_number[unum-1]->text().toInt( &ok );
         if ( ! ok )
         {
-            std::cerr << __FILE__ << ':' << __LINE__
-                      << " *** ERROR *** Invalid symmetry number."
-                      << std::endl;
+            std::cerr << "(EditDialog::applyToField) Invalid pair number." << std::endl;
             continue;
         }
 
@@ -453,7 +519,7 @@ EditDialog::applyToField()
         }
         else
         {
-            ptr->updateRoleData( unum, symmetry_unum, role_name );
+            ptr->updateRoleData( unum, paired_number, role_name );
         }
 
         bool ok_x = false;
@@ -465,18 +531,20 @@ EditDialog::applyToField()
             ptr->movePlayerTo( unum, x, y );
         }
 
-        ptr->updateRoleType( unum, M_role_type[unum-1]->currentIndex() );
+        ptr->updateRoleType( unum,
+                             M_role_type[unum-1]->currentIndex(),
+                             M_role_side[unum-1]->currentIndex() );
 
-        ptr->updateMarkerData( unum,
-                               ( M_marker[unum-1]->checkState() == Qt::Checked ),
-                               ( M_setplay_marker[unum-1]->checkState() == Qt::Checked ) );
+        // ptr->updateMarkerData( unum,
+        //                        ( M_marker[unum-1]->checkState() == Qt::Checked ),
+        //                        ( M_setplay_marker[unum-1]->checkState() == Qt::Checked ) );
     }
 
     updateData();
 
     Options::instance().setDataAutoSelect( data_auto_select );
     Options::instance().setPlayerAutoMove( player_auto_move );
-    Options::instance().setSymmetryMode( symmetry_mode );
+    Options::instance().setPairMode( pair_mode );
 
     emit viewUpdated();
 

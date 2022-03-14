@@ -62,11 +62,12 @@ private:
     QLineEdit * M_ball_pos_x;
     QLineEdit * M_ball_pos_y;
 
-    QLineEdit * M_symmetry_unum[11];
+    QLineEdit * M_paired_number[11];
     QComboBox * M_role_type[11];
+    QComboBox * M_role_side[11];
     QLineEdit * M_role_name[11];
-    QCheckBox * M_marker[11];
-    QCheckBox * M_setplay_marker[11];
+    // QCheckBox * M_marker[11];
+    // QCheckBox * M_setplay_marker[11];
 
     QLineEdit * M_pos_x[11];
     QLineEdit * M_pos_y[11];
@@ -87,6 +88,8 @@ public:
 
 private:
     void createWidgets();
+
+    bool checkConsistency();
 
 protected:
     void showEvent( QShowEvent * event );

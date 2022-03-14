@@ -88,7 +88,7 @@ private:
     QPen M_player_pen;
     QPen M_select_pen;
     QBrush M_player_brush;
-    QBrush M_symmetry_brush;
+    QBrush M_paired_brush;
     QFont M_player_font;
 
     QBrush M_background_contained_area_brush;
@@ -96,7 +96,7 @@ private:
     QPen M_background_player_pen;
     QBrush M_background_left_team_brush;
     QBrush M_background_right_team_brush;
-    QBrush M_background_symmetry_brush;
+    QBrush M_background_paired_brush;
     QPen M_background_font_pen;
 
     QPen M_shoot_line_pen;

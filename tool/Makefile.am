@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = average_formation formation_converter
 
-SUBDIRS = dttrainer
+#SUBDIRS = dttrainer
 
 average_formation_SOURCES = \
 	average_formation.cpp

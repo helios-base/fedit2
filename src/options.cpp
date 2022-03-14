@@ -78,7 +78,7 @@ Options::Options()
       //
       M_player_auto_move( true ),
       M_data_auto_select( true ),
-      M_symmetry_mode( true ),
+      M_pair_mode( true ),
       M_constraint_edit_mode( false ),
       //
       M_show_background_data( true ),

@@ -54,7 +54,6 @@
 #include <iostream>
 
 using namespace rcsc;
-using namespace rcsc::formation;
 
 /*-------------------------------------------------------------------*/
 /*!
@@ -82,7 +81,7 @@ EditCanvas::EditCanvas( QWidget * parent )
     M_player_pen( QColor( 0, 0, 0 ), 0, Qt::SolidLine ),
     M_select_pen( Qt::white, 0, Qt::SolidLine ),
     M_player_brush( QColor( 255, 215, 0 ), Qt::SolidPattern ),
-    M_symmetry_brush( QColor( 0, 255, 95 ), Qt::SolidPattern ),
+    M_paired_brush( QColor( 0, 255, 95 ), Qt::SolidPattern ),
     M_player_font( "Sans Serif", 10 ),
     // background graphic context
     M_background_contained_area_brush( QColor( 31, 143, 31 ), Qt::SolidPattern ),
@@ -90,7 +89,7 @@ EditCanvas::EditCanvas( QWidget * parent )
     M_background_player_pen( QColor( 127, 127, 127 ), 0, Qt::SolidLine ),
     M_background_left_team_brush( QColor( 192, 251, 0 ), Qt::SolidPattern ),
     M_background_right_team_brush( QColor( 127, 20, 20 ), Qt::SolidPattern ),
-    M_background_symmetry_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
+    M_background_paired_brush( QColor( 0, 192, 31 ), Qt::SolidPattern ),
     M_background_font_pen( QColor( 0, 63, 127 ), 0, Qt::SolidLine ),
     // additional info
     M_shoot_line_pen( QColor( 255, 140, 0 ), 0, Qt::SolidLine ),
@@ -389,7 +388,7 @@ EditCanvas::drawContainedArea( QPainter & painter )
     //std::cerr << "triangle size = " << ptr->triangulation().triangleMap().size()
     //          << std::endl;
 
-    const Triangulation::Triangle * tri = ptr->triangulation().findTriangleContains( ptr->state().ball_ );
+    const Triangulation::Triangle * tri = ptr->triangulation().findTriangleContains( ptr->currentState().ball_ );
 
     if ( ! tri )
     {
@@ -508,12 +507,9 @@ EditCanvas::drawData( QPainter & painter )
         painter.setPen( M_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        const SampleDataSet::DataCont::const_iterator end = ptr->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
-              it != end;
-              ++it )
+        for ( const FormationData::Data & data : ptr->formationData()->dataCont() )
         {
-            painter.drawRect( QRectF( it->ball_.x - r, it->ball_.y - r, d, d ) );
+            painter.drawRect( QRectF( data.ball_.x - r, data.ball_.y - r, d, d ) );
         }
     }
 
@@ -530,13 +526,11 @@ EditCanvas::drawData( QPainter & painter )
         painter.setWorldMatrixEnabled( false );
 
         int count = 0;
-        const SampleDataSet::DataCont::const_iterator d_end = ptr->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
-              it != d_end;
-              ++it, ++count )
+        for ( const FormationData::Data & data : ptr->formationData()->dataCont() )
         {
-            painter.drawText( transform.map( QPointF( it->ball_.x + 0.7, it->ball_.y - 0.7 ) ),
+            painter.drawText( transform.map( QPointF( data.ball_.x + 0.7, data.ball_.y - 0.7 ) ),
                               QString::number( count ) );
+            ++count;
         }
 
         painter.setWorldMatrixEnabled( true );
@@ -548,7 +542,7 @@ EditCanvas::drawData( QPainter & painter )
 
     if ( 0 <= ptr->currentIndex() )
     {
-        SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
+        FormationData::DataCont::const_iterator it = ptr->formationData()->dataCont().begin();
         std::advance( it, ptr->currentIndex() );
 
         painter.setPen( QPen( Qt::yellow, 0, Qt::SolidLine) );
@@ -597,33 +591,35 @@ EditCanvas::drawPlayers( QPainter & painter )
 
     const QTransform transform = painter.worldTransform();
 
-    const std::vector< Vector2D >::const_iterator selected
+    const Vector2D selected_pos
         = ( ptr->selectType() == EditData::SELECT_PLAYER
-            ? ( ptr->state().players_.begin() + ptr->selectIndex() )
-            : ptr->state().players_.end() );
+            ? ptr->currentState().players_[ptr->selectIndex()]
+            : Vector2D::INVALIDATED );
 
-    int unum = 1;
-    for ( std::vector< Vector2D >::const_iterator p = ptr->state().players_.begin(),
-              end = ptr->state().players_.end();
-          p != end;
-          ++p, ++unum )
+    int unum = 0;
+    for ( const Vector2D & p : ptr->currentState().players_ )
     {
-        if ( p == selected )
+        ++unum;
+
+        const bool paired = ( f->pairedNumber( unum ) > 0
+                              && f->roleType( unum ).side() == RoleType::Right );
+
+        if ( p == selected_pos )
         {
             painter.setPen( M_select_pen );
-            painter.setBrush( f->isSymmetryType( unum )
-                              ? M_symmetry_brush
+            painter.setBrush( paired
+                              ? M_paired_brush
                               : M_player_brush );
-            painter.drawEllipse( QRectF( p->x - r - 0.5, p->y - r - 0.5,
+            painter.drawEllipse( QRectF( p.x - r - 0.5, p.y - r - 0.5,
                                          d + 1.0, d + 1.0 ) );
         }
         else
         {
             painter.setPen( M_player_pen );
-            painter.setBrush( f->isSymmetryType( unum )
-                              ? M_symmetry_brush
+            painter.setBrush( paired
+                              ? M_paired_brush
                               : M_player_brush );
-            painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
+            painter.drawEllipse( QRectF( p.x - r, p.y - r, d, d ) );
         }
 
         painter.setBrush( Qt::NoBrush );
@@ -631,18 +627,18 @@ EditCanvas::drawPlayers( QPainter & painter )
         if ( unum == 1 )
         {
             // catchable area circle
-            painter.drawEllipse( QRectF( p->x - cr, p->y - cr, cd, cd ) );
+            painter.drawEllipse( QRectF( p.x - cr, p.y - cr, cd, cd ) );
         }
         else if ( ! enlarge )
         {
             // kickable area circle
-            painter.drawEllipse( QRectF( p->x - kr, p->y - kr, kd, kd ) );
+            painter.drawEllipse( QRectF( p.x - kr, p.y - kr, kd, kd ) );
         }
 
 
         painter.setPen( Qt::white );
         painter.setWorldMatrixEnabled( false );
-        painter.drawText( transform.map( QPointF( p->x + r, p->y ) ),
+        painter.drawText( transform.map( QPointF( p.x + r, p.y ) ),
                           QString::number( unum ) );
         painter.setWorldMatrixEnabled( true );
     }
@@ -665,7 +661,7 @@ EditCanvas::drawBall( QPainter & painter )
     painter.setBrush( M_ball_brush );
 
 
-    const Vector2D bpos = ptr->state().ball_;
+    const Vector2D bpos = ptr->currentState().ball_;
     const bool enlarge = Options::instance().enlarge();
     const double r = ( enlarge
                        ? ( ptr->selectType() == EditData::SELECT_BALL
@@ -705,7 +701,7 @@ EditCanvas::drawShootLines( QPainter & painter )
     painter.setPen( M_shoot_line_pen );
     painter.setBrush( Qt::NoBrush );
 
-    const Vector2D ball = ptr->state().ball_;
+    const Vector2D ball = ptr->currentState().ball_;
     const double goal_line_x = -ServerParam::i().pitchHalfLength() - 0.001;
     const double goal_half_width = ServerParam::i().goalHalfWidth() - 0.1;
     const double bdecay = ServerParam::i().ballDecay();
@@ -794,7 +790,7 @@ EditCanvas::drawFreeKickCircle( QPainter & painter )
     painter.setPen( M_free_kick_circle_pen );
     painter.setBrush( Qt::NoBrush );
 
-    const Vector2D ball = ptr->state().ball_;
+    const Vector2D ball = ptr->currentState().ball_;
     const double r = ServerParam::DEFAULT_CENTER_CIRCLE_R;
 
     painter.drawEllipse( QRectF( ball.x - r, ball.y - r, r*2, r*2 ) );
@@ -813,12 +809,12 @@ EditCanvas::drawGoalieMovableArea( QPainter & painter )
         return;
     }
 
-    if ( ptr->state().players_.empty() )
+    if ( ptr->currentState().players_.empty() )
     {
         return;
     }
 
-    const Vector2D goalie_pos = ptr->state().players_.front();
+    const Vector2D goalie_pos = ptr->currentState().players_.front();
     const double catch_area = ServerParam::i().catchableArea();
     const double max_accel = ServerParam::i().maxDashPower() * ServerParam::i().defaultDashPowerRate() * ServerParam::i().defaultEffortMax();
     const double decay = ServerParam::i().defaultPlayerDecay();
@@ -886,7 +882,7 @@ EditCanvas::drawConstraintSelection( QPainter & painter )
         setAntialiasFlag( painter, false );
     }
 
-    SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
+    FormationData::DataCont::const_iterator it = ptr->formationData()->dataCont().begin();
     std::advance( it, ptr->constraintOriginIndex() );
 
     painter.setPen( QPen( Qt::blue, 0, Qt::SolidLine ) );
@@ -929,7 +925,7 @@ EditCanvas::drawBackgroundContainedArea( QPainter & painter )
         return;
     }
 
-    const Triangulation::Triangle * tri = ptr->backgroundTriangulation().findTriangleContains( ptr->state().ball_ );
+    const Triangulation::Triangle * tri = ptr->backgroundTriangulation().findTriangleContains( ptr->currentState().ball_ );
 
     if ( ! tri )
     {
@@ -997,15 +993,12 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setPen( M_background_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        const Triangulation::SegmentCont::const_iterator e_end = ptr->backgroundTriangulation().edges().end();
-        for ( Triangulation::SegmentCont::const_iterator e = ptr->backgroundTriangulation().edges().begin();
-              e != e_end;
-              ++e )
+        for ( const auto & e : ptr->backgroundTriangulation().edges() )
         {
-            painter.drawLine( QLineF( points[e->first].x,
-                                      points[e->first].y,
-                                      points[e->second].x,
-                                      points[e->second].y ) );
+            painter.drawLine( QLineF( points[e.first].x,
+                                      points[e.first].y,
+                                      points[e.second].x,
+                                      points[e.second].y ) );
         }
     }
     else
@@ -1018,12 +1011,10 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setPen( M_triangle_pen );
         painter.setBrush( Qt::NoBrush );
 
-        const SampleDataSet::DataCont::const_iterator d_end = ptr->backgroundFormation()->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->backgroundFormation()->samples()->dataCont().begin();
-              it != d_end;
-              ++it )
+        // for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
+        for ( const Vector2D & p : ptr->backgroundTriangulation().points() )
         {
-            painter.drawRect( QRectF( it->ball_.x - r, it->ball_.y - r, d, d ) );
+            painter.drawRect( QRectF( p.x - r, p.y - r, d, d ) );
         }
     }
 
@@ -1039,13 +1030,12 @@ EditCanvas::drawBackgroundData( QPainter & painter )
         painter.setWorldMatrixEnabled( false );
 
         int count = 0;
-        const SampleDataSet::DataCont::const_iterator d_end = ptr->backgroundFormation()->samples()->dataCont().end();
-        for ( SampleDataSet::DataCont::const_iterator it = ptr->backgroundFormation()->samples()->dataCont().begin();
-              it != d_end;
-              ++it, ++count )
+        //for ( const FormationData::Data & data : ptr->backgroundFormation()->data()->dataCont() )
+        for ( const Vector2D & p : ptr->backgroundTriangulation().points() )
         {
-            painter.drawText( transform.map( QPointF( it->ball_.x + 0.7, it->ball_.y - 0.7 ) ),
+            painter.drawText( transform.map( QPointF( p.x + 0.7, p.y - 0.7 ) ),
                               QString::number( count ) );
+            ++count;
         }
 
         painter.setWorldMatrixEnabled( true );
@@ -1088,17 +1078,20 @@ EditCanvas::drawBackgroundPlayers( QPainter & painter )
 
     std::vector< Vector2D > players;
     players.reserve( 11 );
-    f->getPositions( ptr->state().ball_, players );
+    f->getPositions( ptr->currentState().ball_, players );
 
     int unum = 1;
     for ( std::vector< Vector2D >::const_iterator p = players.begin();
           p != players.end();
           ++p, ++unum )
     {
-        if ( f->isSymmetryType( unum ) )
+        const bool paired = ( f->pairedNumber( unum ) > 0
+                              && f->roleType( unum ).side() == RoleType::Right );
+
+        if ( paired )
         {
             painter.setPen( M_background_player_pen );
-            painter.setBrush( M_background_symmetry_brush );
+            painter.setBrush( M_background_paired_brush );
             painter.drawEllipse( QRectF( p->x - r, p->y - r, d, d ) );
         }
         else
