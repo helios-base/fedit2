@@ -374,8 +374,8 @@ MainWindow::createToolBars()
         M_tool_bar->addSeparator();
 
         M_tool_bar->addAction( M_train_act );
-        M_tool_bar->addAction( M_replace_data_act );
         M_tool_bar->addAction( M_insert_data_act );
+        M_tool_bar->addAction( M_replace_data_act );
         M_tool_bar->addAction( M_add_data_act );
 
         //
@@ -636,7 +636,7 @@ MainWindow::createActionsEdit()
 #else
     M_add_data_act->setShortcut( Qt::CTRL + Qt::Key_R );
 #endif
-    M_add_data_act->setStatusTip( tr( "Add current field status as a training data. (" )
+    M_add_data_act->setStatusTip( tr( "Add the current field state as a new data. (" )
                                   + M_add_data_act->shortcut().toString()
                                   + tr( ")" ) );
     connect( M_add_data_act, SIGNAL( triggered() ), this, SLOT( addData() ) );
@@ -644,27 +644,26 @@ MainWindow::createActionsEdit()
 
     //
     M_insert_data_act = new QAction( QIcon( QPixmap( insert_xpm ) ),
-                                     tr( "Insert" ),
+                                     tr( "Insert Data" ),
                                      this );
-    M_insert_data_act->setStatusTip( tr( "Insert the screen data after the current index" ) );
+    M_insert_data_act->setStatusTip( tr( "Insert the field state as a new data after the current index" ) );
     connect( M_insert_data_act, SIGNAL( triggered() ), this, SLOT( insertData() ) );
     this->addAction( M_insert_data_act );
 
     //
     M_replace_data_act = new QAction( QIcon( QPixmap( replace_xpm ) ),
-                                      tr( "Replace" ),
+                                      tr( "Replace Data" ),
                                       this );
-    M_replace_data_act->setStatusTip( tr( "Replace a current indexed training"
-                                          " data by the screen status" ) );
+    M_replace_data_act->setStatusTip( tr( "Replace the current index data by the field state" ) );
     connect( M_replace_data_act, SIGNAL( triggered() ), this, SLOT( replaceData() ) );
     this->addAction( M_replace_data_act );
 
     //
     M_delete_data_act = new QAction( QIcon( QPixmap( delete_xpm ) ),
-                                     tr( "Delete" ),
+                                     tr( "Delete Data" ),
                                      this );
     M_delete_data_act->setShortcut( Qt::Key_Delete );
-    M_delete_data_act->setStatusTip( tr( "Delete a current indexed training data. (" )
+    M_delete_data_act->setStatusTip( tr( "Delete the current index data. (" )
                                      + M_delete_data_act->shortcut().toString()
                                      + tr( ")" ) );
     connect( M_delete_data_act, SIGNAL( triggered() ), this, SLOT( deleteData() ) );
@@ -698,9 +697,9 @@ MainWindow::createActionsEdit()
 
     //
     M_train_act = new QAction( QIcon( QPixmap( train_xpm ) ),
-                               tr( "Train" ),
+                               tr( "Fit to Data" ),
                                this );
-    M_train_act->setStatusTip( tr( "Train formation using current trainig data set." ) );
+    M_train_act->setStatusTip( tr( "Train the formation model using the current trainig data set." ) );
     connect( M_train_act, SIGNAL( triggered() ), this, SLOT( train() ) );
     this->addAction( M_train_act );
 }
