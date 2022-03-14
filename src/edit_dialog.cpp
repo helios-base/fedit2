@@ -176,8 +176,8 @@ EditDialog::createWidgets()
         int col = 0;
         layout->addWidget( new QLabel( tr( "Unum" ) ), 0, col, Qt::AlignCenter ); ++col;
         {
-            QLabel * l = new QLabel( tr( "R" ) );
-            l->setToolTip( tr( "Symmetry Reference Number" ) );
+            QLabel * l = new QLabel( tr( "Pair" ) );
+            l->setToolTip( tr( "Paired Number" ) );
             layout->addWidget( l, 0, col, Qt::AlignCenter ); ++col;
         }
         layout->addWidget( new QLabel( tr( "Type" ) ), 0, col, Qt::AlignCenter ); ++col;
