@@ -34,7 +34,7 @@
 
 #include <QDialog>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class EditCanvas;
 class EditData;
@@ -53,7 +53,7 @@ class ConstraintEditDialog
 private:
 
     EditCanvas * M_edit_canvas;
-    boost::shared_ptr< EditData > M_edit_data;
+    std::shared_ptr< EditData > M_edit_data;
 
     QSpinBox * M_origin;
     QSpinBox * M_terminal;
@@ -66,7 +66,7 @@ public:
 
     ConstraintEditDialog( QWidget * parent,
                           EditCanvas * canvas,
-                          boost::shared_ptr< EditData > data,
+                          std::shared_ptr< EditData > data,
                           const int origin_index,
                           const int terminal_index );
     ~ConstraintEditDialog();

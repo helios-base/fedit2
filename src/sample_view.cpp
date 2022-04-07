@@ -124,9 +124,9 @@ SampleView::~SampleView()
 void
 SampleView::updateData()
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
-         || ! ptr->samples() )
+         || ! ptr->formationData() )
     {
         return;
     }
@@ -135,19 +135,17 @@ SampleView::updateData()
     // update samples
     //
 
-    const int data_count = ptr->samples()->dataCont().size();
+    const int data_count = ptr->formationData()->dataCont().size();
 
     while ( this->topLevelItemCount() > data_count )
     {
         this->takeTopLevelItem( this->topLevelItemCount() - 1 );
     }
 
-    int idx = 0;
-    const rcsc::formation::SampleDataSet::DataCont::const_iterator end = ptr->samples()->dataCont().end();
-    for ( rcsc::formation::SampleDataSet::DataCont::const_iterator it = ptr->samples()->dataCont().begin();
-          it != end;
-          ++it, ++idx )
+    int idx = -1;
+    for ( const rcsc::FormationData::Data & d : ptr->formationData()->dataCont() )
     {
+        ++idx;
         QTreeWidgetItem * item = this->topLevelItem( idx );
         if ( ! item )
         {
@@ -161,7 +159,7 @@ SampleView::updateData()
                             );
             this->insertTopLevelItem( idx, item );
 
-            for ( size_t i = 0; i < it->players_.size(); ++i )
+            for ( size_t i = 0; i < d.players_.size(); ++i )
             {
                 QTreeWidgetItem * p = new QTreeWidgetItem();
                 p->setText( 0, tr( "p%1" ).arg( i + 1 ) );
@@ -178,13 +176,13 @@ SampleView::updateData()
         }
 
         item->setText( 0, QString::number( idx ) ); // visual index
-        item->setText( 1, QString::number( it->ball_.x, 'f', 2 ) );
-        item->setText( 2, QString::number( it->ball_.y, 'f', 2 ) );
+        item->setText( 1, QString::number( d.ball_.x, 'f', 2 ) );
+        item->setText( 2, QString::number( d.ball_.y, 'f', 2 ) );
         //item->setData( 0, Qt::DisplayRole, idx + 1 ); // visual index
-        //item->setData( 1, Qt::EditRole, it->ball_.x );
-        //item->setData( 2, Qt::EditRole, it->ball_.y );
+        //item->setData( 1, Qt::EditRole, d.ball_.x );
+        //item->setData( 2, Qt::EditRole, d.ball_.y );
 
-        for ( size_t i = 0; i < it->players_.size(); ++i )
+        for ( size_t i = 0; i < d.players_.size(); ++i )
         {
             QTreeWidgetItem * p = item->child( i );
             if ( ! p )
@@ -198,8 +196,8 @@ SampleView::updateData()
                 continue;
             }
 
-            p->setText( 1, QString::number( it->players_[i].x, 'f', 2 ) );
-            p->setText( 2, QString::number( it->players_[i].y, 'f', 2 ) );
+            p->setText( 1, QString::number( d.players_[i].x, 'f', 2 ) );
+            p->setText( 2, QString::number( d.players_[i].y, 'f', 2 ) );
             //p->setData( 1, Qt::EditRole, it->players_[i].x );
             //p->setData( 2, Qt::EditRole, it->players_[i].y );
         }
@@ -405,9 +403,9 @@ SampleView::setCurrentData( QTreeWidgetItem * current )
 void
 SampleView::menuChangeSampleIndex()
 {
-    boost::shared_ptr< EditData > ptr = M_edit_data.lock();
+    std::shared_ptr< EditData > ptr = M_edit_data.lock();
     if ( ! ptr
-         || ! ptr->samples() )
+         || ! ptr->formationData() )
     {
         return;
     }
@@ -421,7 +419,7 @@ SampleView::menuChangeSampleIndex()
     int idx = this->indexOfTopLevelItem( item );
     if ( 0 <= idx )
     {
-        const int data_size = ptr->samples()->dataCont().size();
+        const int data_size = ptr->formationData()->dataCont().size();
         if ( data_size == 0 )
         {
             return;

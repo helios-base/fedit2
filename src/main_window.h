@@ -34,7 +34,7 @@
 
 #include <QMainWindow>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class QCloseEvent;
 class QLabel;
@@ -49,7 +49,7 @@ class ConfigDialog;
 class EditCanvas;
 class EditData;
 class EditDialog;
-class ConstraintView;
+//class ConstraintView;
 class SampleView;
 
 /*!
@@ -62,14 +62,14 @@ class MainWindow
 
 private:
 
-    boost::shared_ptr< EditData > M_edit_data;
+    std::shared_ptr< EditData > M_edit_data;
 
     QToolBar * M_tool_bar;
     QSpinBox * M_index_spin_box;
 
     QSplitter * M_splitter;
     SampleView * M_sample_view;
-    ConstraintView * M_constraint_view;
+    //ConstraintView * M_constraint_view;
     EditCanvas * M_edit_canvas;
     EditDialog * M_edit_dialog;
     ConfigDialog * M_config_dialog;
@@ -95,13 +95,13 @@ private:
     QAction * M_replace_data_act;
     QAction * M_delete_data_act;
     QAction * M_reverse_y_act;
-    QAction * M_add_constraint_act;
+    //QAction * M_add_constraint_act;
     QAction * M_train_act;
 
     QAction * M_toggle_player_auto_move_act;
     QAction * M_toggle_data_auto_select_act;
-    QAction * M_toggle_symmetry_mode_act;
-    QAction * M_toggle_constraint_edit_mode_act;
+    QAction * M_toggle_pair_mode_act;
+    //QAction * M_toggle_constraint_edit_mode_act;
 
     // view actions
     QAction * M_full_screen_act;
@@ -155,7 +155,7 @@ private:
     void createEditCanvas();
     void createEditDialog();
     void createSampleView();
-    void createConstraintView();
+    //void createConstraintView();
 
     void createUndoStack();
 
@@ -187,7 +187,7 @@ private:
     bool openBackgroundConfFile( const QString & filepath );
     bool openDataFile( const QString & filepath );
 
-    void showWarningMessage( const int err );
+    void showWarningMessage( const std::string & err );
 
     void updateEditModel();
 
@@ -207,8 +207,8 @@ private slots:
     // edit
     void setPlayerAutoMove( bool on );
     void setDataAutoSelect( bool on );
-    void setSymmetryMode( bool on );
-    void setConstraintEditMode( bool on );
+    void setPairMode( bool on );
+    //void setConstraintEditMode( bool on );
 
     void addData();
     void insertData();
@@ -252,17 +252,17 @@ private slots:
                         double x,
                         double y );
 
-    void deleteConstraint( int origin_idx,
-                           int terminal_idx );
-    void replaceConstraint( int idx,
-                            int origin_idx,
-                            int terminal_idx );
+    // void deleteConstraint( int origin_idx,
+    //                        int terminal_idx );
+    // void replaceConstraint( int idx,
+    //                         int origin_idx,
+    //                         int terminal_idx );
 
     void updateDataIndex();
 
-    void showConstraintEditDialog();
-    void showConstraintEditDialog( int first_index,
-                                   int second_index );
+    // void showConstraintEditDialog();
+    // void showConstraintEditDialog( int first_index,
+    //                                int second_index );
 signals:
     void viewUpdated();
 

@@ -34,7 +34,7 @@
 
 #include <QTreeWidget>
 
-#include <boost/weak_ptr.hpp>
+#include <memory>
 
 class EditData;
 
@@ -45,14 +45,14 @@ class SampleView
 
 private:
 
-    boost::weak_ptr< EditData > M_edit_data;
+    std::weak_ptr< EditData > M_edit_data;
 
 public:
 
     SampleView( QWidget * parent = 0 );
     ~SampleView();
 
-    void setData( boost::shared_ptr< EditData > ptr )
+    void setData( std::shared_ptr< EditData > ptr )
       {
           M_edit_data = ptr;
       }
