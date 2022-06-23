@@ -1953,10 +1953,20 @@ MainWindow::resizeView( const QSize & size )
 
     int width_diff = rect.width() - M_splitter->width();
     int height_diff = rect.height() - M_splitter->height();
-    int first_width = sizes.at( 0 );
+    int first_width = sizes.at( 0 ) + M_splitter->handleWidth() / 2;
+
+    // std::cout << "(resizeView)\n"
+    //           << " rect.w=" << rect.width() << " central.w=" << M_splitter->width() << '\n'
+    //           << " rect.h=" << rect.height() << " central.h=" << M_splitter->height() << '\n'
+    //           << " splitter[0].w =" << first_width << " handle.w=" << M_splitter->handleWidth() << '\n'
+    //           << " width_diff = " << width_diff
+    //           << " height_diff = " << height_diff
+    //           << std::endl;
 
     rect.setWidth( width_diff + first_width + size.width() );
     rect.setHeight( height_diff + size.height() );
+
+    // std::cout << "new.w=" << rect.width() << " new_h=" << rect.height() << std::endl;
 
     this->setGeometry( rect );
 }
