@@ -187,7 +187,14 @@ EditData::backup( const QString & filepath )
     }
 
     QString backup_filepath = filepath;
-    if ( M_saved_datetime.isEmpty() )
+
+    if ( M_formation
+         && ! M_formation->version().empty() )
+    {
+        backup_filepath += QString( "_" );
+        backup_filepath += QString::fromStdString( M_formation->version() );
+    }
+    else if ( M_saved_datetime.isEmpty() )
     {
         backup_filepath += QString( "_" );
         backup_filepath += QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
@@ -395,11 +402,7 @@ EditData::saveConfAs( const QString & filepath )
     }
 
     M_saved_datetime = QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
-
-    if ( Options::instance().autoBackup() )
-    {
-        backup( M_filepath );
-    }
+    M_formation->setVersion( M_saved_datetime.toStdString() );
 
     std::ofstream fout( filepath.toStdString().c_str() );
     if ( ! fout.is_open() )
@@ -408,7 +411,6 @@ EditData::saveConfAs( const QString & filepath )
         return false;
     }
 
-    M_formation->setVersion( M_saved_datetime.toStdString() );
     if ( ! M_formation->print( fout ) )
     {
         return false;
@@ -416,6 +418,25 @@ EditData::saveConfAs( const QString & filepath )
 
     fout.flush();
     fout.close();
+
+    std::cerr << "Saved to  [" << filepath.toStdString() << "]" << std::endl;
+
+    if ( Options::instance().autoBackup() )
+    {
+        //backup( M_filepath );
+        QString backup_filepath = filepath;
+        backup_filepath += QString( "_" );
+        backup_filepath += QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
+        if ( ! QFile::copy( filepath, backup_filepath ) )
+        {
+            std::cerr << "Failed to backup the file [" << filepath.toStdString()  << "]"
+                      << std::endl;
+        }
+        else
+        {
+            std::cerr << "Copied to [" << backup_filepath.toStdString() << "]" << std::endl;
+        }
+    }
 
     M_conf_changed = false;
     M_filepath = filepath;
