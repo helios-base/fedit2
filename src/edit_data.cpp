@@ -221,24 +221,7 @@ EditData::backup( const QString & filepath )
 bool
 EditData::openConf( const QString & filepath )
 {
-    FormationParser::Ptr parser = FormationParser::create( filepath.toStdString() );
-
-    if ( ! parser )
-    {
-        std::cerr << "(EditData::openConf) Could not create the parser instance for [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    std::cerr << "(EditData::openConf) parser type = " << parser->name() << std::endl;
-
-    std::ifstream fin( filepath.toStdString().c_str() );
-    if ( ! fin.is_open() )
-    {
-        std::cerr << "(EditData::openConf) Failed to open formation file [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    M_formation = parser->parse( fin );
+    M_formation = FormationParser::parse( filepath.toStdString() );
     if ( ! M_formation )
     {
         std::cerr << "(EditData::openConf) Failed to read a formation [" << filepath.toStdString() << "]" << std::endl;
@@ -329,22 +312,7 @@ EditData::saveDataAs( const QString & filepath )
 bool
 EditData::openBackgroundConf( const QString & filepath )
 {
-    FormationParser::Ptr parser = FormationParser::create( filepath.toStdString() );
-
-    if ( ! parser )
-    {
-        std::cerr << "Could not create the parser instance for [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    std::ifstream fin( filepath.toStdString().c_str() );
-    if ( ! fin.is_open() )
-    {
-        std::cerr << "(openBackgroundConf) Failed to open formation file [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    M_background_formation = parser->parse( fin );
+    M_background_formation = FormationParser::parse( filepath.toStdString() );
     if ( ! M_background_formation )
     {
         std::cerr << "(EditData::openBackgroundConf) Failed to create a background formation. [" << filepath.toStdString() << "]" << std::endl;
