@@ -136,9 +136,10 @@ EditCanvas::paintEvent( QPaintEvent * )
 
     if ( Options::instance().autoFitMode() )
     {
-        double scale_w = this->width() / ( ServerParam::DEFAULT_PITCH_LENGTH + 10.0 );
-        double scale_h =  this->height() / ( ServerParam::DEFAULT_PITCH_WIDTH + 10.0 );
+        double scale_w = this->width() / ( ServerParam::DEFAULT_PITCH_LENGTH + 10.0 + 1.0 );
+        double scale_h =  this->height() / ( ServerParam::DEFAULT_PITCH_WIDTH + 10.0 + 1.0 );
         double scale_factor = qMin( scale_w, scale_h );
+        scale_factor = rint( scale_factor * 100.0 ) / 100.0;
 
         Options::instance().setFocusPoint( QPointF( 0.0, 0.0 ) );
         Options::instance().setViewScale( scale_factor );

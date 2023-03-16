@@ -187,7 +187,14 @@ EditData::backup( const QString & filepath )
     }
 
     QString backup_filepath = filepath;
-    if ( M_saved_datetime.isEmpty() )
+
+    if ( M_formation
+         && ! M_formation->version().empty() )
+    {
+        backup_filepath += QString( "_" );
+        backup_filepath += QString::fromStdString( M_formation->version() );
+    }
+    else if ( M_saved_datetime.isEmpty() )
     {
         backup_filepath += QString( "_" );
         backup_filepath += QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
@@ -214,24 +221,7 @@ EditData::backup( const QString & filepath )
 bool
 EditData::openConf( const QString & filepath )
 {
-    FormationParser::Ptr parser = FormationParser::create( filepath.toStdString() );
-
-    if ( ! parser )
-    {
-        std::cerr << "(EditData::openConf) Could not create the parser instance for [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    std::cerr << "(EditData::openConf) parser type = " << parser->name() << std::endl;
-
-    std::ifstream fin( filepath.toStdString().c_str() );
-    if ( ! fin.is_open() )
-    {
-        std::cerr << "(EditData::openConf) Failed to open formation file [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    M_formation = parser->parse( fin );
+    M_formation = FormationParser::parse( filepath.toStdString() );
     if ( ! M_formation )
     {
         std::cerr << "(EditData::openConf) Failed to read a formation [" << filepath.toStdString() << "]" << std::endl;
@@ -322,22 +312,7 @@ EditData::saveDataAs( const QString & filepath )
 bool
 EditData::openBackgroundConf( const QString & filepath )
 {
-    FormationParser::Ptr parser = FormationParser::create( filepath.toStdString() );
-
-    if ( ! parser )
-    {
-        std::cerr << "Could not create the parser instance for [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    std::ifstream fin( filepath.toStdString().c_str() );
-    if ( ! fin.is_open() )
-    {
-        std::cerr << "(openBackgroundConf) Failed to open formation file [" << filepath.toStdString() << "]" << std::endl;
-        return false;
-    }
-
-    M_background_formation = parser->parse( fin );
+    M_background_formation = FormationParser::parse( filepath.toStdString() );
     if ( ! M_background_formation )
     {
         std::cerr << "(EditData::openBackgroundConf) Failed to create a background formation. [" << filepath.toStdString() << "]" << std::endl;
@@ -395,11 +370,7 @@ EditData::saveConfAs( const QString & filepath )
     }
 
     M_saved_datetime = QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
-
-    if ( Options::instance().autoBackup() )
-    {
-        backup( M_filepath );
-    }
+    M_formation->setVersion( M_saved_datetime.toStdString() );
 
     std::ofstream fout( filepath.toStdString().c_str() );
     if ( ! fout.is_open() )
@@ -408,7 +379,6 @@ EditData::saveConfAs( const QString & filepath )
         return false;
     }
 
-    M_formation->setVersion( M_saved_datetime.toStdString() );
     if ( ! M_formation->print( fout ) )
     {
         return false;
@@ -416,6 +386,25 @@ EditData::saveConfAs( const QString & filepath )
 
     fout.flush();
     fout.close();
+
+    std::cerr << "Saved to  [" << filepath.toStdString() << "]" << std::endl;
+
+    if ( Options::instance().autoBackup() )
+    {
+        //backup( M_filepath );
+        QString backup_filepath = filepath;
+        backup_filepath += QString( "_" );
+        backup_filepath += QDateTime::currentDateTime().toString( QString( "yyyyMMdd-hhmmss" ) );
+        if ( ! QFile::copy( filepath, backup_filepath ) )
+        {
+            std::cerr << "Failed to backup the file [" << filepath.toStdString()  << "]"
+                      << std::endl;
+        }
+        else
+        {
+            std::cerr << "Copied to [" << backup_filepath.toStdString() << "]" << std::endl;
+        }
+    }
 
     M_conf_changed = false;
     M_filepath = filepath;

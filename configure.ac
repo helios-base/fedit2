@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(fedit2, [2020.08], akky@users.sourceforge.jp)
+AC_INIT(fedit2, [2023], akky@users.sourceforge.jp)
 
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
@@ -79,7 +79,7 @@ fi
 # ----------------------------------------------------------
 # check C++
 
-AX_CXX_COMPILE_STDCXX_14(noext)
+AX_CXX_COMPILE_STDCXX_17(noext)
 
 # ----------------------------------------------------------
 # check boost

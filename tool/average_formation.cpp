@@ -15,54 +15,23 @@ private:
 public:
 
 private:
-    Formation::Ptr openFormation( const char * filepath );
-
-    bool openBaseFormation( const char * filepath );
-    bool openTargetFormation( const char * filepath );
+    bool openBaseFormation( const std::string & filepath );
+    bool openTargetFormation( const std::string & filepath );
 
 public:
 
-    bool generate( const char * base_filepath,
-                   const char * target_filepath );
+    bool generate( const std::string & base_filepath,
+                   const std::string & target_filepath );
 };
 
 /*-------------------------------------------------------------------*/
 /*!
 
  */
-Formation::Ptr
-AverageConfGenerator::openFormation( const char * filepath )
-{
-    FormationParser::Ptr parser = FormationParser::create( filepath );
-
-    if ( ! parser )
-    {
-        std::cerr << "(openFormation) Could not create a parser for [" << filepath << "]" << std::endl;
-        return Formation::Ptr();
-    }
-
-
-    std::ifstream fin( filepath );
-
-    if ( ! fin )
-    {
-        return Formation::Ptr();
-    }
-
-    Formation::Ptr ptr = parser->parse( fin );
-
-    return ptr;
-
-}
-
-/*-------------------------------------------------------------------*/
-/*!
-
- */
 bool
-AverageConfGenerator::openBaseFormation( const char * filepath )
+AverageConfGenerator::openBaseFormation( const std::string & filepath )
 {
-    M_base_formation = openFormation( filepath );
+    M_base_formation = FormationParser::parse( filepath );
 
     if ( ! M_base_formation )
     {
@@ -79,9 +48,9 @@ AverageConfGenerator::openBaseFormation( const char * filepath )
 
  */
 bool
-AverageConfGenerator::openTargetFormation( const char * filepath )
+AverageConfGenerator::openTargetFormation( const std::string & filepath )
 {
-    M_target_formation = openFormation( filepath );
+    M_target_formation = FormationParser::parse( filepath );
 
     if ( ! M_target_formation )
     {
@@ -98,8 +67,8 @@ AverageConfGenerator::openTargetFormation( const char * filepath )
 
  */
 bool
-AverageConfGenerator::generate( const char * base_filepath,
-                                const char * target_filepath )
+AverageConfGenerator::generate( const std::string & base_filepath,
+                                const std::string & target_filepath )
 {
     if ( ! openBaseFormation( base_filepath )
          || ! openTargetFormation( target_filepath ) )

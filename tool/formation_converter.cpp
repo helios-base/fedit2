@@ -15,22 +15,7 @@ using namespace rcsc;
 Formation::Ptr
 openFormation( const char * filepath )
 {
-    FormationParser::Ptr parser = FormationParser::create( filepath );
-
-    if ( ! parser )
-    {
-        std::cerr << "(openFormation) Could not create a parser for [" << filepath << "]" << std::endl;
-        return Formation::Ptr();
-    }
-
-    std::ifstream fin( filepath );
-    if ( ! fin )
-    {
-        return Formation::Ptr();
-    }
-
-    Formation::Ptr ptr = parser->parse( fin );
-
+    Formation::Ptr ptr = FormationParser::parse( filepath );
     return ptr;
 
 }
@@ -61,7 +46,7 @@ main( int argc, char ** argv )
 
     std::string filepath = argv[1];
 
-    Formation::Ptr f = openFormation( filepath.c_str() );
+    Formation::Ptr f = FormationParser::parse( filepath );
 
     if ( ! f )
     {
