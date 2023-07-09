@@ -1,8 +1,13 @@
+fedit2 is no longer maintained.
+The feature of the formation editor is integrated into soccerwindow2.
+Please use https://github.com/helios-base/soccerwindow2 instead.
+
+
 ============
-�Ϥ����
+はじめに
 ============
-fedit2��RoboCup���å������ߥ�졼�����Τ���Υե����᡼����󥨥ǥ�
-���Ǥ���
+fedit2はRoboCupサッカーシミュレーションのためのフォーメーションエディ
+タです．
 
 - RoboCup Soccer Simulator Homepage: http://sserver.sf.net/
 - RoboCup Official Homepage: http://www.robocup.org/
@@ -12,7 +17,7 @@ fedit2��RoboCup���å������ߥ�졼�����Τ���Υե����᡼����󥨥ǥ�
 ==========
 REFERENCES
 ==========
-��ʸ���Ǥλ�����Ȥ��Ƥϰʲ������Ѥ���������
+論文等での参照先としては以下をご利用ください．
 
 Hidehisa Akiyama, Tomoharu Nakashima, HELIOS Base: An Open Source
 Package for the RoboCup Soccer 2D Simulation, In Sven Behnke, Manuela
@@ -36,68 +41,68 @@ Berlin, 2014.
 }
 
 ============
-�׵�饤�֥��
+要求ライブラリ
 ============
-fedit2-0.0.0 �ϰʲ��Υ饤�֥����׵ᤷ�ޤ�:
+fedit2-0.0.0 は以下のライブラリを要求します:
  - Qt-4.3 or later
  - boost-1.32 or later
  - librcsc-4.0.x
 
-fedit2�Υ��󥹥ȡ����Ϥ�����ˡ������Υ饤�֥�����˥��󥹥ȡ���
-���Ƥ����Ƥ���������
+fedit2のインストールを始める前に，これらのライブラリを先にインストール
+しておいてください．
 
 ==========
-���󥹥ȡ���
+インストール
 ==========
-�ѥå�������Ÿ�������ǥ��쥯�ȥ������ǰʲ��Υ��ޥ�ɤ�¹Ԥ��ޤ�:
+パッケージを展開したディレクトリ内部で以下のコマンドを実行します:
 
 ./configure
 make
 su
 make install
 
-���μ��ˤ�ä�ɬ�פʥХ��ʥ꤬�������졤������'/usr/local'�ʲ��إ�
-�󥹥ȡ��뤵��ޤ���'/usr/local/bin/fedit2'���¹ԥե�����Ǥ���
+この手順によって必要なバイナリが生成され，それらは'/usr/local'以下へイ
+ンストールされます．'/usr/local/bin/fedit2'が実行ファイルです．
 
-librcsc�򥷥��ƥ�Υǥ��쥯�ȥ�˥��󥹥ȡ��뤷�Ƥ��ʤ���硤�ʲ��Τ�
-����configure��'--with-librcsc'���ץ����ˤ�ä�librcsc�Υ��󥹥ȡ���
-�ѥ�����ꤷ�ʤ���Фʤ�ޤ���
+librcscをシステムのディレクトリにインストールしていない場合，以下のよ
+うにconfigureの'--with-librcsc'オプションによってlibrcscのインストール
+パスを指定しなければなりません．
 
 ./configure --with-librcsc=/path/to/librcsc/prefix
 
-���ξ�硤�Ķ��ѿ� LD_LIBRARY_PATH �����ꤹ��ɬ�פ����뤫�⤷��ޤ���
+この場合，環境変数 LD_LIBRARY_PATH も設定する必要があるかもしれません．
 
 =================
-���󥹥ȡ����������
+インストール時の設定
 =================
-fedit2��ӥ�ɤ������ˡ��ѥå������˴ޤޤ��configure������ץ�
-�Υ��ץ����ˤ�ä�������ѹ����뤳�Ȥ��Ǥ��ޤ���
+fedit2をビルドする前に，パッケージに含まれるconfigureスクリプト
+のオプションによって設定を変更することができます．
 
-�ǥե���Ȥ�����Ǥϡ�fedit2�ϰʲ��ξ��إ��󥹥ȡ��뤵��ޤ���
+デフォルトの設定では，fedit2は以下の場所へインストールされます．
 
-/usr/local/bin        �¹ԥե�����
+/usr/local/bin        実行ファイル
 
-/usr/local/share      �ǡ���
+/usr/local/share      データ
 
-�ǥե���Ȱ��֤�fedit2�򥤥󥹥ȡ��뤹�뤿��ˤϴ����Ը��¤�ɬ�פˤʤ�
-�ޤ������󥹥ȡ������configure������ץȤ�'--prefix'���ץ����ˤ��
-���ѹ��Ǥ��ޤ���configure�ǻ���Ǥ��륪�ץ����ξܺ٤ϡ�'configure
---help'��¹Ԥ��뤳�Ȥǻ��ȤǤ��ޤ���
+デフォルト位置へfedit2をインストールするためには管理者権限が必要になり
+ます．インストール場所はconfigureスクリプトの'--prefix'オプションによっ
+て変更できます．configureで指定できるオプションの詳細は，'configure
+--help'を実行することで参照できます．
 
 =============
-���󥤥󥹥ȡ���
+アンインストール
 =============
-�ѥå������򥳥�ѥ��뤷���ǥ��쥯�ȥ�� 'make uninstall'��¹Ԥ����
-����fedit2���ñ�˥��󥤥󥹥ȡ���Ǥ��ޤ����������ϥ��󥹥ȡ��뤵��
-�����٤ƤΥե�����������ޤ��������󥹥ȡ�����˺������줿�ǥ��쥯��
-��Ϻ������ޤ���
+パッケージをコンパイルしたディレクトリで 'make uninstall'を実行するだ
+けでfedit2を簡単にアンインストールできます．この操作はインストールされ
+たすべてのファイルを削除しますが，インストール時に作成されたディレクト
+リは削除されません．
 
 =======
-������ˡ
+使用方法
 =======
-fedit2��¹Ԥ���ˤϡ��ʲ��Υ��ޥ�ɤ�¹Ԥ��ޤ���
+fedit2を実行するには，以下のコマンドを実行します．
 
 `fedit2'
 
-�����������ξ�硤�¹ԥե����뤬�Ķ��ѿ�PATH�˴ޤޤ��ǥ��쥯�ȥ��¸
-�ߤ��ʤ���Фʤ�ޤ���
+ただし，この場合，実行ファイルが環境変数PATHに含まれるディレクトリに存
+在しなければなりません．
